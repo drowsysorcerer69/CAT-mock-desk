@@ -17,10 +17,28 @@ jobs:
           java-version: 17
       - name: Install
         run: npm install
+      - name: Signing key (same key every build so updates install over the old app)
+        run: |
+          if [ ! -f catmock.keystore ]; then
+            echo "catmock.keystore not found in the repository; creating a new one (updates will then not install over an older app)."
+            keytool -genkeypair -keystore catmock.keystore -alias catmock -keyalg RSA -keysize 2048 -validity 36500 -storepass catmock123 -keypass catmock123 -dname "CN=CAT Mock Desk, O=Personal"
+          fi
       - name: Create Android project
         run: |
           npx cap add android
-          node scripts/patch-gradle.js
+          cat > /tmp/patch-gradle.js <<'JSEOF'
+          const fs = require('fs');
+          const f = 'android/app/build.gradle';
+          let g = fs.readFileSync(f, 'utf8');
+          if (!g.includes('catmock.keystore')) {
+            const block = 'android {\n    signingConfigs {\n        debug {\n            storeFile file("${rootProject.projectDir}/../catmock.keystore")\n            storePassword "catmock123"\n            keyAlias "catmock"\n            keyPassword "catmock123"\n        }\n    }\n';
+            if (!/android\s*\{/.test(g)) throw new Error('android block not found');
+            g = g.replace(/android\s*\{\n?/, () => block);
+            fs.writeFileSync(f, g);
+          }
+          console.log('build.gradle ready');
+          JSEOF
+          node /tmp/patch-gradle.js
       - name: Copy app into Android project
         run: npx cap sync android
       - name: Build APK
