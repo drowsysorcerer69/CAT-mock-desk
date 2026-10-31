@@ -2,7 +2,7 @@
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>CAT Mock Desk</title>
 <meta name="claude:viewport-fit-sides" content="cover">
-<meta name="app-build" content="2026-10-31.02">
+<meta name="app-build" content="2026-10-31.03">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto+Flex:opsz,wght@8..144,400;8..144,500;8..144,600&family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Serif:wght@400;600&display=swap">
 <style>
 /* Layout: home/analysis are scrolling pages on a paper-blue ground; the exam is a fixed-height console (header, section bar, question pane + palette, action bar) modelled on the CAT screen. */
@@ -143,6 +143,15 @@ body:not(.exam-on) svg.chart{cursor:zoom-in}
 .pgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(500px,1fr));gap:8px}
 @media(max-width:560px){.pgrid{grid-template-columns:minmax(0,1fr)}}
 .more{position:relative;display:inline-block}
+.dueb{display:inline-grid;place-items:center;min-width:18px;height:18px;padding:0 5px;margin-left:4px;border-radius:99px;background:var(--bad);color:#fff;font:600 11px var(--f-ui)}
+@media (max-width:640px){
+  .top{display:block}
+  .homebar{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;width:100%;margin-top:12px}
+  .homebar .nm{grid-column:1/-1;width:100%;max-width:none}
+  .homebar>.btn,.homebar>.more,.homebar>.more>summary{width:100%;min-width:0}
+  .homebar .btn{justify-content:center;text-align:center;padding-inline:6px;white-space:nowrap;font-size:13px}
+  .homebar>.more>summary{display:flex;align-items:center;justify-content:center;white-space:nowrap}
+}
 .more[open]{z-index:60}
 .top{position:relative;z-index:50}
 .more>summary{list-style:none;cursor:pointer}
@@ -680,7 +689,7 @@ function renderHome(){
   const papers=store.papers.filter(p=>!p.derived),sets=store.papers.filter(p=>p.derived),atts=store.attempts;
   app.innerHTML=`<div class="wrap">
   <div class="top"><div class="brand">CAT Mock Desk<small>practice console</small></div>
-   <div class="row"><input class="nm" id="candname" value="${esc(candName())}" placeholder="Your name" aria-label="Your name" maxlength="40"><button class="btn sm pri" data-act="practice">DPP</button>${(()=>{const d=typeof dueCount==='function'?dueCount():0;return `<button class="btn sm" data-act="notebook">Mistakes${d?' ('+d+' due)':''}</button><button class="btn sm" data-act="weak">Weak areas</button>`})()}
+   <div class="row homebar"><input class="nm" id="candname" value="${esc(candName())}" placeholder="Your name" aria-label="Your name" maxlength="40"><button class="btn sm pri" data-act="practice">DPP</button>${(()=>{const d=typeof dueCount==='function'?dueCount():0;return `<button class="btn sm" data-act="notebook"${d?` title="${d} due for review"`:''}>Mistakes${d?` <span class="dueb">${d}</span>`:''}</button><button class="btn sm" data-act="weak">Weak areas</button>`})()}
     <details class="more"><summary class="btn sm" aria-label="More options">More ▾</summary><div class="menu"><button class="btn sm" data-act="syopen">Cloud sync${typeof SY!=='undefined'&&SY.refresh?' · on':''}</button>${window.Capacitor?'':`<button class="btn sm" data-act="fullscreen">${document.fullscreenElement?'Exit full screen':'Full screen'}</button>`}${window.desk?'<button class="btn sm" data-act="backup">Export backup</button><button class="btn sm" data-act="restore">Import backup</button>':''}<div class="sub" style="font-size:12px;padding:6px 12px">${window.desk?'History saved on this computer':window.Capacitor?'History saved on this phone':store.cloud?'History saved to your account':'History saved in this browser'}</div></div></details></div></div>
   ${sess&&store.papers.find(p=>p.id===sess.paperId)?`<div class="banner"><div><b>Test in progress:</b> ${esc(sess.title)}<div class="sub">Your answers and timers were saved when you left.</div></div><div class="row"><button class="btn pri" data-act="resume">Resume test</button><button class="btn" data-act="discard">Discard</button></div></div>`:''}
   ${(()=>{const d=typeof dueCount==='function'?dueCount():0;return d?`<div class="banner" style="background:var(--accent-soft);border-color:var(--accent);padding:8px 14px"><div><b>${d} mistake${d>1?'s are':' is'} due for review</b></div><div class="row"><button class="btn pri sm" data-act="nbstart" data-set="due">Practise them now</button><button class="btn sm" data-act="notebook">Open notebook</button></div></div>`:''})()}
@@ -2721,21 +2730,3 @@ document.addEventListener('click',e=>{const t=e.target.closest&&e.target.closest
 document.addEventListener('input',e=>{const t=e.target;if(t&&t.id&&t.id.startsWith('sy-')&&t.closest&&t.closest('#zoomov'))SYF[t.id]=t.value});
 document.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target&&e.target.id&&e.target.id.startsWith('sy-')){e.preventDefault();syAccount(false)}});
 document.addEventListener('visibilitychange',()=>{if(!document.hidden&&SY.refresh&&Date.now()-(SY.last||0)>60000)syncNow(true)});
-window.addEventListener('online',()=>{if(SY.refresh)syncNow(true)});
-setTimeout(()=>{if(SY.refresh)syncNow(true)},2500);
-</script>
-
-<script>
-'use strict';
-/* Android back button: close windows, go home, double-press to exit; never leaves a running test by accident */
-(function(){
-  const A=window.Capacitor&&Capacitor.Plugins&&Capacitor.Plugins.App;if(!A||!A.addListener)return;let last=0;
-  A.addListener('backButton',()=>{
-    if(document.getElementById('zoomov')){closeZoom();return}
-    if(V.view==='exam'){toast('Use the exam menu to submit or leave the test');return}
-    if(V.view!=='home'){go('home');return}
-    if(Date.now()-last<2000)A.exitApp();else{last=Date.now();toast('Press back again to exit')}
-  });
-})();
-</script>
-</body></html>
