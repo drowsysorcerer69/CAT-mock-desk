@@ -2,7 +2,7 @@
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>CAT Mock Desk</title>
 <meta name="claude:viewport-fit-sides" content="cover">
-<meta name="app-build" content="2026-10-31.03">
+<meta name="app-build" content="2026-11-01.01">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto+Flex:opsz,wght@8..144,400;8..144,500;8..144,600&family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Serif:wght@400;600&display=swap">
 <style>
 /* Layout: home/analysis are scrolling pages on a paper-blue ground; the exam is a fixed-height console (header, section bar, question pane + palette, action bar) modelled on the CAT screen. */
@@ -450,6 +450,86 @@ body:not(.exam-on) .wrap.enter>*:nth-child(n+4){animation-delay:.12s}
 .warnbox ul{margin:6px 0 0;padding-left:18px}
 .prog{height:8px;border-radius:99px;background:var(--surface2);overflow:hidden}
 .prog i{display:block;height:100%;background:var(--accent);border-radius:99px;transition:width .2s}
+
+/* ===== Phone / small-screen layout (does not affect wide screens) ===== */
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+*{-webkit-tap-highlight-color:transparent}
+button,summary,label,select,input{touch-action:manipulation}
+label.row{flex-wrap:nowrap;align-items:flex-start}
+label.row>input[type=checkbox]{margin-top:4px;flex:none;width:18px;height:18px}
+@media (max-width:860px){
+  .exam{overscroll-behavior:contain}
+  .xhead{padding:6px 10px;gap:6px 10px;flex-wrap:nowrap}
+  .xhead .ttl{flex:1;min-width:0;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .xhead .row{flex:none;gap:6px;flex-wrap:nowrap}
+  .xhead .row>span:not(.timer){display:none}
+  .xhead .btn{padding:4px 10px;min-height:32px}
+  .xhead .timer{font-size:14px;padding:4px 9px}
+  .xsec{padding:5px 10px;gap:6px}
+  .xsec .tab{padding:6px 12px;min-height:34px}
+  .xsec .info{display:none}
+  .exam .xqhead{padding:6px 12px;font-size:13px;gap:2px 10px}
+  .xqhead .mk{font-size:11.5px}
+  .xside{display:contents}
+  .xside .who,.xside .palhead{display:none}
+  .xside .pal{flex:none;order:-1;position:sticky;top:0;z-index:6;display:flex;flex-wrap:nowrap;overflow-x:auto;overflow-y:hidden;gap:8px;padding:8px 10px;background:var(--surface2);border-bottom:1px solid var(--line);scrollbar-width:none;-webkit-overflow-scrolling:touch;align-content:unset}
+  .xside .pal::-webkit-scrollbar{display:none}
+  .xside .pal .pb{flex:none;width:38px;height:34px}
+  .xside .pal .pb.mk,.xside .pal .pb.mkans{width:36px;height:36px}
+  .xside .xsubmit{order:2;padding:10px 12px;background:var(--surface2);border-top:1px solid var(--line)}
+  .xside .legend{order:3;padding:10px 12px;background:var(--surface2);font-size:11.5px}
+  .xq{order:0}
+  .exam .xpass{flex:none!important;height:auto;max-height:34vh;overflow:auto;padding:10px 12px;font-size:14.5px;line-height:1.65}
+  .exam .xqa{padding:12px 12px 16px}
+  .exam .qtext{font-size:16px;line-height:1.6;margin-bottom:12px}
+  .exam .opt{padding:10px;font-size:15px;line-height:1.5;margin-bottom:5px;gap:10px;min-height:46px}
+  .exam .opt input{width:19px;height:19px;margin-top:3px;flex:none}
+  .xhead [data-act=fullscreen]{display:none}
+  .keys button{padding:13px 0;font-size:16px}
+  .xact{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:8px 10px calc(8px + env(safe-area-inset-bottom,0px))}
+  .xact .sp{display:none}
+  .exam .xact .btn{padding:8px 6px;min-height:44px;font-size:13.5px;width:100%;white-space:normal;line-height:1.2}
+  .exam .xact .btn.sv{padding:8px 6px}
+}
+@media (max-width:640px){
+  body:not(.exam-on){padding-left:max(10px,env(safe-area-inset-left,0px));padding-right:max(10px,env(safe-area-inset-right,0px))}
+  .wrap{padding-block:6px 28px}
+  body:not(.exam-on) .top{padding-block:4px 12px;gap:6px 10px;justify-content:flex-start}
+  body:not(.exam-on) .brand{font-size:19px}
+  body:not(.exam-on) .brand::before{width:26px;height:26px;margin-right:9px;border-radius:9px 9px 9px 3px}
+  body:not(.exam-on) .brand small{font-size:11px;padding:2px 8px;margin-left:8px}
+  .top>.row:not(.homebar){width:100%;gap:8px}
+  body:not(.exam-on) .panel{border-radius:22px;padding:16px 14px}
+  body:not(.exam-on) .panel h2{font-size:19px}
+  .stack{gap:10px}
+  body:not(.exam-on) .btn{padding:8px 14px}
+  body:not(.exam-on) .btn.sm{padding:4px 12px;min-height:36px}
+  .tabs{flex-wrap:nowrap;overflow-x:auto;gap:6px;margin:10px -2px 10px;padding:2px;scrollbar-width:none}
+  .tabs::-webkit-scrollbar{display:none}
+  body:not(.exam-on) .tabs button{flex:none;padding:8px 14px;white-space:nowrap}
+  body:not(.exam-on) .seg{display:flex;width:100%}
+  body:not(.exam-on) .seg button{flex:1 1 0;min-width:0;padding:8px 6px;font-size:13px}
+  .tiles{grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:8px}
+  body:not(.exam-on) .tile{padding:10px 12px;border-radius:16px}
+  .tile b{font-size:19px}
+  .score{font-size:44px}
+  .hist{font-size:12.5px}
+  body:not(.exam-on) .hist th,body:not(.exam-on) .hist td{padding:8px 6px}
+  .bar{min-width:56px}
+  .field{min-width:0;flex:1 1 140px}
+  body:not(.exam-on) .field input,body:not(.exam-on) .field select,body:not(.exam-on) select.tag{min-height:42px}
+  body:not(.exam-on) .nm{min-height:42px}
+  .prow{padding:10px 12px;gap:8px}
+  .prow .pmain .t{white-space:normal;overflow:visible;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  .prow{grid-template-columns:minmax(0,1fr)}
+  .prow .pbtn{justify-content:flex-start}
+  body:not(.exam-on) .paper{padding:12px 14px}
+  body:not(.exam-on) .drop{padding:18px 12px;border-radius:20px}
+  body:not(.exam-on) textarea.paste,body:not(.exam-on) pre.prompt{border-radius:14px;padding:12px}
+  .dlg{padding:16px;max-height:92vh}
+  .modal{padding:10px}
+}
+@media (max-width:640px) and (max-height:520px){.xside .xsubmit{padding:6px 12px}}
 </style>
 </head><body>
 <div id="app"></div>
@@ -877,6 +957,9 @@ function renderExam(){
    ${CALC.open?calcHtml():''}
    ${X.modal?modalHtml():''}
   </div>`;
+
+  const pl=app.querySelector('.pal'),cu=pl&&pl.querySelector('.cur');
+  if(pl&&cu&&pl.scrollWidth>pl.clientWidth)pl.scrollLeft=cu.offsetLeft-(pl.clientWidth-cu.offsetWidth)/2;
 }
 function fbHtml(q,s){
   const g=s.ans,ok=isCorrect(q,g);
@@ -2730,3 +2813,21 @@ document.addEventListener('click',e=>{const t=e.target.closest&&e.target.closest
 document.addEventListener('input',e=>{const t=e.target;if(t&&t.id&&t.id.startsWith('sy-')&&t.closest&&t.closest('#zoomov'))SYF[t.id]=t.value});
 document.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target&&e.target.id&&e.target.id.startsWith('sy-')){e.preventDefault();syAccount(false)}});
 document.addEventListener('visibilitychange',()=>{if(!document.hidden&&SY.refresh&&Date.now()-(SY.last||0)>60000)syncNow(true)});
+window.addEventListener('online',()=>{if(SY.refresh)syncNow(true)});
+setTimeout(()=>{if(SY.refresh)syncNow(true)},2500);
+</script>
+
+<script>
+'use strict';
+/* Android back button: close windows, go home, double-press to exit; never leaves a running test by accident */
+(function(){
+  const A=window.Capacitor&&Capacitor.Plugins&&Capacitor.Plugins.App;if(!A||!A.addListener)return;let last=0;
+  A.addListener('backButton',()=>{
+    if(document.getElementById('zoomov')){closeZoom();return}
+    if(V.view==='exam'){toast('Use the exam menu to submit or leave the test');return}
+    if(V.view!=='home'){go('home');return}
+    if(Date.now()-last<2000)A.exitApp();else{last=Date.now();toast('Press back again to exit')}
+  });
+})();
+</script>
+</body></html>
