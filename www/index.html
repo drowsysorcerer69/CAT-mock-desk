@@ -2,7 +2,7 @@
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>CAT Mock Desk</title>
 <meta name="claude:viewport-fit-sides" content="cover">
-<meta name="app-build" content="2026-11-01.02">
+<meta name="app-build" content="2026-11-02.01">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto+Flex:opsz,wght@8..144,400;8..144,500;8..144,600&family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Serif:wght@400;600&display=swap">
 <style>
 /* Layout: home/analysis are scrolling pages on a paper-blue ground; the exam is a fixed-height console (header, section bar, question pane + palette, action bar) modelled on the CAT screen. */
@@ -75,7 +75,7 @@ button.chip{cursor:pointer}
 .tablewrap{overflow-x:auto}
 .addgrid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px}
 @media(max-width:760px){.addgrid{grid-template-columns:minmax(0,1fr)}}
-.cattiles{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-top:18px}
+.cattiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin-top:18px}
 @media(max-width:860px){.cattiles{grid-template-columns:minmax(0,1fr)}}
 .cattile{display:flex;flex-direction:column;gap:8px;text-align:left;border:0;background:var(--tile);color:var(--ink);border-radius:28px;padding:22px 24px;min-height:190px;transition:transform .15s,box-shadow .2s;position:relative}
 .cattile:hover{transform:translateY(-2px);box-shadow:var(--m3-shadow2,0 6px 18px rgba(0,0,0,.12))}
@@ -707,7 +707,8 @@ function render(){({home:renderHome,instr:renderInstr,exam:renderExam,analysis:r
 const AREAS=['VARC','DILR','QA'],AREA_LABEL={VARC:'VA / RC',DILR:'DILR',QA:'Quant'};
 const CATS={full:{name:'Full syllabus mock',desc:'Complete CAT papers with all three sections, timed like the real exam.',tint:'--accent-soft'},
   sectional:{name:'Sectional mock',desc:'One section at a time, with its own 40 minute clock.',tint:'--good-soft'},
-  topic:{name:'Topic-wise mock',desc:'Short drills on one area: VA / RC, DILR or Quant.',tint:'--mark-soft'}};
+  topic:{name:'Topic-wise mock',desc:'Short drills on one area: VA / RC, DILR or Quant.',tint:'--mark-soft'},
+  drill:{name:'Drill',desc:'Untimed practice: add any paper and solve it at your own pace, with full analysis.',tint:'--warn-soft'}};
 function areaOfName(n){n=String(n||'');
   if(/varc|verbal|reading|\brc\b|\bva\b/i.test(n))return'VARC';
   if(/dilr|lrdi|data|logic|interpret/i.test(n))return'DILR';
@@ -733,6 +734,7 @@ function paperCat(p){
   return p.sections.length>1?'full':'sectional';
 }
 const attPaper=a=>store.papers.find(x=>x.id===a.paperId);
+const isDrill=id=>{const p=store.papers.find(x=>x.id===id);return !!p&&paperCat(p)==='drill'};
 function attCat(a){const p=attPaper(a);return p?paperCat(p):((a.secs&&a.secs.length>1)?'full':'sectional')}
 function attArea(a){const p=attPaper(a);return p?paperArea(p):(areaOfName(a.qs[0]&&a.qs[0].secName)||'')}
 function attPct(a,area){
@@ -761,7 +763,7 @@ function subjectCard(area,pts,cats){
   const last=pts[pts.length-1],avg=pts.length?pts.reduce((s,x)=>s+x.pct,0)/pts.length:0,best=pts.length?Math.max(...pts.map(x=>x.pct)):0;
   return `<div class="subj${pts.length?'':' empty'}"><div class="row" style="justify-content:space-between;align-items:baseline"><b style="font-size:15px">${AREA_LABEL[area]||area}</b>${last?`<span class="num" style="font:600 22px var(--f-mono)">${Math.round(last.pct)}%</span>`:''}</div>
    ${subjectSvg(pts,AREA_LABEL[area]||area)}
-   <div class="sub" style="font-size:12px">${pts.length?`${pts.length} test${pts.length>1?'s':''} · average ${Math.round(avg)}% · best ${Math.round(best)}% · accuracy ${Math.round(last.acc)}% last time`:'Attempt a full or sectional mock to see this graph.'}</div></div>`;
+   <div class="sub" style="font-size:12px">${pts.length?`${pts.length} test${pts.length>1?'s':''} · average ${Math.round(avg)}% · best ${Math.round(best)}% · accuracy ${Math.round(last.acc)}% last time`:'Attempt a paper to see this graph.'}</div></div>`;
 }
 
 /* ---------- home ---------- */
@@ -783,7 +785,7 @@ function renderHome(){
     <details class="more"><summary class="btn sm" aria-label="More options">More ▾</summary><div class="menu"><button class="btn sm" data-act="syopen">Cloud sync${typeof SY!=='undefined'&&SY.refresh?' · on':''}</button>${window.Capacitor?'':`<button class="btn sm" data-act="fullscreen">${document.fullscreenElement?'Exit full screen':'Full screen'}</button>`}${window.desk?'<button class="btn sm" data-act="backup">Export backup</button><button class="btn sm" data-act="restore">Import backup</button>':''}<div class="sub" style="font-size:12px;padding:6px 12px">${window.desk?'History saved on this computer':window.Capacitor?'History saved on this phone':store.cloud?'History saved to your account':'History saved in this browser'}</div></div></details></div></div>
   ${sess&&store.papers.find(p=>p.id===sess.paperId)?`<div class="banner"><div><b>Test in progress:</b> ${esc(sess.title)}<div class="sub">Your answers and timers were saved when you left.</div></div><div class="row"><button class="btn pri" data-act="resume">Resume test</button><button class="btn" data-act="discard">Discard</button></div></div>`:''}
   ${(()=>{const d=typeof dueCount==='function'?dueCount():0;return d?`<div class="banner" style="background:var(--accent-soft);border-color:var(--accent);padding:8px 14px"><div><b>${d} mistake${d>1?'s are':' is'} due for review</b></div><div class="row"><button class="btn pri sm" data-act="nbstart" data-set="due">Practise them now</button><button class="btn sm" data-act="notebook">Open notebook</button></div></div>`:''})()}
-  <div class="cattiles" style="margin-top:0">${['full','sectional','topic'].map(c=>{
+  <div class="cattiles" style="margin-top:0">${['full','sectional','topic','drill'].map(c=>{
     const ps=store.papers.filter(p=>paperCat(p)===c),as=atts.filter(x=>attCat(x)===c),avg=as.length?Math.round(as.reduce((s,x)=>s+(x.max?x.score/x.max*100:0),0)/as.length):null;
     return `<button class="cattile" style="--tile:var(${CATS[c].tint});min-height:0;padding:16px 20px" data-act="opencat" data-c="${c}"><span class="ct-name">${CATS[c].name}</span>
       <span class="ct-stats"><span><b class="num">${ps.length}</b> paper${ps.length===1?'':'s'}</span><span><b class="num">${as.length}</b> attempt${as.length===1?'':'s'}</span>${avg!=null?`<span>avg <b class="num">${avg}%</b></span>`:''}</span><span class="ct-go">Open ›</span></button>`}).join('')}</div>
@@ -791,7 +793,7 @@ function renderHome(){
    <div class="subjgrid">${AREAS.map(a=>subjectCard(a,subjectPoints(a,['full','sectional']))).join('')}</div></div>
   <div class="panel stack" style="margin-top:14px;gap:10px">
     <div class="row" style="justify-content:space-between;align-items:center"><h2 style="margin:0">Add a practice paper</h2>
-     <div class="row" style="gap:8px"><span class="sub" style="font-size:12px">Add it as</span><div class="seg">${[['auto','Auto'],['full','Full syllabus'],['sectional','Sectional'],['topic','Topic-wise']].map(([k,l])=>`<button class="${(V.addCat||'auto')===k?'on':''}" data-act="addcat" data-v="${k}">${l}</button>`).join('')}</div></div></div>
+     <div class="row" style="gap:8px"><span class="sub" style="font-size:12px">Add it as</span><div class="seg">${[['auto','Auto'],['full','Full syllabus'],['sectional','Sectional'],['topic','Topic-wise'],['drill','Drill']].map(([k,l])=>`<button class="${(V.addCat||'auto')===k?'on':''}" data-act="addcat" data-v="${k}">${l}</button>`).join('')}</div></div></div>
     <div class="dropbar drop" id="drop"><span class="grow">Drop a PDF or JSON file here, or</span><button class="btn pri sm" data-act="pick">Choose file</button><button class="btn sm" data-act="importpdf">Import PDF or text…</button><button class="btn sm" data-act="sample">Try a sample paper</button><input type="file" id="file" accept=".pdf,.json,.txt,application/pdf,application/json,text/plain" multiple hidden></div>
     ${V.msg?`<div class="msg ${V.msg.t}" style="white-space:pre-wrap">${esc(V.msg.m)}</div>`:''}
     <details><summary>Paste text or JSON, and the AI prompt</summary>
@@ -1229,8 +1231,8 @@ const acts={
   copyprompt(){copyText(AI_PROMPT)},
   resume(){const s=LS.get('cmd.session');const p=s&&paperById(s.paperId);if(!p)return;startExam(p,s.mode,s)},
   discard(t){if(!armed(t,'Confirm discard?'))return;LS.del('cmd.session');renderHome()},
-  start(t){V.paperId=t.dataset.id;V.mode='cat';V.scope='all';V.tmv=null;V.untimed=false;V.instant=false;go('instr')},
-  retake(t){V.paperId=t.dataset.id;V.mode='cat';V.scope='all';V.tmv=null;V.untimed=false;V.instant=false;go('instr')},
+  start(t){V.paperId=t.dataset.id;const dr=isDrill(t.dataset.id);V.mode=dr?'free':'cat';V.scope='all';V.tmv=null;V.untimed=dr;V.instant=false;go('instr')},
+  retake(t){V.paperId=t.dataset.id;const dr=isDrill(t.dataset.id);V.mode=dr?'free':'cat';V.scope='all';V.tmv=null;V.untimed=dr;V.instant=false;go('instr')},
   mode(t){V.mode=t.dataset.m;renderInstr()},
   begin(){
     let p=paperById(V.paperId);if(!p)return;let off=0;
@@ -1990,7 +1992,7 @@ function renderReview(){
   <div class="stack">
   <div class="panel stack">
    <div class="imf"><label style="flex:1;min-width:240px">Paper name<input data-imf="title" value="${esc(d.title)}"></label></div>
-   <div><div class="sub" style="font-size:12px;margin-bottom:4px">Add it as</div><div class="seg">${[['auto','Auto'],['full','Full syllabus'],['sectional','Sectional'],['topic','Topic-wise']].map(([k,l])=>`<button class="${(V.addCat||'auto')===k?'on':''}" data-act="addcat" data-v="${k}">${l}</button>`).join('')}</div></div>
+   <div><div class="sub" style="font-size:12px;margin-bottom:4px">Add it as</div><div class="seg">${[['auto','Auto'],['full','Full syllabus'],['sectional','Sectional'],['topic','Topic-wise'],['drill','Drill']].map(([k,l])=>`<button class="${(V.addCat||'auto')===k?'on':''}" data-act="addcat" data-v="${k}">${l}</button>`).join('')}</div></div>
    <div class="imf">${d.sections.map((s,i)=>`<label style="flex:1;min-width:200px">Section ${i+1} name<input data-imsec="${i}:name" value="${esc(s.name)}"></label><label style="width:110px">Minutes<input type="number" min="1" data-imsec="${i}:minutes" value="${s.minutes}"></label>`).join('')}</div>
    <div class="sub">${d.questions.length} questions found: ${d.questions.filter(q=>q.type==='mcq').length} multiple choice, ${d.questions.filter(q=>q.type==='tita').length} type-in. ${d.hadKey?'An answer key was found.':'No answer key was found. Paste one below or fill answers in.'}</div>
    ${IM.note?`<div class="msg info">${esc(IM.note)}</div>`:''}
@@ -2297,7 +2299,7 @@ function catRow(p){
    <div class="sub" style="font-size:12px;margin-top:2px">${meta} · ${a.length?a.length+' attempt'+(a.length>1?'s':'')+' · last '+r1(last.score)+'/'+last.max:'not attempted'}</div></div>
    <div class="pbtn"><button class="btn pri sm" data-act="start" data-id="${p.id}">Start</button>${a.length?`<button class="btn sm" data-act="paperan" data-id="${p.id}">Analysis</button>`:''}
     <details class="more"><summary class="btn sm" aria-label="More actions">⋯</summary><div class="menu"><button class="btn sm" data-act="rename" data-id="${p.id}">Rename</button><button class="btn sm" data-act="logpast" data-id="${p.id}">Log past attempt</button><button class="btn sm danger" data-act="delpaper" data-id="${p.id}">Delete</button></div></details></div>
-   <div class="pctl"><label class="sub" style="display:flex;gap:6px;align-items:center;font-size:12px">Category <select class="tag" data-mvc="${p.id}">${opt('full','Full syllabus',c)}${opt('sectional','Sectional',c)}${opt('topic','Topic-wise',c)}</select></label>
+   <div class="pctl"><label class="sub" style="display:flex;gap:6px;align-items:center;font-size:12px">Category <select class="tag" data-mvc="${p.id}">${opt('full','Full syllabus',c)}${opt('sectional','Sectional',c)}${opt('topic','Topic-wise',c)}${opt('drill','Drill',c)}</select></label>
    ${c!=='full'?`<label class="sub" style="display:flex;gap:6px;align-items:center;font-size:12px">Area <select class="tag" data-mva="${p.id}">${opt('','Auto ('+(AREA_LABEL[paperArea(Object.assign({},p,{area:''}))]||'unsorted')+')',ar)}${AREAS.map(x=>opt(x,AREA_LABEL[x],ar)).join('')}</select></label>`:''}</div></div>`;
 }
 function catGraphs(c,area){
@@ -2305,7 +2307,7 @@ function catGraphs(c,area){
     const tot=catAttempts('full','all').slice().sort((x,y)=>x.date-y.date).map(a=>({d:a.date,pct:a.max?a.score/a.max*100:0,acc:a.accuracy,title:a.title}));
     return `<div class="subjgrid g4" style="margin:6px 0 14px">${subjectCard('Total marks',tot)}${AREAS.map(x=>subjectCard(x,subjectPoints(x,['full']))).join('')}</div>`;
   }
-  const areas=(c==='sectional'&&area==='all')?AREAS:[area];
+  const areas=(c!=='topic'&&area==='all')?AREAS:[area];
   return `<div class="subjgrid" style="margin:6px 0 14px;${areas.length===1?'grid-template-columns:minmax(0,520px)':''}">${areas.map(x=>subjectCard(x,subjectPoints(x,[c]))).join('')}</div>`;
 }
 function catAreas(c){return c==='topic'?AREAS:['all'].concat(AREAS)}
@@ -2333,7 +2335,9 @@ function renderCat(){
       const t=x.topic||'General',r=T[t]||(T[t]={t,n:0,c:0,w:0,lost:0,time:0,tn:0});
       const got=typeof x.got==='number'?x.got:0;r.n++;if(x.status==='correct')r.c++;else if(x.status==='wrong')r.w++;r.lost+=Math.max(0,(x.marks||0)-got);if(!a.noTime&&x.time){r.time+=x.time;r.tn++}}));
     const rows=Object.values(T).sort((a,b)=>a.c/a.n-b.c/b.n||b.lost-a.lost);
-    body=as.length?`<div class="tiles" style="margin-top:0"><div class="tile"><b>${as.length}</b><span>attempts</span></div><div class="tile"><b>${Math.round(avg)}%</b><span>average score</span></div><div class="tile"><b>${Math.round(Math.max(...pcts))}%</b><span>best score</span></div><div class="tile"><b>${Math.round(as.reduce((s,a)=>s+a.accuracy,0)/as.length)}%</b><span>average accuracy</span></div></div>
+    const dq=as.reduce((s,a)=>s+a.qs.filter(x=>x.status!=='unseen').length,0),dt=as.filter(a=>!a.noTime).reduce((s,a)=>s+a.qs.reduce((u,x)=>u+(x.time||0),0),0),dn=as.filter(a=>!a.noTime).reduce((s,a)=>s+a.qs.filter(x=>x.status!=='unseen').length,0);
+    const drillTiles=c==='drill'?`<div class="tile"><b>${dq}</b><span>questions practised</span></div><div class="tile"><b>${dn?fmtT0(dt/dn):'–'}</b><span>avg time / question</span></div>`:'';
+    body=as.length?`<div class="tiles" style="margin-top:0"><div class="tile"><b>${as.length}</b><span>attempts</span></div>${drillTiles}<div class="tile"><b>${Math.round(avg)}%</b><span>average score</span></div><div class="tile"><b>${Math.round(Math.max(...pcts))}%</b><span>best score</span></div><div class="tile"><b>${Math.round(as.reduce((s,a)=>s+a.accuracy,0)/as.length)}%</b><span>average accuracy</span></div></div>
      ${as.length>1?`<h3 style="margin-top:18px">Score trend</h3>${trendSvg(as)}`:''}
      <h3 style="margin-top:18px">Topics, weakest first</h3><div class="tablewrap"><table class="hist"><thead><tr><th>Topic</th><th>Questions</th><th>Accuracy</th><th>Marks lost</th><th>Avg time</th></tr></thead><tbody>${rows.map(r=>`<tr><td>${esc(r.t)}</td><td class="num">${r.n}</td><td class="num ${r.c/r.n<.5?'bad':(r.c/r.n>=.75?'good':'')}">${pct(r.c,r.n)}%</td><td class="num">${r1(r.lost)}</td><td class="num">${r.tn?fmtT0(r.time/r.tn):'–'}</td></tr>`).join('')}</tbody></table></div>
      <h3 style="margin-top:18px">Attempts</h3><div class="tablewrap" style="max-height:360px;overflow:auto"><table class="hist"><thead><tr><th>Paper</th><th>Date</th><th>Score</th><th>Accuracy</th><th></th></tr></thead><tbody>${as.map(a=>`<tr><td>${esc(a.title)}${a.imported?' <span class="chip">logged</span>':''}</td><td>${fmtDate(a.date)}</td><td class="num">${r1(a.score)}/${a.max}</td><td class="num">${a.accuracy}%</td><td><div class="row"><button class="btn sm" data-act="analysis" data-id="${a.id}">Analysis</button><button class="btn sm danger" data-act="delatt" data-id="${a.id}">Delete</button></div></td></tr>`).join('')}</tbody></table></div>`
@@ -2408,7 +2412,7 @@ function topicQuestionsHtml(A,topic,sub){
   const seen=new Set(),P=attPaper(A);
   const mine=A.qs.filter(match);mine.forEach(x=>seen.add(keyOf(A,x)));
   let h='<div class="tq">';
-  h+=mine.length?paperGroup('This paper · '+A.title,({full:'Full syllabus',sectional:'Sectional',topic:'Topic-wise'}[attCat(A)]||''),mine.map(x=>({B:A,PB:P,x})),true):'<div class="pg"><div class="pgh cur"><b>This paper · '+esc(A.title)+'</b><span class="sub">no questions from this topic</span></div></div>';
+  h+=mine.length?paperGroup('This paper · '+A.title,({full:'Full syllabus',sectional:'Sectional',topic:'Topic-wise',drill:'Drill'}[attCat(A)]||''),mine.map(x=>({B:A,PB:P,x})),true):'<div class="pg"><div class="pgh cur"><b>This paper · '+esc(A.title)+'</b><span class="sub">no questions from this topic</span></div></div>';
   const by=new Map();
   [...store.attempts].filter(B=>B.id!==A.id).sort((a,b)=>b.date-a.date).forEach(B=>{
     const PB=attPaper(B);
@@ -2418,7 +2422,7 @@ function topicQuestionsHtml(A,topic,sub){
   const tot=[...by.values()].reduce((t,g)=>t+g.items.length,0);
   if(tot){
     h+=`<div class="tqs tqbar"><span class="grow">Same topic in your other papers (${tot})</span><button class="btn sm" data-act="pgall" data-o="0">Collapse all</button><button class="btn sm" data-act="pgall" data-o="1">Expand all</button></div>`;
-    h+=[...by.values()].slice(0,20).map(g=>paperGroup(g.B.title,({full:'Full syllabus',sectional:'Sectional',topic:'Topic-wise'}[attCat(g.B)]||'')+' · '+fmtDate(g.B.date).split(',').slice(0,2).join(','),g.items.slice(0,80),false)).join('');
+    h+=[...by.values()].slice(0,20).map(g=>paperGroup(g.B.title,({full:'Full syllabus',sectional:'Sectional',topic:'Topic-wise',drill:'Drill'}[attCat(g.B)]||'')+' · '+fmtDate(g.B.date).split(',').slice(0,2).join(','),g.items.slice(0,80),false)).join('');
   }else h+='<div class="sub" style="margin-top:10px">No other attempted paper has questions from this topic yet.</div>';
   return h+'</div>';
 }
