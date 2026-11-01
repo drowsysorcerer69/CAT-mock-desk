@@ -2,7 +2,7 @@
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>CAT Mock Desk</title>
 <meta name="claude:viewport-fit-sides" content="cover">
-<meta name="app-build" content="2026-11-01.01">
+<meta name="app-build" content="2026-11-01.02">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto+Flex:opsz,wght@8..144,400;8..144,500;8..144,600&family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Serif:wght@400;600&display=swap">
 <style>
 /* Layout: home/analysis are scrolling pages on a paper-blue ground; the exam is a fixed-height console (header, section bar, question pane + palette, action bar) modelled on the CAT screen. */
@@ -528,6 +528,16 @@ label.row>input[type=checkbox]{margin-top:4px;flex:none;width:18px;height:18px}
   body:not(.exam-on) textarea.paste,body:not(.exam-on) pre.prompt{border-radius:14px;padding:12px}
   .dlg{padding:16px;max-height:92vh}
   .modal{padding:10px}
+}
+@media (max-width:640px){
+  body:not(.exam-on){padding-left:max(14px,env(safe-area-inset-left,0px));padding-right:max(14px,env(safe-area-inset-right,0px))}
+  .top>.row:not(.homebar){margin-top:6px}
+  body:not(.exam-on) .rev>summary{padding:12px 18px;gap:6px 12px}
+  body:not(.exam-on) .revbody{padding:8px 18px 16px}
+  body:not(.exam-on) .rev{margin-bottom:8px}
+  .zoombox{padding:14px 12px 16px;border-radius:22px}
+  .zoombox .pgh{padding-inline:14px}
+  .tq .tqh,.tq .tqs{padding-inline:4px}
 }
 @media (max-width:640px) and (max-height:520px){.xside .xsubmit{padding:6px 12px}}
 </style>
