@@ -2,7 +2,7 @@
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>CAT Mock Desk</title>
 <meta name="claude:viewport-fit-sides" content="cover">
-<meta name="app-build" content="2026-11-02.01">
+<meta name="app-build" content="2026-11-04.05">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto+Flex:opsz,wght@8..144,400;8..144,500;8..144,600&family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Serif:wght@400;600&display=swap">
 <style>
 /* Layout: home/analysis are scrolling pages on a paper-blue ground; the exam is a fixed-height console (header, section bar, question pane + palette, action bar) modelled on the CAT screen. */
@@ -143,6 +143,9 @@ body:not(.exam-on) svg.chart{cursor:zoom-in}
 .pgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(500px,1fr));gap:8px}
 @media(max-width:560px){.pgrid{grid-template-columns:minmax(0,1fr)}}
 .more{position:relative;display:inline-block}
+.wrap>*:has(details.more[open]){position:relative;z-index:40}
+.more[open]{z-index:41}
+.more .menu{z-index:42;background:var(--surface)}
 .dueb{display:inline-grid;place-items:center;min-width:18px;height:18px;padding:0 5px;margin-left:4px;border-radius:99px;background:var(--bad);color:#fff;font:600 11px var(--f-ui)}
 @media (max-width:640px){
   .top{display:block}
@@ -451,6 +454,22 @@ body:not(.exam-on) .wrap.enter>*:nth-child(n+4){animation-delay:.12s}
 .prog{height:8px;border-radius:99px;background:var(--surface2);overflow:hidden}
 .prog i{display:block;height:100%;background:var(--accent);border-radius:99px;transition:width .2s}
 
+.dt{border-collapse:collapse;white-space:normal;margin:10px 0;font:14px/1.45 var(--f-ui);background:var(--surface);border-radius:8px;overflow:hidden;min-width:min(100%,320px)}
+.dt th,.dt td{border:1px solid var(--line);padding:7px 11px;text-align:left;vertical-align:top}
+.dt th{background:var(--surface2);font-weight:600;color:var(--ink);white-space:nowrap}
+.dt td{color:var(--ink)}
+.dt tbody tr:nth-child(even) td{background:color-mix(in srgb,var(--surface2) 45%,transparent)}
+.dtw{margin:4px 0}
+.rev .qt .fr,.rev .qt .m{vertical-align:middle}
+.rev{min-width:0;max-width:100%}
+.rev>summary{min-width:0}
+.revbody{min-width:0;overflow-wrap:anywhere}
+.revbody>*{min-width:0;max-width:100%}
+.qtext,.xpass,.opt span{overflow-wrap:anywhere}
+.tq{min-width:0;max-width:100%}
+/* expanded question lists inside tables must never widen the table */
+.tqin{width:0;min-width:100%;max-width:100%;box-sizing:border-box}
+.tqin .rev,.tqin .pg,.tqin .tq{min-width:0;max-width:100%}
 /* ===== Phone / small-screen layout (does not affect wide screens) ===== */
 html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
 *{-webkit-tap-highlight-color:transparent}
@@ -734,6 +753,38 @@ function paperCat(p){
   return p.sections.length>1?'full':'sectional';
 }
 const attPaper=a=>store.papers.find(x=>x.id===a.paperId);
+/* ---------- percentile table per paper: you give marks vs percentile, attempts are interpolated ---------- */
+function parsePct(txt){
+  const rows=[],bad=[];
+  String(txt||'').split(/\n|;/).forEach(l=>{l=l.trim();if(!l)return;
+    const n=l.replace(/%/g,'').match(/-?\d+(?:\.\d+)?/g);
+    if(!n||n.length<2){bad.push(l);return}
+    const m=+n[0],p=+n[1];if(!(p>=0&&p<=100)){bad.push(l);return}
+    rows.push([m,p]);
+  });
+  const mp=new Map();rows.forEach(([m,p])=>{mp.set(m,Math.max(p,mp.get(m)||0))});
+  return {rows:[...mp].sort((a,b)=>a[0]-b[0]),bad};
+}
+function pctOf(P,score){
+  const t=P&&P.pct;if(!t||!t.length||typeof score!=='number')return null;
+  const f=x=>(Math.round(x*100)/100).toString();
+  if(score<=t[0][0])return {v:t[0][1],txt:(score<t[0][0]?'< ':'')+f(t[0][1]),lo:score<t[0][0]};
+  const L=t[t.length-1];
+  if(score>=L[0])return {v:L[1],txt:(score>L[0]?'> ':'')+f(L[1]),hi:score>L[0]};
+  for(let i=1;i<t.length;i++){const a=t[i-1],b=t[i];
+    if(score<=b[0]){const v=a[1]+(b[1]-a[1])*(score-a[0])/(b[0]-a[0]);return {v,txt:'~'+f(v)}}}
+  return null;
+}
+const pctAtt=A=>pctOf(attPaper(A),A.score);
+const pctBtn=id=>{const p=store.papers.find(x=>x.id===id);return p?`<button class="btn sm" data-act="pctl" data-id="${id}">${p.pct&&p.pct.length?'Edit percentile table':'Add percentile table'}</button>`:''};
+function pctPanel(p,err){
+  const cur=(p.pct||[]).map(r=>r[0]+' '+r[1]).join('\n');
+  return `<div class="stack" style="gap:10px" data-pid="${p.id}">
+   <p class="sub" style="margin:0">Type or paste <b>marks and percentile</b>, one pair per line, for example <code>60 99.5</code>. Any score in between is worked out by a straight line between the two nearest rows, so the more rows you give the more exact it is. This table belongs to <b>${esc(p.title)}</b> and is used for every attempt of it.</p>
+   ${err?`<div class="msg bad">${err}</div>`:''}
+   <textarea class="paste" id="pctta" rows="9" placeholder="90 99.9&#10;75 99&#10;60 95&#10;45 85&#10;30 60&#10;15 30" style="width:100%;font:14px var(--f-mono)">${esc(cur)}</textarea>
+   <div class="row"><button class="btn pri" data-act="pctsave" data-id="${p.id}">Save table</button>${p.pct&&p.pct.length?`<button class="btn danger" data-act="pctclear" data-id="${p.id}">Remove table</button>`:''}</div></div>`;
+}
 const isDrill=id=>{const p=store.papers.find(x=>x.id===id);return !!p&&paperCat(p)==='drill'};
 function attCat(a){const p=attPaper(a);return p?paperCat(p):((a.secs&&a.secs.length>1)?'full':'sectional')}
 function attArea(a){const p=attPaper(a);return p?paperArea(p):(areaOfName(a.qs[0]&&a.qs[0].secName)||'')}
@@ -773,8 +824,8 @@ function papersListHtml(q){
   return `${papers.length?papers.map(p=>{const a=atts.filter(x=>x.paperId===p.id);const last=a[0];return `<div class="paper"><div>${titleCell(p)}
       <div class="chips" style="margin-top:4px">${p.sections.map(s=>`<span class="chip">${esc(s.name)} · ${s.count}Q · ${s.minutes}m</span>`).join('')}<span class="chip">${paperMax(p)} marks</span></div>
       <div class="sub" style="font-size:12px;margin-top:4px">${a.length?a.length+' attempt'+(a.length>1?'s':'')+' · last '+r1(last.score)+'/'+last.max:'Not attempted yet'}</div></div>
-      <div class="row"><button class="btn pri sm" data-act="start" data-id="${p.id}">Start</button><button class="btn sm" data-act="rename" data-id="${p.id}">Rename</button><button class="btn sm" data-act="logpast" data-id="${p.id}">Log past attempt</button><button class="btn sm danger" data-act="delpaper" data-id="${p.id}">Delete</button></div></div>`}).join(''):`<p class="sub">No papers yet. Add one on the left, or load the sample to see how the exam screen and analysis look.</p>`}
-    ${sets.length?`<h3 style="margin-top:20px">DPP sets and section tests</h3>`+sets.map(p=>{const a=atts.filter(x=>x.paperId===p.id);return `<div class="paper"><div>${titleCell(p)}<div class="sub" style="font-size:12px">${p.questions.length} questions · ${p.sections[0].minutes} min${a.length?' · '+a.length+' attempt'+(a.length>1?'s':''):''}</div></div><div class="row"><button class="btn pri sm" data-act="start" data-id="${p.id}">Start</button><button class="btn sm" data-act="rename" data-id="${p.id}">Rename</button><button class="btn sm" data-act="logpast" data-id="${p.id}">Log past attempt</button><button class="btn sm danger" data-act="delpaper" data-id="${p.id}">Delete</button></div></div>`}).join(''):''}`;
+      <div class="row"><button class="btn pri sm" data-act="start" data-id="${p.id}">Start</button><button class="btn sm" data-act="rename" data-id="${p.id}">Rename</button><button class="btn sm" data-act="pctl" data-id="${p.id}">${p.pct&&p.pct.length?'Percentile ✓':'Percentile'}</button><button class="btn sm" data-act="logpast" data-id="${p.id}">Log past attempt</button><button class="btn sm danger" data-act="delpaper" data-id="${p.id}">Delete</button></div></div>`}).join(''):`<p class="sub">No papers yet. Add one on the left, or load the sample to see how the exam screen and analysis look.</p>`}
+    ${sets.length?`<h3 style="margin-top:20px">DPP sets and section tests</h3>`+sets.map(p=>{const a=atts.filter(x=>x.paperId===p.id);return `<div class="paper"><div>${titleCell(p)}<div class="sub" style="font-size:12px">${p.questions.length} questions · ${p.sections[0].minutes} min${a.length?' · '+a.length+' attempt'+(a.length>1?'s':''):''}</div></div><div class="row"><button class="btn pri sm" data-act="start" data-id="${p.id}">Start</button><button class="btn sm" data-act="rename" data-id="${p.id}">Rename</button><button class="btn sm" data-act="pctl" data-id="${p.id}">${p.pct&&p.pct.length?'Percentile ✓':'Percentile'}</button><button class="btn sm" data-act="logpast" data-id="${p.id}">Log past attempt</button><button class="btn sm danger" data-act="delpaper" data-id="${p.id}">Delete</button></div></div>`}).join(''):''}`;
 }
 function renderHome(){
   const sess=LS.get('cmd.session');
@@ -936,7 +987,7 @@ function renderExam(){
   const rv=!!(X.rev&&X.rev[X.cur]);
   let ans='';
   if(q.type==='mcq'){
-    ans=q.options.map((o,k)=>`<label class="opt"><input type="radio" name="o" value="${k}" ${val===k?'checked':''} ${rv?'disabled':''} data-sel="1"><span>${String.fromCharCode(65+k)}.&nbsp; ${esc(o)}</span></label>`).join('')+
+    ans=q.options.map((o,k)=>`<label class="opt"><input type="radio" name="o" value="${k}" ${val===k?'checked':''} ${rv?'disabled':''} data-sel="1"><span>${String.fromCharCode(65+k)}.&nbsp; ${stepHtml(o)}</span></label>`).join('')+
      `<div class="sub" style="margin-top:8px;font-size:12.5px">Choose one option.</div>`;
   }else{
     ans=`<div class="tita"><input class="ans" id="tita" inputmode="decimal" autocomplete="off" value="${esc(val==null?'':val)}" aria-label="Type your answer" data-tita="1" ${rv?'readonly':''}>
@@ -950,8 +1001,8 @@ function renderExam(){
     <div class="xq">
      <div class="xqhead"><span>Question ${n} of ${secQ(q.sec).length} · ${esc(secName)}</span><span class="mk">${q.type==='mcq'?'Single choice':'Type in the answer'} · Marks <b>+${q.marks}</b> ${q.neg?`<i>−${q.neg}</i>`:'· no negative'}</span></div>
      <div class="xbody">
-      ${q.passage?`<div class="xpass" style="flex:0 0 ${splitPct()}%"><span class="plabel">Passage / data set</span>${esc(q.passage)}</div><div class="xdiv" id="xdiv" role="separator" aria-orientation="vertical" aria-label="Drag to resize the passage and question panes (double-click to reset)" title="Drag to resize · double-click to reset"></div>`:''}
-      <div class="xqa"><div class="qtext">${esc(q.text)}</div>${ans}${rv?fbHtml(q,s):''}</div>
+      ${q.passage?`<div class="xpass" style="flex:0 0 ${splitPct()}%"><span class="plabel">Passage / data set</span>${richText(q.passage)}</div><div class="xdiv" id="xdiv" role="separator" aria-orientation="vertical" aria-label="Drag to resize the passage and question panes (double-click to reset)" title="Drag to resize · double-click to reset"></div>`:''}
+      <div class="xqa"><div class="qtext">${richText(q.text)}</div>${ans}${rv?fbHtml(q,s):''}</div>
      </div>
     </div>
     <aside class="xside">
@@ -1088,8 +1139,8 @@ function renderAnalysis(){
   let body='';
   if(V.tab==='overview'){
     const ins=buildInsights(A);
-    body=`${A.imported?'<div class="msg info" style="margin-bottom:12px">Logged attempt: you entered the answers yourself, so time per question was not recorded. Time analysis is hidden and everything else is based on your answers.</div>':''}<div class="panel"><div class="hero"><div><div class="score num">${r1(A.score)}<small> / ${A.max}</small></div><div class="sub">${esc(A.title)} · ${fmtDate(A.date)}</div></div>
-     <div class="tiles" style="margin:0"><div class="tile"><b>${A.accuracy}%</b><span>Accuracy (${A.correct}/${A.attempted})</span></div><div class="tile"><b>${A.attempted}/${A.qs.length}</b><span>Attempted</span></div><div class="tile"><b class="good">${T.correct}</b><span>Correct</span></div><div class="tile"><b class="bad">${T.wrong}</b><span>Wrong (−${r1(T.neg)} marks)</span></div><div class="tile"><b class="warn">${T.skipped+T.unseen}</b><span>Not attempted</span></div>${A.noTime?'<div class="tile"><b>–</b><span>Time not recorded</span></div>':`<div class="tile"><b>${fmtT(used)}</b><span>Time used of ${fmtT(allot)}</span></div>`}</div></div></div>
+    body=`${A.imported?'<div class="msg info" style="margin-bottom:12px">Logged attempt: you entered the answers yourself, so time per question was not recorded. Time analysis is hidden and everything else is based on your answers.</div>':''}<div class="panel"><div class="hero"><div><div class="score num">${r1(A.score)}<small> / ${A.max}</small></div><div class="sub">${esc(A.title)} · ${fmtDate(A.date)}</div><div style="margin-top:8px">${pctBtn(A.paperId)}</div></div>
+     <div class="tiles" style="margin:0">${(q=>q?`<div class="tile" style="background:var(--accent-soft)"><b>${q.txt}</b><span>Estimated percentile</span></div>`:'')(pctAtt(A))}<div class="tile"><b>${A.accuracy}%</b><span>Accuracy (${A.correct}/${A.attempted})</span></div><div class="tile"><b>${A.attempted}/${A.qs.length}</b><span>Attempted</span></div><div class="tile"><b class="good">${T.correct}</b><span>Correct</span></div><div class="tile"><b class="bad">${T.wrong}</b><span>Wrong (−${r1(T.neg)} marks)</span></div><div class="tile"><b class="warn">${T.skipped+T.unseen}</b><span>Not attempted</span></div>${A.noTime?'<div class="tile"><b>–</b><span>Time not recorded</span></div>':`<div class="tile"><b>${fmtT(used)}</b><span>Time used of ${fmtT(allot)}</span></div>`}</div></div></div>
      <div class="panel" style="margin-top:16px"><h3>Section summary</h3>${legendRow()}<div class="tablewrap"><table class="hist"><thead><tr><th>Section</th><th>Score</th><th>Attempted</th><th>Accuracy</th><th>Outcome</th><th>Time used</th></tr></thead><tbody>
       ${A.secs.map((s,i)=>{const a=agg(A.qs.filter(x=>x.sec===i));return `<tr><td><b>${esc(s.name)}</b></td><td class="num">${r1(a.score)}/${a.max}</td><td class="num">${a.attempted}/${a.n}</td><td class="num">${a.attempted?a.acc+'%':'–'}</td><td style="min-width:120px">${outcomeBar(a)}</td><td class="num">${fmtT(s.used)} / ${s.minutes}m</td></tr>`}).join('')}</tbody></table></div></div>
      <div class="panel" style="margin-top:16px"><h3>What the data says</h3>${ins.length?`<ul class="ins">${ins.map(i=>`<li class="${i.cls}"><b>${esc(i.title)}</b>${esc(i.text)}</li>`).join('')}</ul>`:'<p class="sub">Not enough activity to draw conclusions.</p>'}</div>`;
@@ -1129,11 +1180,11 @@ function revItem(A,P,x,o){
   const pq=P&&P.questions[x.n-1]&&P.questions[x.n-1].id===x.id?P.questions[x.n-1]:null;
   const ideal=idealOf(A,x);const tag=(A.tags||{})[x.id]||'';
   const opts=pq&&pq.type==='mcq'?`<div class="opts">${pq.options.map((o,k)=>`<div class="${k===pq.ai?'c':(k===x.given?'w':'')}">${String.fromCharCode(65+k)}. ${stepHtml(o)}${k===pq.ai?'  ✓ correct':''}${k===x.given&&k!==pq.ai?'  ✗ your answer':''}${k===x.given&&k===pq.ai?'  (your answer)':''}</div>`).join('')}</div>`:'';
-  return `<details class="rev"${o.open?' open':''}><summary>${o.src?`<span class="chip ${o.cur?'on':''}">${esc(o.src)}</span>`:''}<span class="qn">${esc(x.secName)} ${x.n}</span><span class="pill ${x.status}">${x.status==='skipped'?'blank':x.status}</span><span class="qt">${pq?esc(pq.text.replace(/\s+/g,' ')):esc(x.topic)}</span><span class="sub num">${fmtT(x.time)}</span><span class="num ${x.got>0?'good':x.got<0?'bad':'sub'}">${x.got>0?'+':''}${x.got}</span></summary>
+  return `<details class="rev"${o.open?' open':''}><summary>${o.src?`<span class="chip ${o.cur?'on':''}">${esc(o.src)}</span>`:''}<span class="qn">${esc(x.secName)} ${x.n}</span><span class="pill ${x.status}">${x.status==='skipped'?'blank':x.status}</span><span class="qt">${pq?stepHtml(pq.text.replace(/\s+/g,' ')):esc(x.topic)}</span><span class="sub num">${fmtT(x.time)}</span><span class="num ${x.got>0?'good':x.got<0?'bad':'sub'}">${x.got>0?'+':''}${x.got}</span></summary>
    <div class="revbody">
     <div class="chips"><span class="chip">${esc(x.topic)}</span><span class="chip">${x.difficulty}</span><span class="chip">time ${fmtT(x.time)} vs ${fmtT(ideal)} available</span><span class="chip">opened ${x.visits}×</span>${x.ch?`<span class="chip">answer changed ${x.ch}×</span>`:''}${x.mk?'<span class="chip">marked for review</span>':''}</div>
-    ${pq&&pq.passage?`<details><summary class="sub">Show passage / data set</summary><div style="white-space:pre-wrap;font-family:var(--f-serif);margin-top:6px">${stepHtml(pq.passage)}</div></details>`:''}
-    ${pq?`<div style="white-space:pre-wrap;font-family:var(--f-serif);font-size:15px">${stepHtml(pq.text)}</div>`:'<div class="sub">The paper was deleted, so question text is unavailable.</div>'}
+    ${pq&&pq.passage?`<details><summary class="sub">Show passage / data set</summary><div style="white-space:pre-wrap;font-family:var(--f-serif);margin-top:6px">${richText(pq.passage)}</div></details>`:''}
+    ${pq?`<div style="white-space:pre-wrap;font-family:var(--f-serif);font-size:15px">${richText(pq.text)}</div>`:'<div class="sub">The paper was deleted, so question text is unavailable.</div>'}
     ${opts}
     ${x.type==='tita'?`<div>Your answer: <b class="num">${esc(givenText(0,x,null))}</b> · Correct answer: <b class="num good">${pq?esc(correctText(pq)):'–'}</b></div>`:''}
     ${pq&&pq.solution?`${solBlock(pq.solution)}`:''}
@@ -1155,7 +1206,7 @@ function aggRow(label,l,o){
 }
 function topicTable(list,showSec){
   const g=groupBy(list,'topic'),keys=Object.keys(g).sort((a,b)=>lostOf(g[b])-lostOf(g[a]));let rows='';
-  const AA=store.attempts.find(x=>x.id===V.analysisId),cols=showSec?9:8,tq=(key,t,sb)=>(AA&&V.topicOpen&&V.topicOpen.has(key))?`<tr class="tqrow"><td colspan="${cols}">${topicQuestionsHtml(AA,t,sb)}</td></tr>`:'';
+  const AA=store.attempts.find(x=>x.id===V.analysisId),cols=showSec?9:8,tq=(key,t,sb)=>(AA&&V.topicOpen&&V.topicOpen.has(key))?`<tr class="tqrow"><td colspan="${cols}"><div class="tqin">${topicQuestionsHtml(AA,t,sb)}</div></td></tr>`:'';
   keys.forEach(k=>{const l=g[k];rows+=aggRow(k,l,{key:k,sec:showSec?[...new Set(l.map(x=>x.secName))].join(', '):null})+tq(k,k,'');
     const subs=groupBy(l.filter(x=>x.sub),'sub'),sk=Object.keys(subs).sort((a,b)=>lostOf(subs[b])-lostOf(subs[a]));
     sk.forEach(t=>{rows+=aggRow(t,subs[t],{sub:1,key:k+'›'+t,sec:showSec?'':null})+tq(k+'›'+t,k,t)})});
@@ -2160,11 +2211,11 @@ function renderNotebook(){
   const row=m=>{
     const it=m.pool,q=it&&it.q,first=q?String(q.text||'').replace(/^Directions:.*?\n\n/s,'').replace(/\s+/g,' '):'(paper deleted, question text unavailable)';
     const pill=m.last.st==='correct'?`<span class="pill correct">Correct last time</span>`:`<span class="pill ${m.last.st}">${m.last.st==='wrong'?'Wrong':'Left blank'} last time</span>`;
-    return `<details class="rev"><summary><span class="qn">${it?esc(it.sec)+' '+(it.i+1):'—'}</span><span class="qt">${esc(first.slice(0,140))}</span>${pill}<span class="pill ${m.due?'wrong':'unseen'}">${esc(dueLabel(m))}</span></summary>
+    return `<details class="rev"><summary><span class="qn">${it?esc(it.sec)+' '+(it.i+1):'—'}</span><span class="qt">${stepHtml(first.slice(0,140))}</span>${pill}<span class="pill ${m.due?'wrong':'unseen'}">${esc(dueLabel(m))}</span></summary>
      <div class="revbody"><div class="sub">${esc(m.topic)}${m.sub?' › '+esc(m.sub):''} · ${it?esc(it.p.title):esc(m.title)} · missed ${m.wrongs} time${m.wrongs>1?'s':''} · ${m.streak} correct in a row (need ${NEED_RIGHT}) · last tried ${fmtDate(m.last.d)}</div>
-     ${q?`${q.passage?`<details><summary>Show passage</summary><div class="sol" style="max-height:240px;overflow:auto;font-family:var(--f-serif)">${esc(q.passage)}</div></details>`:''}
-      <div style="white-space:pre-wrap;font-family:var(--f-serif)">${esc(q.text)}</div>
-      ${q.type==='mcq'?`<div class="opts">${q.options.map((o,k)=>`<div class="${k===q.ai?'c':''}">${String.fromCharCode(65+k)}. ${esc(o)}</div>`).join('')}</div>`:`<div><b>Answer:</b> ${esc(correctText(q))}</div>`}
+     ${q?`${q.passage?`<details><summary>Show passage</summary><div class="sol" style="max-height:240px;overflow:auto;font-family:var(--f-serif)">${richText(q.passage)}</div></details>`:''}
+      <div style="white-space:pre-wrap;font-family:var(--f-serif)">${richText(q.text)}</div>
+      ${q.type==='mcq'?`<div class="opts">${q.options.map((o,k)=>`<div class="${k===q.ai?'c':''}">${String.fromCharCode(65+k)}. ${stepHtml(o)}</div>`).join('')}</div>`:`<div><b>Answer:</b> ${esc(correctText(q))}</div>`}
       ${q.solution?solBlock(q.solution):''}`:''}</div></details>`;
   };
   app.innerHTML=`<div class="wrap" style="max-width:980px"><div class="top"><div class="brand">Mistake notebook<small>revise until it sticks</small></div><div class="row"><button class="btn sm" data-act="weak">Weak areas</button><button class="btn sm" data-act="home">Back</button></div></div>
@@ -2298,7 +2349,7 @@ function catRow(p){
   return `<div class="prow"><div class="pmain" style="min-width:0">${titleCell(p)}
    <div class="sub" style="font-size:12px;margin-top:2px">${meta} · ${a.length?a.length+' attempt'+(a.length>1?'s':'')+' · last '+r1(last.score)+'/'+last.max:'not attempted'}</div></div>
    <div class="pbtn"><button class="btn pri sm" data-act="start" data-id="${p.id}">Start</button>${a.length?`<button class="btn sm" data-act="paperan" data-id="${p.id}">Analysis</button>`:''}
-    <details class="more"><summary class="btn sm" aria-label="More actions">⋯</summary><div class="menu"><button class="btn sm" data-act="rename" data-id="${p.id}">Rename</button><button class="btn sm" data-act="logpast" data-id="${p.id}">Log past attempt</button><button class="btn sm danger" data-act="delpaper" data-id="${p.id}">Delete</button></div></details></div>
+    <details class="more"><summary class="btn sm" aria-label="More actions">⋯</summary><div class="menu"><button class="btn sm" data-act="rename" data-id="${p.id}">Rename</button><button class="btn sm" data-act="pctl" data-id="${p.id}">${p.pct&&p.pct.length?'Percentile ✓':'Percentile'}</button><button class="btn sm" data-act="logpast" data-id="${p.id}">Log past attempt</button><button class="btn sm danger" data-act="delpaper" data-id="${p.id}">Delete</button></div></details></div>
    <div class="pctl"><label class="sub" style="display:flex;gap:6px;align-items:center;font-size:12px">Category <select class="tag" data-mvc="${p.id}">${opt('full','Full syllabus',c)}${opt('sectional','Sectional',c)}${opt('topic','Topic-wise',c)}${opt('drill','Drill',c)}</select></label>
    ${c!=='full'?`<label class="sub" style="display:flex;gap:6px;align-items:center;font-size:12px">Area <select class="tag" data-mva="${p.id}">${opt('','Auto ('+(AREA_LABEL[paperArea(Object.assign({},p,{area:''}))]||'unsorted')+')',ar)}${AREAS.map(x=>opt(x,AREA_LABEL[x],ar)).join('')}</select></label>`:''}</div></div>`;
 }
@@ -2337,10 +2388,10 @@ function renderCat(){
     const rows=Object.values(T).sort((a,b)=>a.c/a.n-b.c/b.n||b.lost-a.lost);
     const dq=as.reduce((s,a)=>s+a.qs.filter(x=>x.status!=='unseen').length,0),dt=as.filter(a=>!a.noTime).reduce((s,a)=>s+a.qs.reduce((u,x)=>u+(x.time||0),0),0),dn=as.filter(a=>!a.noTime).reduce((s,a)=>s+a.qs.filter(x=>x.status!=='unseen').length,0);
     const drillTiles=c==='drill'?`<div class="tile"><b>${dq}</b><span>questions practised</span></div><div class="tile"><b>${dn?fmtT0(dt/dn):'–'}</b><span>avg time / question</span></div>`:'';
-    body=as.length?`<div class="tiles" style="margin-top:0"><div class="tile"><b>${as.length}</b><span>attempts</span></div>${drillTiles}<div class="tile"><b>${Math.round(avg)}%</b><span>average score</span></div><div class="tile"><b>${Math.round(Math.max(...pcts))}%</b><span>best score</span></div><div class="tile"><b>${Math.round(as.reduce((s,a)=>s+a.accuracy,0)/as.length)}%</b><span>average accuracy</span></div></div>
+    body=as.length?`<div class="tiles" style="margin-top:0"><div class="tile"><b>${as.length}</b><span>attempts</span></div>${drillTiles}${(()=>{const v=as.map(pctAtt).filter(Boolean).map(q=>q.v);return v.length?`<div class="tile"><b>${Math.round(Math.max(...v)*100)/100}</b><span>best percentile</span></div>`:''})()}<div class="tile"><b>${Math.round(avg)}%</b><span>average score</span></div><div class="tile"><b>${Math.round(Math.max(...pcts))}%</b><span>best score</span></div><div class="tile"><b>${Math.round(as.reduce((s,a)=>s+a.accuracy,0)/as.length)}%</b><span>average accuracy</span></div></div>
      ${as.length>1?`<h3 style="margin-top:18px">Score trend</h3>${trendSvg(as)}`:''}
      <h3 style="margin-top:18px">Topics, weakest first</h3><div class="tablewrap"><table class="hist"><thead><tr><th>Topic</th><th>Questions</th><th>Accuracy</th><th>Marks lost</th><th>Avg time</th></tr></thead><tbody>${rows.map(r=>`<tr><td>${esc(r.t)}</td><td class="num">${r.n}</td><td class="num ${r.c/r.n<.5?'bad':(r.c/r.n>=.75?'good':'')}">${pct(r.c,r.n)}%</td><td class="num">${r1(r.lost)}</td><td class="num">${r.tn?fmtT0(r.time/r.tn):'–'}</td></tr>`).join('')}</tbody></table></div>
-     <h3 style="margin-top:18px">Attempts</h3><div class="tablewrap" style="max-height:360px;overflow:auto"><table class="hist"><thead><tr><th>Paper</th><th>Date</th><th>Score</th><th>Accuracy</th><th></th></tr></thead><tbody>${as.map(a=>`<tr><td>${esc(a.title)}${a.imported?' <span class="chip">logged</span>':''}</td><td>${fmtDate(a.date)}</td><td class="num">${r1(a.score)}/${a.max}</td><td class="num">${a.accuracy}%</td><td><div class="row"><button class="btn sm" data-act="analysis" data-id="${a.id}">Analysis</button><button class="btn sm danger" data-act="delatt" data-id="${a.id}">Delete</button></div></td></tr>`).join('')}</tbody></table></div>`
+     <h3 style="margin-top:18px">Attempts</h3><div class="tablewrap" style="max-height:360px;overflow:auto"><table class="hist"><thead><tr><th>Paper</th><th>Date</th><th>Score</th><th>Accuracy</th><th>Percentile</th><th></th></tr></thead><tbody>${as.map(a=>`<tr><td>${esc(a.title)}${a.imported?' <span class="chip">logged</span>':''}</td><td>${fmtDate(a.date)}</td><td class="num">${r1(a.score)}/${a.max}</td><td class="num">${a.accuracy}%</td><td class="num">${(q=>q?q.txt:'–')(pctAtt(a))}</td><td><div class="row"><button class="btn sm" data-act="analysis" data-id="${a.id}">Analysis</button><button class="btn sm danger" data-act="delatt" data-id="${a.id}">Delete</button></div></td></tr>`).join('')}</tbody></table></div>`
      :`<p class="sub">No attempts in ${area==='all'||c==='full'?'this category':AREA_LABEL[area]} yet. Start a paper from the Papers tab and the analysis appears here.</p>`;
   }
   app.innerHTML=`<div class="wrap"><div class="top"><div class="brand">${esc(info.name)}<small>${(n=>n+' paper'+(n===1?'':'s'))(store.papers.filter(p=>paperCat(p)===c).length)}</small></div><div class="row"><button class="btn sm" data-act="home">Back</button></div></div>
@@ -2427,13 +2478,22 @@ function topicQuestionsHtml(A,topic,sub){
   return h+'</div>';
 }
 Object.assign(acts,{
+  pctl(t){const p=store.papers.find(x=>x.id===t.dataset.id);if(!p)return;openPanel('Percentile table',p.title,pctPanel(p));const z=document.getElementById('zoomov');if(z)z.dataset.pct='1'},
+  pctsave(t){const p=store.papers.find(x=>x.id===t.dataset.id),ta=document.getElementById('pctta');if(!p||!ta)return;
+    const r=parsePct(ta.value);
+    if(!r.rows.length){openPanel('Percentile table',p.title,pctPanel(Object.assign({},p,{pct:[]}),'No valid rows found. Write marks, a space, then the percentile (0 to 100) on each line.'));document.getElementById('zoomov').dataset.pct='1';document.getElementById('pctta').value=ta.value;return}
+    p.pct=r.rows;store.save(p);closeZoom();render();toast('Percentile table saved ('+r.rows.length+' rows)'+(r.bad.length?'; skipped '+r.bad.length+' unreadable line'+(r.bad.length>1?'s':''):''))},
+  pctclear(t){const p=store.papers.find(x=>x.id===t.dataset.id);if(!p)return;delete p.pct;store.save(p);closeZoom();render();toast('Percentile table removed')}
+});
+document.addEventListener('click',e=>{const t=e.target.closest&&e.target.closest('#zoomov [data-act^="pct"]');if(t&&acts[t.dataset.act])acts[t.dataset.act](t)});
+Object.assign(acts,{
   topicopen(t){
     if(!V.topicOpen)V.topicOpen=new Set();
     const k=t.dataset.k,A=store.attempts.find(x=>x.id===V.analysisId),next=t.nextElementSibling;
     if(next&&next.classList.contains('tqrow')){next.remove();V.topicOpen.delete(k);const c=t.querySelector('.tcaret');if(c)c.textContent='▸';return}
     if(!A)return;
     const parts=k.split('›'),tr=document.createElement('tr');tr.className='tqrow';
-    tr.innerHTML=`<td colspan="${t.children.length}">${topicQuestionsHtml(A,parts[0],parts[1]||'')}</td>`;
+    tr.innerHTML=`<td colspan="${t.children.length}"><div class="tqin">${topicQuestionsHtml(A,parts[0],parts[1]||'')}</div></td>`;
     t.after(tr);V.topicOpen.add(k);const c=t.querySelector('.tcaret');if(c)c.textContent='▾';
   },
   paperan(t){
@@ -2557,7 +2617,7 @@ function fracPlace(t,store){
 }
 function stepInner(x,store){return mathSet(esc(fracPlace(x,store)))}
 function stepHtml(t){
-  const store=[];const T=fracPlace(String(t).replace(/\b([A-Za-z])_([A-Za-z0-9]+)\b/g,(m,x,y)=>{store.push(esc(x)+'<sub>'+esc(y)+'</sub>');return '\u0002'+(store.length-1)+'\u0003'}),store);
+  const store=[];const T=fracPlace(String(t==null?'':t).replace(/[\u00a0\u1680\u2000-\u200a\u202f\u205f\u3000]/g,' ').replace(/[\u200b\u200c\u2060\ufeff\u00ad]/g,'').replace(/([A-Za-z]{1,6}|\d+|\))_(?:\{([^}]{1,12})\}|(\d{1,4}(?!\d)|[A-Za-z]{1,3}(?![A-Za-z0-9])|[A-Za-z]\d{1,2}(?!\d)))/g,(m,x,y,z)=>{store.push(esc(x)+'<sub>'+esc(y||z)+'</sub>');return '\u0002'+(store.length-1)+'\u0003'}),store);
   let out='',last=0,m;MATH_RUN.lastIndex=0;
   while((m=MATH_RUN.exec(T))){
     const seg=m[0];
@@ -2577,6 +2637,25 @@ function solSteps(text){
   });
   const merged=[];steps.forEach(p=>{const pv=merged[merged.length-1];if(pv&&/^traps?\b/i.test(pv))merged[merged.length-1]=pv+'; '+p;else merged.push(p)});
   return merged;
+}
+/* text with real tables (pipe or tab separated rows) and typeset maths */
+function richText(t){
+  const lines=String(t==null?'':t).replace(/\r/g,'').split('\n');
+  const isSep=l=>/^\s*\|?\s*:?-{2,}:?\s*(\|\s*:?-{2,}:?\s*)*\|?\s*$/.test(l);
+  const isRow=l=>{if(isSep(l))return true;const pipes=(l.match(/\|/g)||[]).length;return pipes>=2||(pipes===1&&/^\s*\|/.test(l))||(l.match(/\t/g)||[]).length>=2};
+  const cells=l=>{let c=l.includes('|')?l.split('|'):l.split('\t');if(l.includes('|')){if(c[0].trim()==='')c.shift();if(c.length&&c[c.length-1].trim()==='')c.pop()}return c.map(x=>x.trim())};
+  const out=[];let buf=[],i=0;
+  const flush=()=>{const tx=buf.join('\n').replace(/^\n+|\n+$/g,'');if(tx)out.push(stepHtml(tx));buf=[]};
+  while(i<lines.length){
+    if(isRow(lines[i])){let j=i;while(j<lines.length&&isRow(lines[j]))j++;
+      const rows=lines.slice(i,j).filter(l=>!isSep(l)).map(cells);
+      if(rows.length>=2){flush();const n=Math.max(...rows.map(r=>r.length));
+        out.push('<div class="tablewrap dtw"><table class="dt"><thead><tr>'+rows[0].concat(Array(n-rows[0].length).fill('')).map(c=>'<th>'+stepHtml(c)+'</th>').join('')+'</tr></thead><tbody>'+rows.slice(1).map(r=>'<tr>'+r.concat(Array(n-r.length).fill('')).map(c=>'<td>'+stepHtml(c)+'</td>').join('')+'</tr>').join('')+'</tbody></table></div>');
+        i=j;continue}
+    }
+    buf.push(lines[i]);i++;
+  }
+  flush();return out.join('');
 }
 function solBlock(text,style,title){
   const st=solSteps(text);if(!st.length)return '';
