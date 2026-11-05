@@ -2,7 +2,7 @@
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>CAT Mock Desk</title>
 <meta name="claude:viewport-fit-sides" content="cover">
-<meta name="app-build" content="2026-11-04.05">
+<meta name="app-build" content="2026-11-05.01">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto+Flex:opsz,wght@8..144,400;8..144,500;8..144,600&family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Serif:wght@400;600&display=swap">
 <style>
 /* Layout: home/analysis are scrolling pages on a paper-blue ground; the exam is a fixed-height console (header, section bar, question pane + palette, action bar) modelled on the CAT screen. */
@@ -468,6 +468,7 @@ body:not(.exam-on) .wrap.enter>*:nth-child(n+4){animation-delay:.12s}
 .qtext,.xpass,.opt span{overflow-wrap:anywhere}
 .tq{min-width:0;max-width:100%}
 /* expanded question lists inside tables must never widen the table */
+.cbin{width:100%;min-width:90px;padding:7px 10px;border:1px solid var(--line);border-radius:10px;background:var(--surface);color:var(--ink);font:inherit}
 .tqin{width:0;min-width:100%;max-width:100%;box-sizing:border-box}
 .tqin .rev,.tqin .pg,.tqin .tq{min-width:0;max-width:100%}
 /* ===== Phone / small-screen layout (does not affect wide screens) ===== */
@@ -720,7 +721,7 @@ const paperMax=p=>p.questions.reduce((s,q)=>s+q.marks,0);
 /* ---------- navigation ---------- */
 const V={view:'home',msg:null,analysisId:null,tab:'overview',filter:'all',secFilter:'all'};
 function go(view,extra){NOTIME=false;if(view!=='analysis'&&view!=='cat')V.fromCat=null;Object.assign(V,{view},extra||{});document.body.classList.toggle('exam-on',view==='exam');app.classList.toggle('is-exam',view==='exam');render();if(view!=='exam'){window.scrollTo(0,0);const w=app.querySelector('.wrap');if(w)w.classList.add('enter')}}
-function render(){({home:renderHome,instr:renderInstr,exam:renderExam,analysis:renderAnalysis,practice:renderPractice,log:renderLog,import:renderImport,notebook:renderNotebook,weak:renderWeak,papers:renderAllPapers,cat:renderCat})[V.view]()}
+function render(){({home:renderHome,instr:renderInstr,exam:renderExam,analysis:renderAnalysis,practice:renderPractice,log:renderLog,import:renderImport,notebook:renderNotebook,weak:renderWeak,papers:renderAllPapers,cat:renderCat,combine:renderCombine})[V.view]()}
 
 /* ---------- categories: full syllabus, sectional, topic-wise ---------- */
 const AREAS=['VARC','DILR','QA'],AREA_LABEL={VARC:'VA / RC',DILR:'DILR',QA:'Quant'};
@@ -845,7 +846,7 @@ function renderHome(){
   <div class="panel stack" style="margin-top:14px;gap:10px">
     <div class="row" style="justify-content:space-between;align-items:center"><h2 style="margin:0">Add a practice paper</h2>
      <div class="row" style="gap:8px"><span class="sub" style="font-size:12px">Add it as</span><div class="seg">${[['auto','Auto'],['full','Full syllabus'],['sectional','Sectional'],['topic','Topic-wise'],['drill','Drill']].map(([k,l])=>`<button class="${(V.addCat||'auto')===k?'on':''}" data-act="addcat" data-v="${k}">${l}</button>`).join('')}</div></div></div>
-    <div class="dropbar drop" id="drop"><span class="grow">Drop a PDF or JSON file here, or</span><button class="btn pri sm" data-act="pick">Choose file</button><button class="btn sm" data-act="importpdf">Import PDF or text…</button><button class="btn sm" data-act="sample">Try a sample paper</button><input type="file" id="file" accept=".pdf,.json,.txt,application/pdf,application/json,text/plain" multiple hidden></div>
+    <div class="dropbar drop" id="drop"><span class="grow">Drop a PDF or JSON file here, or</span><button class="btn pri sm" data-act="pick">Choose file</button><button class="btn sm" data-act="importpdf">Import PDF or text…</button><button class="btn sm" data-act="combine">Combine sections…</button><button class="btn sm" data-act="sample">Try a sample paper</button><input type="file" id="file" accept=".pdf,.json,.txt,application/pdf,application/json,text/plain" multiple hidden></div>
     ${V.msg?`<div class="msg ${V.msg.t}" style="white-space:pre-wrap">${esc(V.msg.m)}</div>`:''}
     <details><summary>Paste text or JSON, and the AI prompt</summary>
       <textarea class="paste" id="paste" placeholder="Paste the paper JSON or plain text here" aria-label="Paste paper JSON" style="min-height:110px;margin:8px 0"></textarea><div class="row"><button class="btn sm" data-act="addpaste">Add pasted paper</button></div>
@@ -2486,6 +2487,73 @@ Object.assign(acts,{
   pctclear(t){const p=store.papers.find(x=>x.id===t.dataset.id);if(!p)return;delete p.pct;store.save(p);closeZoom();render();toast('Percentile table removed')}
 });
 document.addEventListener('click',e=>{const t=e.target.closest&&e.target.closest('#zoomov [data-act^="pct"]');if(t&&acts[t.dataset.act])acts[t.dataset.act](t)});
+/* ---------- combine several section JSON files into one full-syllabus paper ---------- */
+const CB={secs:[],title:'',cat:'full',err:'',note:''};
+function cbAddPaper(p,src){p.sections.forEach((sc,i)=>CB.secs.push({src,name:sc.name,minutes:sc.minutes,qs:p.questions.filter(q=>q.sec===i).map(q=>JSON.parse(JSON.stringify(q)))}))}
+async function cbAddFiles(files){
+  const bad=[];let ok=0;
+  for(const f of files){
+    try{cbAddPaper(normalizePaper(await f.text()),f.name);ok++}
+    catch(e){bad.push(f.name+': '+(e.name==='SyntaxError'?'not valid JSON':e.message))}
+  }
+  CB.err=bad.join('\n');CB.note=ok?ok+' file'+(ok>1?'s':'')+' added.':'';
+}
+function cbAddText(v){
+  try{cbAddPaper(normalizePaper(v),'pasted JSON');CB.err='';CB.note='Section added.';return true}
+  catch(e){CB.err=e.name==='SyntaxError'?'That is not valid JSON. ('+e.message+')':e.message;CB.note='';return false}
+}
+function renderCombine(){
+  const n=CB.secs.reduce((a,x)=>a+x.qs.length,0),m=CB.secs.reduce((a,x)=>a+(+x.minutes||0),0),mk=CB.secs.reduce((a,x)=>a+x.qs.reduce((u,q)=>u+q.marks,0),0);
+  const rows=CB.secs.map((x,i)=>`<tr><td class="num">${i+1}</td>
+    <td><input class="cbin" data-cb="name" data-i="${i}" value="${esc(x.name)}" aria-label="Section name"></td>
+    <td><input class="cbin" style="width:70px" type="number" min="1" data-cb="min" data-i="${i}" value="${+x.minutes||40}" aria-label="Minutes"></td>
+    <td class="num">${x.qs.length}</td><td class="num">${x.qs.reduce((u,q)=>u+q.marks,0)}</td>
+    <td class="sub" style="font-size:12px;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(x.src)}</td>
+    <td><div class="row" style="gap:4px;flex-wrap:nowrap"><button class="btn sm" data-act="cbup" data-i="${i}" ${i?'':'disabled'} aria-label="Move up">↑</button><button class="btn sm" data-act="cbdown" data-i="${i}" ${i<CB.secs.length-1?'':'disabled'} aria-label="Move down">↓</button><button class="btn sm danger" data-act="cbdel" data-i="${i}" aria-label="Remove">✕</button></div></td></tr>`).join('');
+  app.innerHTML=`<div class="wrap"><div class="top"><div class="brand">Combine sections<small>one full mock</small></div><div class="row"><button class="btn sm" data-act="home">Back</button></div></div>
+  <div class="panel stack" style="max-width:940px">
+   <p class="sub" style="margin:0">Add the JSON file of each section (VARC, DILR, QA…) one after another or all together. Every section in every file is joined, in the order shown below, into one paper. You can rename a section, change its minutes and reorder or remove it before creating the paper. A file can hold one section or several.</p>
+   <div class="dropbar drop" id="cbdrop"><span class="grow">Drop JSON files here, or</span><button class="btn pri sm" data-act="cbpick">Choose files</button><input type="file" id="cbfile" accept=".json,.txt,application/json,text/plain" multiple hidden></div>
+   <details><summary>Paste JSON instead</summary><textarea class="paste" id="cbpaste" style="min-height:100px;margin:8px 0" placeholder="Paste one section's JSON here" aria-label="Paste section JSON"></textarea><div class="row"><button class="btn sm" data-act="cbpaste">Add pasted section</button></div></details>
+   ${CB.err?`<div class="msg err" style="white-space:pre-wrap">${esc(CB.err)}</div>`:''}${CB.note?`<div class="msg ok">${esc(CB.note)}</div>`:''}
+   ${CB.secs.length?`<div class="tablewrap"><table class="hist"><thead><tr><th>#</th><th>Section</th><th>Minutes</th><th>Qs</th><th>Marks</th><th>From</th><th></th></tr></thead><tbody>${rows}</tbody></table></div>
+   <div class="sub" style="font-size:13px"><b>${CB.secs.length}</b> section${CB.secs.length>1?'s':''} · <b>${n}</b> questions · <b>${mk}</b> marks · <b>${m}</b> minutes in total</div>
+   <div class="row" style="gap:10px;align-items:flex-end"><label class="field" style="flex:1 1 240px"><span>Paper title</span><input data-cb="title" value="${esc(CB.title)}" placeholder="e.g. CAT Mock 12 (full)" aria-label="Paper title"></label>
+    <div><div class="sub" style="font-size:12px;margin-bottom:4px">Add it as</div><div class="seg">${[['full','Full mock'],['drill','Drill'],['auto','Auto']].map(([k,l])=>`<button class="${CB.cat===k?'on':''}" data-act="cbcat" data-v="${k}">${l}</button>`).join('')}</div></div></div>
+   <div class="row"><button class="btn pri" data-act="cbmake">Create combined paper</button><button class="btn" data-act="cbclear">Clear all</button></div>`:'<div class="sub">No sections added yet.</div>'}
+  </div></div>`;
+}
+Object.assign(acts,{
+  combine(){CB.err='';CB.note='';go('combine')},
+  cbpick(){const i=document.getElementById('cbfile');if(i)i.click()},
+  cbpaste(){const t=document.getElementById('cbpaste'),v=t&&t.value.trim();if(!v){CB.err='Paste a section JSON first.';CB.note='';return renderCombine()}cbAddText(v);renderCombine()},
+  cbup(t){const i=+t.dataset.i;if(i>0){[CB.secs[i-1],CB.secs[i]]=[CB.secs[i],CB.secs[i-1]]}renderCombine()},
+  cbdown(t){const i=+t.dataset.i;if(i<CB.secs.length-1){[CB.secs[i+1],CB.secs[i]]=[CB.secs[i],CB.secs[i+1]]}renderCombine()},
+  cbdel(t){CB.secs.splice(+t.dataset.i,1);CB.note='';renderCombine()},
+  cbcat(t){CB.cat=t.dataset.v;renderCombine()},
+  cbclear(t){if(!armed(t,'Confirm clear?'))return;CB.secs=[];CB.err='';CB.note='';CB.title='';renderCombine()},
+  cbmake(){
+    if(!CB.secs.length){CB.err='Add at least one section first.';return renderCombine()}
+    const used={},sections=[],questions=[];
+    CB.secs.forEach((x,si)=>{
+      let nm=(x.name||'').trim()||'Section '+(si+1);if(used[nm]){used[nm]++;nm+=' ('+used[nm]+')'}else used[nm]=1;
+      sections.push({name:nm,minutes:Math.max(1,+x.minutes||40),count:x.qs.length});
+      x.qs.forEach(q=>{const c=JSON.parse(JSON.stringify(q));c.id='q'+questions.length;c.sec=si;questions.push(c)});
+    });
+    const p={id:uid('p_'),kind:'paper',title:(CB.title||'').trim()||'Combined mock '+new Date().toLocaleDateString(),created:Date.now(),sections,questions};
+    if(CB.cat!=='auto')p.cat=CB.cat;
+    store.save(p);
+    const t=p.title;CB.secs=[];CB.title='';CB.err='';CB.note='';
+    go('home',{msg:{t:'ok',m:'Created "'+t+'": '+sections.length+' sections, '+questions.length+' questions, '+sections.reduce((a,x)=>a+x.minutes,0)+' minutes.'}});
+  }
+});
+document.addEventListener('input',e=>{const t=e.target;if(!t.dataset||!t.dataset.cb)return;
+  if(t.dataset.cb==='title'){CB.title=t.value;return}
+  const x=CB.secs[+t.dataset.i];if(!x)return;
+  if(t.dataset.cb==='name')x.name=t.value;else if(t.dataset.cb==='min')x.minutes=+t.value});
+document.addEventListener('change',e=>{const t=e.target;if(t&&t.id==='cbfile'){const fs=[...t.files];t.value='';cbAddFiles(fs).then(renderCombine)}});
+document.addEventListener('dragover',e=>{if(e.target.closest&&e.target.closest('#cbdrop'))e.preventDefault()});
+document.addEventListener('drop',e=>{if(e.target.closest&&e.target.closest('#cbdrop')){e.preventDefault();e.stopPropagation();cbAddFiles([...e.dataTransfer.files]).then(renderCombine)}},true);
 Object.assign(acts,{
   topicopen(t){
     if(!V.topicOpen)V.topicOpen=new Set();
