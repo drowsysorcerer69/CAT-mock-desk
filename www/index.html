@@ -2,7 +2,7 @@
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>CAT Mock Desk</title>
 <meta name="claude:viewport-fit-sides" content="cover">
-<meta name="app-build" content="2026-11-05.01">
+<meta name="app-build" content="2026-11-08.01">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto+Flex:opsz,wght@8..144,400;8..144,500;8..144,600&family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Serif:wght@400;600&display=swap">
 <style>
 /* Layout: home/analysis are scrolling pages on a paper-blue ground; the exam is a fixed-height console (header, section bar, question pane + palette, action bar) modelled on the CAT screen. */
@@ -149,7 +149,9 @@ body:not(.exam-on) svg.chart{cursor:zoom-in}
 .dueb{display:inline-grid;place-items:center;min-width:18px;height:18px;padding:0 5px;margin-left:4px;border-radius:99px;background:var(--bad);color:#fff;font:600 11px var(--f-ui)}
 @media (max-width:640px){
   .top{display:block}
-  .homebar{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;width:100%;margin-top:12px}
+  .homebar{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:8px;width:100%;margin-top:12px}
+  .homebar>:nth-child(n+2):nth-child(-n+4){grid-column:span 2}
+  .homebar>:nth-child(n+5){grid-column:span 3}
   .homebar .nm{grid-column:1/-1;width:100%;max-width:none}
   .homebar>.btn,.homebar>.more,.homebar>.more>summary{width:100%;min-width:0}
   .homebar .btn{justify-content:center;text-align:center;padding-inline:6px;white-space:nowrap;font-size:13px}
@@ -561,7 +563,6 @@ label.row>input[type=checkbox]{margin-top:4px;flex:none;width:18px;height:18px}
 }
 @media (max-width:640px) and (max-height:520px){.xside .xsubmit{padding:6px 12px}}
 </style>
-</head><body>
 <div id="app"></div>
 <script>
 'use strict';
@@ -581,8 +582,8 @@ function toast(m){let t=document.querySelector('.toast');if(!t){t=document.creat
 async function copyText(t){try{await navigator.clipboard.writeText(t);toast('Copied')}catch(e){const ta=document.createElement('textarea');ta.value=t;document.body.appendChild(ta);ta.select();try{document.execCommand('copy');toast('Copied')}catch(_){toast('Select and copy manually')}ta.remove()}}
 
 /* ---------- storage: browser copy always, account copy when the viewer provides it ---------- */
-const store={papers:LS.get('cmd.papers')||[],attempts:LS.get('cmd.attempts')||[],cloud:false,col:null,q:Promise.resolve(),
-  mirror(){LS.set('cmd.papers',this.papers);LS.set('cmd.attempts',this.attempts)},
+const store={papers:LS.get('cmd.papers')||[],attempts:LS.get('cmd.attempts')||[],notes:LS.get('cmd.notes')||[],cloud:false,col:null,q:Promise.resolve(),
+  mirror(){LS.set('cmd.papers',this.papers);LS.set('cmd.attempts',this.attempts);LS.set('cmd.notes',this.notes)},
   async init(){
     try{
       if(!window.claude||!claude.use)return;
@@ -600,13 +601,13 @@ const store={papers:LS.get('cmd.papers')||[],attempts:LS.get('cmd.attempts')||[]
   },
   push(d){this.q=this.q.then(()=>this.col&&this.col.doc(d.id).set(d)).catch(e=>{toast('Could not save to your account; kept in this browser')})},
   save(d){
-    const list=d.kind==='paper'?this.papers:this.attempts;const i=list.findIndex(x=>x.id===d.id);
+    const list=d.kind==='paper'?this.papers:d.kind==='note'?this.notes:this.attempts;const i=list.findIndex(x=>x.id===d.id);
     if(i>=0)list[i]=d;else{if(d.kind==='paper'&&!d.derived&&!d.cat&&typeof V!=='undefined'&&V.addCat&&V.addCat!=='auto')d.cat=V.addCat;list.unshift(d)}
-    if(!LS.set('cmd.'+(d.kind==='paper'?'papers':'attempts'),list)&&!this.cloud)toast('Browser storage is full or blocked; this will not be kept');
+    if(!LS.set('cmd.'+(d.kind==='paper'?'papers':d.kind==='note'?'notes':'attempts'),list)&&!this.cloud)toast('Browser storage is full or blocked; this will not be kept');
     if(this.cloud)this.push(d);
   },
   remove(d){
-    const list=d.kind==='paper'?this.papers:this.attempts;const i=list.findIndex(x=>x.id===d.id);if(i>=0)list.splice(i,1);
+    const list=d.kind==='paper'?this.papers:d.kind==='note'?this.notes:this.attempts;const i=list.findIndex(x=>x.id===d.id);if(i>=0)list.splice(i,1);
     this.mirror();
     if(this.cloud)this.q=this.q.then(()=>this.col.doc(d.id).delete()).catch(()=>{});
   }
@@ -825,8 +826,8 @@ function papersListHtml(q){
   return `${papers.length?papers.map(p=>{const a=atts.filter(x=>x.paperId===p.id);const last=a[0];return `<div class="paper"><div>${titleCell(p)}
       <div class="chips" style="margin-top:4px">${p.sections.map(s=>`<span class="chip">${esc(s.name)} · ${s.count}Q · ${s.minutes}m</span>`).join('')}<span class="chip">${paperMax(p)} marks</span></div>
       <div class="sub" style="font-size:12px;margin-top:4px">${a.length?a.length+' attempt'+(a.length>1?'s':'')+' · last '+r1(last.score)+'/'+last.max:'Not attempted yet'}</div></div>
-      <div class="row"><button class="btn pri sm" data-act="start" data-id="${p.id}">Start</button><button class="btn sm" data-act="rename" data-id="${p.id}">Rename</button><button class="btn sm" data-act="pctl" data-id="${p.id}">${p.pct&&p.pct.length?'Percentile ✓':'Percentile'}</button><button class="btn sm" data-act="logpast" data-id="${p.id}">Log past attempt</button><button class="btn sm danger" data-act="delpaper" data-id="${p.id}">Delete</button></div></div>`}).join(''):`<p class="sub">No papers yet. Add one on the left, or load the sample to see how the exam screen and analysis look.</p>`}
-    ${sets.length?`<h3 style="margin-top:20px">DPP sets and section tests</h3>`+sets.map(p=>{const a=atts.filter(x=>x.paperId===p.id);return `<div class="paper"><div>${titleCell(p)}<div class="sub" style="font-size:12px">${p.questions.length} questions · ${p.sections[0].minutes} min${a.length?' · '+a.length+' attempt'+(a.length>1?'s':''):''}</div></div><div class="row"><button class="btn pri sm" data-act="start" data-id="${p.id}">Start</button><button class="btn sm" data-act="rename" data-id="${p.id}">Rename</button><button class="btn sm" data-act="pctl" data-id="${p.id}">${p.pct&&p.pct.length?'Percentile ✓':'Percentile'}</button><button class="btn sm" data-act="logpast" data-id="${p.id}">Log past attempt</button><button class="btn sm danger" data-act="delpaper" data-id="${p.id}">Delete</button></div></div>`}).join(''):''}`;
+      <div class="row"><button class="btn pri sm" data-act="start" data-id="${p.id}">Start</button><button class="btn sm" data-act="rename" data-id="${p.id}">Rename</button><button class="btn sm" data-act="pctl" data-id="${p.id}">${p.pct&&p.pct.length?'Percentile ✓':'Percentile'}</button><button class="btn sm" data-act="expjson" data-id="${p.id}">Export JSON</button><button class="btn sm" data-act="logpast" data-id="${p.id}">Log past attempt</button><button class="btn sm danger" data-act="delpaper" data-id="${p.id}">Delete</button></div></div>`}).join(''):`<p class="sub">No papers yet. Add one on the left, or load the sample to see how the exam screen and analysis look.</p>`}
+    ${sets.length?`<h3 style="margin-top:20px">DPP sets and section tests</h3>`+sets.map(p=>{const a=atts.filter(x=>x.paperId===p.id);return `<div class="paper"><div>${titleCell(p)}<div class="sub" style="font-size:12px">${p.questions.length} questions · ${p.sections[0].minutes} min${a.length?' · '+a.length+' attempt'+(a.length>1?'s':''):''}</div></div><div class="row"><button class="btn pri sm" data-act="start" data-id="${p.id}">Start</button><button class="btn sm" data-act="rename" data-id="${p.id}">Rename</button><button class="btn sm" data-act="pctl" data-id="${p.id}">${p.pct&&p.pct.length?'Percentile ✓':'Percentile'}</button><button class="btn sm" data-act="expjson" data-id="${p.id}">Export JSON</button><button class="btn sm" data-act="logpast" data-id="${p.id}">Log past attempt</button><button class="btn sm danger" data-act="delpaper" data-id="${p.id}">Delete</button></div></div>`}).join(''):''}`;
 }
 function renderHome(){
   const sess=LS.get('cmd.session');
@@ -1529,10 +1530,10 @@ acts.airun=async()=>{
   V.aiBusy=false;if(V.view==='analysis')renderAnalysis();
 };
 /* desktop backup */
-acts.backup=async()=>{try{const ok=await window.desk.exportBackup(JSON.stringify({app:'cat-mock-desk',papers:store.papers,attempts:store.attempts}));toast(ok?'Backup saved':'Cancelled')}catch(e){toast('Backup failed')}};
+acts.backup=async()=>{try{const ok=await window.desk.exportBackup(JSON.stringify({app:'cat-mock-desk',papers:store.papers,attempts:store.attempts,notes:store.notes}));toast(ok?'Backup saved':'Cancelled')}catch(e){toast('Backup failed')}};
 acts.restore=async()=>{
   try{const txt=await window.desk.importBackup();if(!txt)return;const d=JSON.parse(txt);let n=0;
-    [...(d.papers||[]),...(d.attempts||[])].forEach(x=>{if(x&&x.id&&(x.kind==='paper'||x.kind==='attempt')){const l=x.kind==='paper'?store.papers:store.attempts;if(!l.find(y=>y.id===x.id)){store.save(x);n++}}});
+    [...(d.papers||[]),...(d.attempts||[]),...(d.notes||[])].forEach(x=>{if(x&&x.id&&(x.kind==='paper'||x.kind==='attempt'||x.kind==='note')){const l=x.kind==='paper'?store.papers:x.kind==='note'?store.notes:store.attempts;if(!l.find(y=>y.id===x.id)){store.save(x);n++}}});
     store.papers.sort((a,b)=>b.created-a.created);store.attempts.sort((a,b)=>b.date-a.date);store.mirror();
     V.msg={t:'ok',m:n+' item'+(n===1?'':'s')+' restored.'}}catch(e){V.msg={t:'err',m:'That file is not a valid backup.'}}
   renderHome();
@@ -1553,6 +1554,33 @@ function buildDerived(items,title,mins,secName){
   const qs=items.map((it,i)=>Object.assign({},it.q,{id:'q'+i,sec:0,srcKey:it.q.srcKey||it.key}));
   const d={id:uid('p_'),kind:'paper',derived:true,title,created:Date.now(),sections:[{name:secName,minutes:mins,count:qs.length}],questions:qs};
   store.save(d);return d;
+}
+/* ---------- mock formats made from one paper: sectional sets and micro sets ---------- */
+function sectionalSets(p){
+  if(!p||p.sections.length<2)return [];
+  const out=[];p.sections.forEach((s,si)=>{if(p.questions.some(q=>q.sec===si))out.push(sectionOnly(p,si))});return out;
+}
+function microSets(p,size){
+  size=Math.max(2,Math.min(30,Math.round(+size)||5));
+  if(store.papers.some(x=>x.derived&&x.srcPaper===p.id&&x.microSize===size))return [];
+  const out=[];
+  p.sections.forEach((sec,si)=>{
+    const qs=p.questions.filter(q=>q.sec===si);if(!qs.length)return;
+    const groups=[];qs.forEach(q=>{const g=groups[groups.length-1];if(g&&q.passage&&g.passage===q.passage)g.qs.push(q);else groups.push({passage:q.passage||'',qs:[q]})});
+    const sets=[];let cur=[];
+    groups.forEach(g=>{if(cur.length&&cur.length+g.qs.length>size){sets.push(cur);cur=[]}cur=cur.concat(g.qs)});
+    if(cur.length){if(sets.length&&cur.length<Math.ceil(size/2))sets[sets.length-1]=sets[sets.length-1].concat(cur);else sets.push(cur)}
+    const perQ=(sec.minutes||40)/qs.length;
+    sets.forEach((set,k)=>{
+      const mins=Math.max(2,Math.round(set.length*perQ));
+      const label=(p.sections.length>1?sec.name+' ':'')+'micro '+(k+1);
+      const d={id:uid('p_'),kind:'paper',derived:true,micro:true,microSize:size,srcPaper:p.id,title:p.title+' · '+label,created:Date.now()+out.length,
+        sections:[{name:sec.name,minutes:mins,count:set.length}],
+        questions:set.map((q,i)=>Object.assign({},q,{id:'q'+i,sec:0,srcKey:q.srcKey||p.id+':'+q.id}))};
+      store.save(d);out.push(d);
+    });
+  });
+  return out;
 }
 function qPool(){const o=[];store.papers.filter(p=>!p.derived).forEach(p=>p.questions.forEach((q,i)=>o.push({p,q,i,key:p.id+':'+q.id,sec:p.sections[q.sec].name})));return o}
 function lastStatus(){
@@ -1735,8 +1763,9 @@ function parseExamPages(pages){
     const t=(l.t||'').replace(/\s+/g,' ').trim();if(!t)return;
     if(/^page\s+\d+(\s+of\s+\d+)?$/i.test(t)||/^[-–\s]*\d{1,3}[-–\s]*$/.test(t)&&t.length<6)return;
     if(np>=3&&freq[t]>=Math.max(3,Math.ceil(np*0.6))&&t.length<90)return;
-    lines.push({t,x:+l.x||0,para:!!l.para,pg:pi});
+    lines.push({t,x:+l.x||0,cx:+l.cx||0,para:!!l.para,pg:pi});
   }));
+  if(lines.length>1&&lines[0].t===title&&lines[1].t.length<40&&/^(practice|mock|test|full|paper)\b/i.test(lines[1].t))title+=' '+lines[1].t;
   /* margin: most common smallest x */
   const xs=lines.map(l=>Math.round(l.x)).filter(x=>x>0).sort((a,b)=>a-b);
   const margin=xs.length?xs[Math.floor(xs.length*0.08)]:0;
@@ -1745,7 +1774,18 @@ function parseExamPages(pages){
   const keyRe=/^(answer\s*key(?:\s*(?:&|and)\s*(?:explanations?|solutions?))?|answers?\s*(?:&|and)\s*(?:explanations?|solutions?)|solutions?\s*(?:&|and)\s*(?:answers?|explanations?)|answers?\s*and\s*solutions|answers|explanations|solutions)\s*[:.]?$/i;
   let keyIdx=-1;
   for(let i=Math.floor(lines.length*0.2);i<lines.length;i++){if(lines[i].t.length<70&&/^[A-Z]/.test(lines[i].t)&&(lines[i].para||i===0||/key/i.test(lines[i].t))&&keyRe.test(lines[i].t)){keyIdx=i;break}}
-  const body=keyIdx>=0?lines.slice(0,keyIdx):lines,keyL=keyIdx>=0?lines.slice(keyIdx+1):[];
+  /* an answer grid with no heading: a line holding several "n. (x)" pairs */
+  const labelRe=/^(VARC|DILR|LRDI|DI\s*&\s*LR|QUANT(?:ITATIVE(?:\s+ABILITY)?)?|QA|VERBAL(?:\s+ABILITY)?(?:\s*(?:&|and)\s*READING\s+COMPREHENSION)?)$/i;
+  {const gridRe=/\b(\d{1,3})\s*[.)]\s*\(([A-Da-d]|\d+(?:\.\d+)?)\)/g;
+   for(let i=Math.floor(lines.length*0.2);i<lines.length&&(keyIdx<0||i<keyIdx);i++){
+     const m=lines[i].t.match(gridRe);
+     if(m&&m.length>=4){let k=i;while(k>0&&i-k<3&&labelRe.test(lines[k-1].t))k--;keyIdx=k;break}
+   }}
+  let keyHdr=false;
+  const body=keyIdx>=0?lines.slice(0,keyIdx):lines;
+  let keyL=keyIdx>=0?lines.slice(keyIdx+1):[];
+  if(keyIdx>=0&&labelRe.test(lines[keyIdx].t)){keyL=lines.slice(keyIdx)}
+  keyL=keyL.filter(l=>!/smart\.link|^PW\s+Web|^Library\s*[-–]|^Hints?\s*(&|and)\s*Solutions?$/i.test(l.t));
   /* ----- answer key ----- */
   const key={};
   const num='\\d+(?:\\.\\d+)?';
@@ -1756,10 +1796,11 @@ function parseExamPages(pages){
   keyL.forEach((l,i)=>{
     const m=startA.exec(l.t);
     if(m){curK={a:m[2],sol:m[3]||''};key[+m[1]]=curK;return}
-    const b=/^\s*(?:Q\.?\s*)?(\d{1,3})\s*[.):\-–]\s*\(?([A-Da-d])\)?\s*(?:[.,;]|$)/.exec(l.t);
-    if(b&&!key[+b[1]]){key[+b[1]]={a:b[2]};curK=key[+b[1]];return}
+    const b=/^\s*(?:Q\.?\s*)?(\d{1,3})\s*[.):\-–]\s*(?:\(([A-Da-d]|\d+(?:\.\d+)?)\)|([A-Da-d]))\s*(?:[.,;]|$)/.exec(l.t);
+    if(b){const v=b[2]||b[3];if(!key[+b[1]])key[+b[1]]={a:v};curK=key[+b[1]];return}
     if(curK){
       if(/^(Passage \d+|Section \d+|[A-Za-z ]{3,40}:?\s*Explanations?|Verbal Ability.*|Reading Comprehension.*)$/i.test(l.t)&&l.t.length<90)return;
+      if(labelRe.test(l.t))return;
       if(/^Quick key/i.test(l.t))return;
       curK.sol=((curK.sol||'')+' '+l.t).trim();
     }
@@ -1774,12 +1815,13 @@ function parseExamPages(pages){
   const diffDoc=/\b(difficult|hard|tough)\b/i.test(title)?'hard':/\beasy\b/i.test(title)?'easy':'medium';
   /* ----- body walk ----- */
   const secHeads=body.filter(l=>/^Section\s*[A-Z0-9IVX]+\s*[:\-–.]/i.test(l.t)).length;
-  const singleName=tokenM?(/^QUANT/i.test(tokenM[1])?'QA':tokenM[1].toUpperCase().replace('LRDI','DILR')):null;
-  const multi=!singleName&&secHeads>=2;
+  const labelHeads=new Set(body.filter(l=>labelRe.test(l.t)).map(l=>l.t.toUpperCase().replace(/\s+/g,''))).size;
+  const singleName=labelHeads>=2?null:tokenM?(/^QUANT/i.test(tokenM[1])?'QA':tokenM[1].toUpperCase().replace('LRDI','DILR')):null;
+  const multi=labelHeads>=2||(!singleName&&secHeads>=2);
   const sections=[];let secIdx=-1;
-  const newSection=(name,mins)=>{sections.push({name,minutes:mins||40});secIdx=sections.length-1};
+  const newSection=(name,mins)=>{sections.push({name,minutes:mins||40,auto:!mins});secIdx=sections.length-1};
   const canon=n=>/verbal|reading|varc/i.test(n)?'VARC':/data\s*interp|logical|dilr|lrdi/i.test(n)?'DILR':/quant|\bqa\b|arithmetic/i.test(n)?'QA':n;
-  if(!multi)newSection(singleName||'Section 1',minutesM?+minutesM[1]:40);
+  if(!multi)newSection(singleName||'Section 1',minutesM?+minutesM[1]:0);
   const topicGroups=[],passages=[];
   let curPassage=null,pendPass=null,loose=[],curDir='',dirMode=false,mode='pre',cur=null,expected=1,justSection=false;
   const qs=[];
@@ -1792,6 +1834,10 @@ function parseExamPages(pages){
   for(let i=0;i<body.length;i++){
     const l=body[i],t=l.t;let m;
     /* headings */
+    if(multi&&labelRe.test(t)&&t.length<40&&!cur||multi&&labelRe.test(t)&&cur&&cur.options.length>=2&&t.length<40){
+      closeQ();closePass();curPassage=null;curDir='';dirMode=false;justSection=true;loose=[];
+      newSection(canon(t),0);mode='pre';continue;
+    }
     if((m=/^Section\s*([A-Z0-9IVX]+)\s*[:\-–.]\s*(.+)$/i.exec(t))){
       closeQ();closePass();curPassage=null;curDir='';dirMode=false;justSection=true;
       const rg=/\(\s*Questions?\s*(\d+)\s*[-–to]+\s*(\d+)\s*\)/i.exec(m[2]);
@@ -1831,7 +1877,7 @@ function parseExamPages(pages){
       }
     }
     if(mode==='passage'){joinInto(pendPass.paras,l);continue}
-    if(dirMode&&!cur){if(l.para||/^(Passage|Section)/i.test(t))dirMode=false;else{curDir+=' '+t;continue}}
+    if(dirMode&&!cur){if(l.para||/^(Passage|Section)/i.test(t)||/[.:!?]\s*$/.test(curDir))dirMode=false;else{curDir+=' '+t;continue}}
     if(!cur){ if(l.para||!loose.length)loose.push(t);else loose[loose.length-1]+=' '+t; continue }
     /* inside a question */
     if((m=/^(?:Correct\s*)?(?:Ans(?:wer)?|Key)\s*[:\-–]\s*\(?([A-Da-d](?![A-Za-z])|\d+(?:\.\d+)?)\)?\.?\s*(.*)$/i.exec(t))){cur.ans=m[1];cur.sol=m[2]||'';cur.state='sol';continue}
@@ -1853,7 +1899,7 @@ function parseExamPages(pages){
       }
     }
     if(cur.state==='opts'){
-      const cont=(hasX&&l.x>margin+8)||(!l.para&&/^[a-z(“"'‘]/.test(t))||(!hasX&&!l.para);
+      const cont=(hasX&&l.x>(l.cx||margin)+8)||(!l.para&&/^[a-z(“"'‘]/.test(t))||(!hasX&&!l.para);
       if(cont){cur.options[cur.options.length-1]+=' '+t;continue}
       if(l.para||true){ if(l.para||!loose.length)loose.push(t);else loose[loose.length-1]+=' '+t; continue }
     }
@@ -1905,6 +1951,7 @@ function parseExamPages(pages){
     if(!q.text)warnings.push('Question '+q.n+' has no question text.');
   });
   if(!questions.length)warnings.push('No questions were recognised. Try Parse with AI, or paste the text.');
+  sections.forEach((sc,si)=>{if(sc.auto){const n=questions.filter(q=>q.sec===si).length;sc.minutes=(n>=16&&n<=34)||!n?40:Math.max(5,Math.round(n*1.8/5)*5)}delete sc.auto});
   return {title:title.replace(/\s+/g,' ').slice(0,120),sections,questions,warnings,hadKey:keyIdx>=0||Object.keys(key).length>0};
 }
 function textToPages(text){
@@ -1945,6 +1992,25 @@ function groupLines(items){
   lines.forEach((l,i)=>{l.para=i>0&&(l.y-lines[i-1].y)>med*1.45});
   return lines;
 }
+/* two-column pages (common in coaching PDFs): read the left column, then the right one */
+function groupCols(items,W){
+  const done=(arr)=>{const ls=groupLines(arr);const xs=ls.map(l=>l.x).sort((a,b)=>a-b);const cx=xs.length?xs[Math.floor(xs.length*0.05)]:0;ls.forEach(l=>{l.cx=cx});return ls};
+  /* join neighbouring pieces on one baseline into runs, so a centred heading is not cut at the gutter */
+  items=items.slice().sort((a,b)=>a.y-b.y||a.x-b.x);
+  {const out=[];items.forEach(it=>{const p=out[out.length-1];
+    if(p&&Math.abs(p.y-it.y)<=Math.max(2,it.h*.3)&&it.x>=p.x+p.w-1&&it.x-(p.x+p.w)<=Math.max(2,it.h*.8)){p.s+=(/\s$/.test(p.s)||/^\s/.test(it.s)||it.x-(p.x+p.w)<1?'':' ')+it.s;p.w=it.x+it.w-p.x}
+    else out.push(Object.assign({},it))});items=out}
+  if(items.length<40)return done(items);
+  const mid=(W||Math.max(...items.map(i=>i.x+i.w)))/2;
+  const cross=items.filter(it=>it.x<mid-6&&it.x+it.w>mid+6).length;
+  const L=items.filter(it=>it.x<mid),R=items.filter(it=>it.x>=mid);
+  if(cross<=items.length*0.04&&L.length>=items.length*0.2&&R.length>=items.length*0.2){
+    /* the gutter must be empty for most of the page height */
+    const gut=items.filter(it=>it.x+it.w>mid-4&&it.x<mid+4).length;
+    if(gut<=items.length*0.04)return done(L).concat(done(R));
+  }
+  return done(items);
+}
 async function pdfToPages(file,progress){
   const lib=await loadPdfJs();
   const doc=await lib.getDocument({data:new Uint8Array(await file.arrayBuffer())}).promise;
@@ -1954,7 +2020,8 @@ async function pdfToPages(file,progress){
     const page=await doc.getPage(i);
     const tc=await page.getTextContent();
     const items=tc.items.filter(it=>it.str&&it.str.trim()).map(it=>({s:it.str,x:it.transform[4],y:-it.transform[5],w:it.width||0,h:Math.abs(it.transform[3])||10}));
-    let lines=groupLines(items);
+    const vw=page.getViewport({scale:1}).width;
+    let lines=groupCols(items,vw);
     if(lines.reduce((n,l)=>n+l.t.length,0)<25){
       /* scanned page: render and OCR (desktop app only) */
       if(window.desk&&window.desk.ocr){
@@ -1972,7 +2039,7 @@ async function pdfToPages(file,progress){
 }
 function sectionsOk(d){return d&&d.sections&&d.sections.length}
 function startReview(parsed,fname,note){
-  IM.draft=parsed;IM.stage='review';IM.fname=fname||'';IM.note=note||'';IM.busy='';go('import');
+  IM.draft=parsed;IM.stage='review';IM.fname=fname||'';IM.note=note||'';IM.busy='';IM.mk={full:true,sec:parsed.sections.length>1,micro:false,size:5};go('import');
 }
 async function importFiles(files){
   const f=files[0];if(!f)return;
@@ -2045,6 +2112,10 @@ function renderReview(){
   <div class="panel stack">
    <div class="imf"><label style="flex:1;min-width:240px">Paper name<input data-imf="title" value="${esc(d.title)}"></label></div>
    <div><div class="sub" style="font-size:12px;margin-bottom:4px">Add it as</div><div class="seg">${[['auto','Auto'],['full','Full syllabus'],['sectional','Sectional'],['topic','Topic-wise'],['drill','Drill']].map(([k,l])=>`<button class="${(V.addCat||'auto')===k?'on':''}" data-act="addcat" data-v="${k}">${l}</button>`).join('')}</div></div>
+   ${(()=>{const mk=IM.mk||(IM.mk={full:true,sec:d.sections.length>1,micro:false,size:5});return `<div class="stack" style="gap:6px"><div class="sub" style="font-size:12px">Ways to attempt it (tick any)</div>
+    <label class="row" style="gap:10px"><input type="checkbox" data-imopt="full" ${mk.full?'checked':''}><span>Normal mock: the whole paper, all sections</span></label>
+    <label class="row" style="gap:10px"><input type="checkbox" data-imopt="sec" ${mk.sec?'checked':''}><span>Sectional mocks: one test per section, each with its own timer</span></label>
+    <label class="row" style="gap:10px"><input type="checkbox" data-imopt="micro" ${mk.micro?'checked':''}><span>Micro mocks: short sets of <input type="number" min="2" max="30" data-imopt="size" value="${mk.size}" style="width:62px;border:1px solid var(--line);border-radius:10px;padding:2px 8px;background:var(--surface);color:var(--ink)"> questions (a passage and its questions stay together)</span></label></div>`})()}
    <div class="imf">${d.sections.map((s,i)=>`<label style="flex:1;min-width:200px">Section ${i+1} name<input data-imsec="${i}:name" value="${esc(s.name)}"></label><label style="width:110px">Minutes<input type="number" min="1" data-imsec="${i}:minutes" value="${s.minutes}"></label>`).join('')}</div>
    <div class="sub">${d.questions.length} questions found: ${d.questions.filter(q=>q.type==='mcq').length} multiple choice, ${d.questions.filter(q=>q.type==='tita').length} type-in. ${d.hadKey?'An answer key was found.':'No answer key was found. Paste one below or fill answers in.'}</div>
    ${IM.note?`<div class="msg info">${esc(IM.note)}</div>`:''}
@@ -2123,6 +2194,19 @@ async function aiRead(){
   IM.aiBusy=false;renderReview();
 }
 Object.assign(acts,{
+  mksec(t){const p=store.papers.find(x=>x.id===t.dataset.id);if(!p)return;
+    const had=store.papers.filter(x=>x.derived&&x.srcPaper===p.id&&x.srcSec!=null).length;const n=sectionalSets(p).length;
+    toast(had?'Sectional mocks already exist. Find them under Sectional mock.':n+' sectional mocks made. Find them under Sectional mock.');render()},
+  mkmicro(t){const p=store.papers.find(x=>x.id===t.dataset.id);if(!p)return;
+    openPanel('Make micro mocks',p.title,`<div class="stack" style="gap:12px;max-width:420px"><p class="sub" style="margin:0">Splits each section into short timed sets. A passage and its questions always stay together. Time is shared out in proportion to the section time.</p>
+     <label class="field"><span class="sub">Questions per micro mock</span><input class="cbin" id="mmsize" type="number" min="2" max="30" value="5"></label>
+     <div class="row"><button class="btn pri" data-act="mkmicrogo" data-id="${p.id}">Create</button></div></div>`)},
+  mkmicrogo(t){const p=store.papers.find(x=>x.id===t.dataset.id),i=document.getElementById('mmsize');if(!p)return;
+    const sz=Math.max(2,Math.min(30,Math.round(+(i&&i.value))||5));const n=microSets(p,sz).length;closeZoom();
+    toast(n?n+' micro mocks made. Find them under Topic-wise mock.':'Micro mocks of '+sz+' questions already exist for this paper.');render()}
+});
+document.addEventListener('click',e=>{const t=e.target.closest&&e.target.closest('#zoomov [data-act^="mk"]');if(t&&acts[t.dataset.act])acts[t.dataset.act](t)});
+Object.assign(acts,{
   importpdf(){IM.stage='pick';IM.err='';IM.busy='';go('import')},
   impick(){document.getElementById('imfile').click()},
   imparse(){const v=(document.getElementById('imtext').value||'').trim();if(!v){IM.err='Paste the paper text first.';return renderImport()}IM.pages=null;importText(v,'')},
@@ -2133,12 +2217,22 @@ Object.assign(acts,{
   imdel(t){IM.draft.questions.splice(+t.dataset.i,1);renderReview()},
   imai(){aiRead()},
   imadd(){
-    try{const p=normalizePaper(draftToRaw(IM.draft));store.save(p);IM.draft=null;IM.stage='pick';V.msg={t:'ok',m:'"'+p.title+'" added with '+p.questions.length+' questions.'};go('home')}
+    try{const p=normalizePaper(draftToRaw(IM.draft));const mk=IM.mk||{full:true};
+      const keep0=mk.full||(!mk.sec&&!mk.micro);
+      if(keep0)store.save(p);
+      const sec=mk.sec?sectionalSets(p):[],mic=mk.micro?microSets(p,mk.size):[];
+      if(!keep0&&!sec.length&&!mic.length)store.save(p);
+      const keep=keep0||(!sec.length&&!mic.length);
+      const bits=[];if(keep)bits.push('normal mock');if(sec.length)bits.push(sec.length+' sectional');if(mic.length)bits.push(mic.length+' micro');
+      IM.draft=null;IM.stage='pick';V.msg={t:'ok',m:'"'+p.title+'" added ('+p.questions.length+' questions): '+bits.join(', ')+'.'};go('home')}
     catch(e){IM.err=e.message;renderReview();window.scrollTo(0,0)}
   }
 });
+app.addEventListener('change',e=>{const t=e.target;if(!t||!t.dataset||!t.dataset.imopt||!IM.mk)return;
+  const k=t.dataset.imopt;if(k==='size')IM.mk.size=Math.max(2,Math.min(30,Math.round(+t.value)||5));else IM.mk[k]=t.checked});
 app.addEventListener('input',e=>{
-  const t=e.target;if(!IM.draft||V.view!=='import')return;
+  const t=e.target;if(t&&t.dataset&&t.dataset.imopt==='size'&&IM.mk){IM.mk.size=Math.max(2,Math.min(30,Math.round(+t.value)||5));return}
+  if(!IM.draft||V.view!=='import')return;
   if(t.dataset.imf==='title'){IM.draft.title=t.value;return}
   if(t.dataset.imsec){const[i,f]=t.dataset.imsec.split(':');IM.draft.sections[+i][f]=f==='minutes'?(+t.value||1):t.value;return}
   if(t.dataset.imq){const[i,f]=t.dataset.imq.split(':');const q=IM.draft.questions[+i];if(!q)return;
@@ -2177,19 +2271,24 @@ function qHistory(){
   return H;
 }
 function poolMap(){const m={};qPool().forEach(it=>{m[it.key]=it});return m}
-function mistakeItems(){
+function mistakeItems(withDisc){
   const H=qHistory(),P=poolMap(),now=Date.now(),out=[];
   Object.values(H).forEach(h=>{
     const wrongs=h.ev.filter(e=>e.st!=='correct').length;if(!wrongs)return;
     let streak=0;for(let i=h.ev.length-1;i>=0&&h.ev[i].st==='correct';i--)streak++;
-    const last=h.ev[h.ev.length-1],mastered=streak>=NEED_RIGHT,dueAt=last.d+REVIEW_DAYS*DAY;
-    out.push(Object.assign({},h,{wrongs,streak,last,mastered,dueAt,due:!mastered&&dueAt<=now,pool:P[h.key]||null}));
+    const last=h.ev[h.ev.length-1],dueAt=last.d+REVIEW_DAYS*DAY;
+    const ns=nbMap()[h.key];let forced=false,disc=false;
+    if(ns&&!(last.d>ns.at&&last.st!=='correct')){if(ns.s==='discarded')disc=true;else forced=ns.s==='learned'}
+    if(disc&&!withDisc)return;
+    const mastered=!disc&&(streak>=NEED_RIGHT||forced);
+    out.push(Object.assign({},h,{wrongs,streak,last,mastered,forced,disc,dueAt,due:!mastered&&!disc&&dueAt<=now,pool:P[h.key]||null}));
   });
   return out.sort((a,b)=>a.dueAt-b.dueAt);
 }
 function dueCount(){try{return mistakeItems().filter(m=>m.due&&m.pool).length}catch(e){return 0}}
 function dueLabel(m){
-  if(m.mastered)return 'Mastered';
+  if(m.disc)return 'Discarded';
+  if(m.mastered)return m.forced?'Marked learned':'Mastered';
   const d=m.dueAt-Date.now();if(d<=0)return 'Due now';
   const n=Math.ceil(d/DAY);return 'Review in '+n+' day'+(n>1?'s':'');
 }
@@ -2199,15 +2298,19 @@ function startDerivedFrom(items,title,secName,perq){
   V.paperId=d.id;V.mode='cat';V.scope='all';V.tmv=null;V.untimed=false;V.instant=false;go('instr');
 }
 /* ---- notebook ---- */
+const nbDoc=()=>store.notes.find(n=>n.id==='nbstate');
+const nbMap=()=>(nbDoc()||{}).map||{};
+function nbSet(keys,state){let d=nbDoc();if(!d)d={id:'nbstate',kind:'note',type:'nbstate',created:Date.now(),map:{}};
+  keys.forEach(k=>{if(state)d.map[k]={s:state,at:Date.now()};else delete d.map[k]});store.save(d)}
 function nbFiltered(){
-  const nb=V.nb,all=mistakeItems();
-  return all.filter(m=>(nb.tab==='mastered')===m.mastered&&(nb.sec==='all'||m.sec===nb.sec)&&(nb.topic==='all'||m.topic===nb.topic)&&(nb.reason==='all'||m.last.st===nb.reason));
+  const nb=V.nb,all=nb.tab==='discarded'?mistakeItems(true).filter(m=>m.disc):mistakeItems();
+  return all.filter(m=>(nb.tab==='discarded'||(nb.tab==='mastered')===m.mastered)&&(nb.sec==='all'||m.sec===nb.sec)&&(nb.topic==='all'||m.topic===nb.topic)&&(nb.reason==='all'||m.last.st===nb.reason));
 }
 function renderNotebook(){
   if(!V.nb)V.nb={tab:'open',sec:'all',topic:'all',reason:'all'};
-  const nb=V.nb,all=mistakeItems(),open=all.filter(m=>!m.mastered),mast=all.filter(m=>m.mastered);
+  const nb=V.nb,all=mistakeItems(),open=all.filter(m=>!m.mastered),mast=all.filter(m=>m.mastered),dis=mistakeItems(true).filter(m=>m.disc);
   const due=open.filter(m=>m.due&&m.pool),list=nbFiltered(),ok=list.filter(m=>m.pool);
-  const uniq=f=>[...new Set(all.filter(m=>(nb.tab==='mastered')===m.mastered).map(f))].filter(Boolean).sort();
+  const uniq=f=>[...new Set((nb.tab==='discarded'?dis:all.filter(m=>(nb.tab==='mastered')===m.mastered)).map(f))].filter(Boolean).sort();
   const sel=(id,label,vals,cur)=>`<label class="field" style="min-width:150px;flex:0 1 190px"><span class="sub">${label}</span><select data-nb="${id}"><option value="all">All</option>${vals.map(v=>`<option value="${esc(v)}"${v===cur?' selected':''}>${esc(v)}</option>`).join('')}</select></label>`;
   const row=m=>{
     const it=m.pool,q=it&&it.q,first=q?String(q.text||'').replace(/^Directions:.*?\n\n/s,'').replace(/\s+/g,' '):'(paper deleted, question text unavailable)';
@@ -2217,7 +2320,9 @@ function renderNotebook(){
      ${q?`${q.passage?`<details><summary>Show passage</summary><div class="sol" style="max-height:240px;overflow:auto;font-family:var(--f-serif)">${richText(q.passage)}</div></details>`:''}
       <div style="white-space:pre-wrap;font-family:var(--f-serif)">${richText(q.text)}</div>
       ${q.type==='mcq'?`<div class="opts">${q.options.map((o,k)=>`<div class="${k===q.ai?'c':''}">${String.fromCharCode(65+k)}. ${stepHtml(o)}</div>`).join('')}</div>`:`<div><b>Answer:</b> ${esc(correctText(q))}</div>`}
-      ${q.solution?solBlock(q.solution):''}`:''}</div></details>`;
+      ${q.solution?solBlock(q.solution):''}`:''}
+     <div class="row" style="margin-top:10px;gap:8px">${m.disc?`<button class="btn sm pri" data-act="nbone" data-op="restore" data-k="${esc(m.key)}">Restore to notebook</button>`
+      :`${m.mastered&&!m.forced?'':`<button class="btn sm pri" data-act="nbone" data-op="learned" data-k="${esc(m.key)}">${m.mastered?'Already learned':'Mark as learned'}</button>`}${m.forced?`<button class="btn sm" data-act="nbone" data-op="reopen" data-k="${esc(m.key)}">Back to open</button>`:''}<button class="btn sm danger" data-act="nbone" data-op="discard" data-k="${esc(m.key)}">Discard</button>`}</div></div></details>`;
   };
   app.innerHTML=`<div class="wrap" style="max-width:980px"><div class="top"><div class="brand">Mistake notebook<small>revise until it sticks</small></div><div class="row"><button class="btn sm" data-act="weak">Weak areas</button><button class="btn sm" data-act="home">Back</button></div></div>
   <div class="stack">
@@ -2227,11 +2332,12 @@ function renderNotebook(){
    <div class="row"><button class="btn pri" data-act="nbstart" data-set="due" ${due.length?'':'disabled'}>Practise what is due (${due.length})</button><button class="btn" data-act="nbstart" data-set="open" ${open.filter(m=>m.pool).length?'':'disabled'}>Practise all open (${open.filter(m=>m.pool).length})</button></div>
   </div>
   <div class="panel">
-   <div class="seg" style="margin-bottom:12px"><button class="${nb.tab==='open'?'on':''}" data-act="nbtab" data-v="open">Open (${open.length})</button><button class="${nb.tab==='mastered'?'on':''}" data-act="nbtab" data-v="mastered">Mastered (${mast.length})</button></div>
+   <div class="seg" style="margin-bottom:12px"><button class="${nb.tab==='open'?'on':''}" data-act="nbtab" data-v="open">Open (${open.length})</button><button class="${nb.tab==='mastered'?'on':''}" data-act="nbtab" data-v="mastered">Mastered (${mast.length})</button>${dis.length?`<button class="${nb.tab==='discarded'?'on':''}" data-act="nbtab" data-v="discarded">Discarded (${dis.length})</button>`:''}</div>
    <div class="row" style="align-items:flex-end;margin-bottom:12px">${sel('sec','Section',uniq(m=>m.sec),nb.sec)}${sel('topic','Topic',uniq(m=>m.topic),nb.topic)}
     <label class="field" style="min-width:150px;flex:0 1 190px"><span class="sub">Last result</span><select data-nb="reason"><option value="all">All</option><option value="wrong"${nb.reason==='wrong'?' selected':''}>Wrong</option><option value="skipped"${nb.reason==='skipped'?' selected':''}>Left blank</option><option value="correct"${nb.reason==='correct'?' selected':''}>Correct last time</option></select></label>
     ${nb.tab==='open'?`<button class="btn" data-act="nbstart" data-set="filtered" ${ok.length?'':'disabled'}>Practise these (${ok.length})</button>`:''}</div>
-   ${list.length?list.map(row).join(''):`<p class="sub">${all.length?'Nothing matches these filters.':'No mistakes recorded yet. Finish an attempt, or log a past one, and the wrong and blank questions show up here.'}</p>`}
+   ${list.length&&nb.tab!=='discarded'?`<div class="row" style="margin:-4px 0 12px;gap:8px"><span class="sub" style="font-size:12.5px">For the ${list.length} shown:</span>${nb.tab==='open'?`<button class="btn sm" data-act="nbbulk" data-op="learned">Mark learned</button>`:''}<button class="btn sm danger" data-act="nbbulk" data-op="discard">Discard</button></div>`:''}
+   ${list.length?list.map(row).join(''):`<p class="sub">${all.length||dis.length?'Nothing matches these filters.':'No mistakes recorded yet. Finish an attempt, or log a past one, and the wrong and blank questions show up here.'}</p>`}
   </div></div>${footerHtml()}</div>`;
 }
 /* ---- weak areas ---- */
@@ -2350,7 +2456,7 @@ function catRow(p){
   return `<div class="prow"><div class="pmain" style="min-width:0">${titleCell(p)}
    <div class="sub" style="font-size:12px;margin-top:2px">${meta} · ${a.length?a.length+' attempt'+(a.length>1?'s':'')+' · last '+r1(last.score)+'/'+last.max:'not attempted'}</div></div>
    <div class="pbtn"><button class="btn pri sm" data-act="start" data-id="${p.id}">Start</button>${a.length?`<button class="btn sm" data-act="paperan" data-id="${p.id}">Analysis</button>`:''}
-    <details class="more"><summary class="btn sm" aria-label="More actions">⋯</summary><div class="menu"><button class="btn sm" data-act="rename" data-id="${p.id}">Rename</button><button class="btn sm" data-act="pctl" data-id="${p.id}">${p.pct&&p.pct.length?'Percentile ✓':'Percentile'}</button><button class="btn sm" data-act="logpast" data-id="${p.id}">Log past attempt</button><button class="btn sm danger" data-act="delpaper" data-id="${p.id}">Delete</button></div></details></div>
+    <details class="more"><summary class="btn sm" aria-label="More actions">⋯</summary><div class="menu"><button class="btn sm" data-act="rename" data-id="${p.id}">Rename</button><button class="btn sm" data-act="pctl" data-id="${p.id}">${p.pct&&p.pct.length?'Percentile ✓':'Percentile'}</button><button class="btn sm" data-act="expjson" data-id="${p.id}">Export JSON</button>${p.derived?'':`${p.sections.length>1?`<button class="btn sm" data-act="mksec" data-id="${p.id}">Make sectional mocks</button>`:''}<button class="btn sm" data-act="mkmicro" data-id="${p.id}">Make micro mocks</button>`}<button class="btn sm" data-act="logpast" data-id="${p.id}">Log past attempt</button><button class="btn sm danger" data-act="delpaper" data-id="${p.id}">Delete</button></div></details></div>
    <div class="pctl"><label class="sub" style="display:flex;gap:6px;align-items:center;font-size:12px">Category <select class="tag" data-mvc="${p.id}">${opt('full','Full syllabus',c)}${opt('sectional','Sectional',c)}${opt('topic','Topic-wise',c)}${opt('drill','Drill',c)}</select></label>
    ${c!=='full'?`<label class="sub" style="display:flex;gap:6px;align-items:center;font-size:12px">Area <select class="tag" data-mva="${p.id}">${opt('','Auto ('+(AREA_LABEL[paperArea(Object.assign({},p,{area:''}))]||'unsorted')+')',ar)}${AREAS.map(x=>opt(x,AREA_LABEL[x],ar)).join('')}</select></label>`:''}</div></div>`;
 }
@@ -2554,6 +2660,40 @@ document.addEventListener('input',e=>{const t=e.target;if(!t.dataset||!t.dataset
 document.addEventListener('change',e=>{const t=e.target;if(t&&t.id==='cbfile'){const fs=[...t.files];t.value='';cbAddFiles(fs).then(renderCombine)}});
 document.addEventListener('dragover',e=>{if(e.target.closest&&e.target.closest('#cbdrop'))e.preventDefault()});
 document.addEventListener('drop',e=>{if(e.target.closest&&e.target.closest('#cbdrop')){e.preventDefault();e.stopPropagation();cbAddFiles([...e.dataTransfer.files]).then(renderCombine)}},true);
+/* ---------- export a paper as JSON, save a file ---------- */
+function paperToJson(p){
+  return {title:p.title,sections:p.sections.map((sc,si)=>({name:sc.name,minutes:sc.minutes,questions:p.questions.filter(q=>q.sec===si).map(q=>{
+    const o={type:q.type,topic:q.topic};if(q.sub)o.subtopic=q.sub;o.difficulty=q.difficulty;if(q.passage)o.passage=q.passage;o.question=q.text;
+    if(q.type==='mcq'){o.options=q.options;o.answer=String.fromCharCode(65+q.ai)}else o.answer=q.answer.length===1?q.answer[0]:q.answer;
+    o.marks=q.marks;o.negative=q.neg;if(q.solution)o.solution=q.solution;return o})}))};
+}
+async function saveTextFile(name,text,mime){
+  try{
+    if(window.desk&&window.desk.saveFile){const ok=await window.desk.saveFile(name,text);toast(ok?'Saved':'Cancelled');return}
+    const file=new File([text],name,{type:mime||'application/json'});
+    if(navigator.canShare&&navigator.canShare({files:[file]})){await navigator.share({files:[file],title:name});return}
+    const a=document.createElement('a');a.href=URL.createObjectURL(file);a.download=name;document.body.appendChild(a);a.click();
+    setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},1500);toast('Download started');
+  }catch(e){if(e&&e.name==='AbortError')return;toast('Could not save a file here. Use Copy instead.')}
+}
+const safeName=t=>String(t||'paper').replace(/[\\/:*?"<>|]+/g,' ').replace(/\s+/g,' ').trim().slice(0,80)||'paper';
+Object.assign(acts,{
+  expjson(t){const p=store.papers.find(x=>x.id===t.dataset.id);if(!p)return;
+    const j=JSON.stringify(paperToJson(p),null,2);
+    openPanel('Export as JSON',p.title,`<div class="stack" style="gap:10px"><p class="sub" style="margin:0">This is the paper in the same JSON format the app imports (${p.questions.length} questions, ${p.sections.length} section${p.sections.length>1?'s':''}). Save it as a file, or copy it.</p><textarea readonly id="expta" class="paste" style="min-height:260px;width:100%;font:12.5px var(--f-mono)">${esc(j)}</textarea><div class="row"><button class="btn pri" data-act="expsave" data-id="${p.id}">Save as file</button><button class="btn" data-act="expcopy">Copy JSON</button></div></div>`)},
+  expsave(t){const p=store.papers.find(x=>x.id===t.dataset.id);if(p)saveTextFile(safeName(p.title)+'.json',JSON.stringify(paperToJson(p),null,2))},
+  expcopy(){const e=document.getElementById('expta');if(e)copyText(e.value)},
+  nbone(t){const k=t.dataset.k,op=t.dataset.op,it=mistakeItems(true).find(m=>m.key===k);if(!it)return;
+    if(op==='learned'){nbSet([k],'learned');toast('Marked as learned')}
+    else if(op==='reopen'||op==='restore'){nbSet([k],null);toast('Back in your notebook')}
+    else if(op==='discard'){if(!armed(t,'Confirm discard?'))return;nbSet([k],'discarded');toast('Discarded')}
+    renderNotebook()},
+  nbbulk(t){const op=t.dataset.op,list=nbFiltered();if(!list.length)return;
+    if(op==='discard'){if(!armed(t,'Discard '+list.length+'?'))return;nbSet(list.map(m=>m.key),'discarded');toast(list.length+' discarded')}
+    else if(op==='learned'){if(!armed(t,'Mark '+list.length+'?'))return;nbSet(list.map(m=>m.key),'learned');toast(list.length+' marked learned')}
+    renderNotebook()}
+});
+document.addEventListener('click',e=>{const t=e.target.closest&&e.target.closest('#zoomov [data-act^="exp"]');if(t&&acts[t.dataset.act])acts[t.dataset.act](t)});
 Object.assign(acts,{
   topicopen(t){
     if(!V.topicOpen)V.topicOpen=new Set();
@@ -2870,7 +3010,7 @@ async function syncNow(silent){
   SY_BUSY=true;SY.msg='Syncing…';syPaint();
   try{
     const tok=await syToken();
-    if(!SY.last){[...store.papers,...store.attempts].forEach(d=>{SY_DIRTY[d.id]=1});LS.set('cmd.dirty',SY_DIRTY)}
+    if(!SY.last){[...store.papers,...store.attempts,...store.notes].forEach(d=>{SY_DIRTY[d.id]=1});LS.set('cmd.dirty',SY_DIRTY)}
     const from=Math.max(0,(SY.srv||0)-5000),remoteUpd={};let off=0,maxSrv=SY.srv||0,down=0,changed=false;
     for(;;){
       const r=await syRest(tok,'docs?select=id,kind,data,upd,deleted,srv&srv=gt.'+from+'&order=srv.asc&limit=40&offset='+off);
@@ -2878,8 +3018,8 @@ async function syncNow(silent){
       SY_APPLYING=true;
       for(const row of part){
         maxSrv=Math.max(maxSrv,row.srv||0);remoteUpd[row.id]=row.upd;
-        const ip=store.papers.findIndex(x=>x.id===row.id),ia=store.attempts.findIndex(x=>x.id===row.id);
-        const list=ip>=0?store.papers:ia>=0?store.attempts:null,idx=ip>=0?ip:ia,loc=list?list[idx]:null;
+        const ip=store.papers.findIndex(x=>x.id===row.id),ia=store.attempts.findIndex(x=>x.id===row.id),inn=store.notes.findIndex(x=>x.id===row.id);
+        const list=ip>=0?store.papers:ia>=0?store.attempts:inn>=0?store.notes:null,idx=ip>=0?ip:ia>=0?ia:inn,loc=list?list[idx]:null;
         if(row.deleted){
           if(loc&&updOf(loc)<=row.upd){list.splice(idx,1);changed=true;down++;delete SY_DIRTY[row.id]}
           SY_TOMB[row.id]=Math.max(SY_TOMB[row.id]||0,row.upd);
@@ -2887,7 +3027,7 @@ async function syncNow(silent){
           const t=SY_TOMB[row.id];if(t&&t>=row.upd)continue;
           if(!loc||row.upd>updOf(loc)){
             const d=Object.assign({},row.data,{upd:row.upd});
-            if(loc)list[idx]=d;else (d.kind==='paper'?store.papers:store.attempts).unshift(d);
+            if(loc)list[idx]=d;else (d.kind==='paper'?store.papers:d.kind==='note'?store.notes:store.attempts).unshift(d);
             changed=true;down++;delete SY_DIRTY[row.id];
           }
         }
@@ -2895,10 +3035,10 @@ async function syncNow(silent){
       SY_APPLYING=false;
       if(part.length<40)break;off+=40;
     }
-    if(changed){store.papers.sort((a,b)=>(b.created||0)-(a.created||0));store.attempts.sort((a,b)=>(b.date||0)-(a.date||0));store.mirror();LS.set('cmd.tomb',SY_TOMB)}
+    if(changed){store.papers.sort((a,b)=>(b.created||0)-(a.created||0));store.attempts.sort((a,b)=>(b.date||0)-(a.date||0));store.notes.sort((a,b)=>(b.created||0)-(a.created||0));store.mirror();LS.set('cmd.tomb',SY_TOMB)}
     const rows=[];
     for(const id of Object.keys(SY_DIRTY)){
-      const item=store.papers.find(x=>x.id===id)||store.attempts.find(x=>x.id===id);
+      const item=store.papers.find(x=>x.id===id)||store.attempts.find(x=>x.id===id)||store.notes.find(x=>x.id===id);
       if(item){const u=updOf(item);if(remoteUpd[id]!==undefined&&remoteUpd[id]>=u){delete SY_DIRTY[id];continue}rows.push({user_id:SY.uid,id,kind:item.kind,data:item,upd:u,deleted:false})}
       else if(SY_TOMB[id]){if(remoteUpd[id]!==undefined&&remoteUpd[id]>=SY_TOMB[id]){delete SY_DIRTY[id];continue}rows.push({user_id:SY.uid,id,kind:'',data:null,upd:SY_TOMB[id],deleted:true})}
       else delete SY_DIRTY[id];
@@ -2906,7 +3046,7 @@ async function syncNow(silent){
     let up=0;
     for(let i=0;i<rows.length;i+=6){
       const b=rows.slice(i,i+6);
-      await syRest(tok,'docs?on_conflict=user_id,id',{method:'POST',headers:{'Content-Type':'application/json',Prefer:'resolution=merge-duplicates,return=minimal'},body:JSON.stringify(b)});
+      await syRest(tok,'docs?on_conflict=user_id,id',{method:'POST',headers:{'Content-Type':'application/json',Prefer:'resolution=merge-duplicates,return=minimal'},body:JSON.stringify(b).replace(/\\u0000/g,'').replace(/\\ud[89ab][0-9a-f]{2}(?!\\ud[c-f][0-9a-f]{2})/gi,'').replace(/(?<!\\ud[89ab][0-9a-f]{2})\\ud[c-f][0-9a-f]{2}/gi,'')});
       b.forEach(x=>delete SY_DIRTY[x.id]);up+=b.length;LS.set('cmd.dirty',SY_DIRTY);
     }
     LS.set('cmd.dirty',SY_DIRTY);
