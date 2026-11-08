@@ -2,7 +2,7 @@
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>CAT Mock Desk</title>
 <meta name="claude:viewport-fit-sides" content="cover">
-<meta name="app-build" content="2026-11-08.01">
+<meta name="app-build" content="2026-11-08.02">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto+Flex:opsz,wght@8..144,400;8..144,500;8..144,600&family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Serif:wght@400;600&display=swap">
 <style>
 /* Layout: home/analysis are scrolling pages on a paper-blue ground; the exam is a fixed-height console (header, section bar, question pane + palette, action bar) modelled on the CAT screen. */
@@ -564,6 +564,7 @@ label.row>input[type=checkbox]{margin-top:4px;flex:none;width:18px;height:18px}
 @media (max-width:640px) and (max-height:520px){.xside .xsubmit{padding:6px 12px}}
 </style>
 <div id="app"></div>
+<script>window.addEventListener('error',function(e){var a=document.getElementById('app');if(a&&!a.children.length){a.innerHTML='<div style="padding:18px;font:14px/1.5 system-ui"><b>The app hit an error while starting.</b><pre style="white-space:pre-wrap;word-break:break-word">'+String(e.message||e).replace(/</g,'&lt;')+'\n'+String(e.filename||'').split('/').pop()+':'+(e.lineno||'')+'</pre><p>Send this text to get it fixed.</p></div>'}});</script>
 <script>
 'use strict';
 const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -3046,7 +3047,7 @@ async function syncNow(silent){
     let up=0;
     for(let i=0;i<rows.length;i+=6){
       const b=rows.slice(i,i+6);
-      await syRest(tok,'docs?on_conflict=user_id,id',{method:'POST',headers:{'Content-Type':'application/json',Prefer:'resolution=merge-duplicates,return=minimal'},body:JSON.stringify(b).replace(/\\u0000/g,'').replace(/\\ud[89ab][0-9a-f]{2}(?!\\ud[c-f][0-9a-f]{2})/gi,'').replace(/(?<!\\ud[89ab][0-9a-f]{2})\\ud[c-f][0-9a-f]{2}/gi,'')});
+      await syRest(tok,'docs?on_conflict=user_id,id',{method:'POST',headers:{'Content-Type':'application/json',Prefer:'resolution=merge-duplicates,return=minimal'},body:JSON.stringify(b).replace(/\\u0000|\\u[dD][89abAB][0-9a-fA-F]{2}(?:\\u[dD][c-fC-F][0-9a-fA-F]{2})?|\\u[dD][c-fC-F][0-9a-fA-F]{2}/g,m=>m.length>6?m:'')});
       b.forEach(x=>delete SY_DIRTY[x.id]);up+=b.length;LS.set('cmd.dirty',SY_DIRTY);
     }
     LS.set('cmd.dirty',SY_DIRTY);
