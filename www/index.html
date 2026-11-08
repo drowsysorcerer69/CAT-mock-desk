@@ -2,7 +2,7 @@
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>CAT Mock Desk</title>
 <meta name="claude:viewport-fit-sides" content="cover">
-<meta name="app-build" content="2026-11-08.02">
+<meta name="app-build" content="2026-11-08.03">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto+Flex:opsz,wght@8..144,400;8..144,500;8..144,600&family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Serif:wght@400;600&display=swap">
 <style>
 /* Layout: home/analysis are scrolling pages on a paper-blue ground; the exam is a fixed-height console (header, section bar, question pane + palette, action bar) modelled on the CAT screen. */
@@ -723,7 +723,7 @@ const paperMax=p=>p.questions.reduce((s,q)=>s+q.marks,0);
 /* ---------- navigation ---------- */
 const V={view:'home',msg:null,analysisId:null,tab:'overview',filter:'all',secFilter:'all'};
 function go(view,extra){NOTIME=false;if(view!=='analysis'&&view!=='cat')V.fromCat=null;Object.assign(V,{view},extra||{});document.body.classList.toggle('exam-on',view==='exam');app.classList.toggle('is-exam',view==='exam');render();if(view!=='exam'){window.scrollTo(0,0);const w=app.querySelector('.wrap');if(w)w.classList.add('enter')}}
-function render(){({home:renderHome,instr:renderInstr,exam:renderExam,analysis:renderAnalysis,practice:renderPractice,log:renderLog,import:renderImport,notebook:renderNotebook,weak:renderWeak,papers:renderAllPapers,cat:renderCat,combine:renderCombine})[V.view]()}
+function render(){if(store.attempts.some(x=>!x||!Array.isArray(x.qs)))store.attempts=store.attempts.filter(x=>x&&Array.isArray(x.qs));({home:renderHome,instr:renderInstr,exam:renderExam,analysis:renderAnalysis,practice:renderPractice,log:renderLog,import:renderImport,notebook:renderNotebook,weak:renderWeak,papers:renderAllPapers,cat:renderCat,combine:renderCombine})[V.view]()}
 
 /* ---------- categories: full syllabus, sectional, topic-wise ---------- */
 const AREAS=['VARC','DILR','QA'],AREA_LABEL={VARC:'VA / RC',DILR:'DILR',QA:'Quant'};
@@ -790,7 +790,7 @@ function pctPanel(p,err){
 }
 const isDrill=id=>{const p=store.papers.find(x=>x.id===id);return !!p&&paperCat(p)==='drill'};
 function attCat(a){const p=attPaper(a);return p?paperCat(p):((a.secs&&a.secs.length>1)?'full':'sectional')}
-function attArea(a){const p=attPaper(a);return p?paperArea(p):(areaOfName(a.qs[0]&&a.qs[0].secName)||'')}
+function attArea(a){const p=attPaper(a);return p?paperArea(p):(areaOfName(a.qs&&a.qs[0]&&a.qs[0].secName)||'')}
 function attPct(a,area){
   const c=attCat(a);let qs;
   if(c==='full'){
