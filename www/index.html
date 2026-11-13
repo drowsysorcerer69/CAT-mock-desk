@@ -2,7 +2,7 @@
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>CAT Mock Desk</title>
 <meta name="claude:viewport-fit-sides" content="cover">
-<meta name="app-build" content="2026-11-08.03">
+<meta name="app-build" content="2026-11-13.08">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto+Flex:opsz,wght@8..144,400;8..144,500;8..144,600&family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Serif:wght@400;600&display=swap">
 <style>
 /* Layout: home/analysis are scrolling pages on a paper-blue ground; the exam is a fixed-height console (header, section bar, question pane + palette, action bar) modelled on the CAT screen. */
@@ -142,6 +142,11 @@ body:not(.exam-on) svg.chart{cursor:zoom-in}
 .prow .pctl{grid-column:1/-1;display:flex;gap:14px;flex-wrap:wrap}
 .pgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(500px,1fr));gap:8px}
 @media(max-width:560px){.pgrid{grid-template-columns:minmax(0,1fr)}}
+.cxgrid{display:grid;grid-template-columns:minmax(300px,380px) minmax(0,1fr);gap:18px;align-items:start}
+.cxside{position:sticky;top:8px;min-width:0}
+.cxside .plist{max-height:calc(100vh - 330px);min-height:170px}
+.cxmain{min-width:0}
+@media(max-width:1000px){.cxgrid{grid-template-columns:minmax(0,1fr)}.cxside{position:static}.cxside .plist{max-height:min(420px,55vh)}}
 .more{position:relative;display:inline-block}
 .wrap>*:has(details.more[open]){position:relative;z-index:40}
 .more[open]{z-index:41}
@@ -562,6 +567,77 @@ label.row>input[type=checkbox]{margin-top:4px;flex:none;width:18px;height:18px}
   .tq .tqh,.tq .tqs{padding-inline:4px}
 }
 @media (max-width:640px) and (max-height:520px){.xside .xsubmit{padding:6px 12px}}
+
+/* ===== Home redesign (Material You) ===== */
+.hm{max-width:1100px}
+.hm-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:6px 2px 14px;position:relative;z-index:50}
+.hm-hello{font-size:14px;color:var(--ink2)}
+.hm-name{border:0!important;background:transparent!important;padding:0!important;min-height:0!important;width:min(70vw,360px)!important;font:600 28px/1.2 var(--f-ui)!important;color:var(--ink);border-bottom:2px solid transparent!important;border-radius:0!important}
+.hm-name:focus{outline:0;border-bottom-color:var(--accent)!important}
+.hm-ic{list-style:none;cursor:pointer;display:grid;place-items:center;width:44px;height:44px;border-radius:50%;background:var(--surface);box-shadow:var(--m3-shadow);color:var(--ink)}
+.hm-ic::-webkit-details-marker{display:none}
+.hm-hero{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;padding:24px 26px;border-radius:32px;background:var(--accent-soft);color:var(--ink);margin-bottom:14px}
+.hm-k{font:600 12px var(--f-ui);letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
+.hm-t{font:600 24px/1.25 var(--f-ui);margin:4px 0}
+.hm-s{color:var(--ink2);font-size:13.5px}
+.hm-ha{display:flex;gap:8px;flex-wrap:wrap}
+.hm-ha .btn{display:inline-flex;align-items:center;gap:6px;min-height:44px;padding-inline:20px;border-radius:99px}
+.hm-quick{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:6px}
+.hm-q{display:flex;align-items:center;gap:12px;text-align:left;border:0;background:var(--surface);border-radius:24px;padding:14px 16px;box-shadow:var(--m3-shadow);color:var(--ink);min-width:0;transition:box-shadow .2s,transform .15s}
+.hm-q:hover{box-shadow:var(--m3-shadow2);transform:translateY(-1px)}
+.hm-qi,.hm-ci{display:grid;place-items:center;flex:none;width:44px;height:44px;border-radius:16px;background:var(--accent-soft);color:var(--accent)}
+.hm-qt{display:flex;flex-direction:column;min-width:0}
+.hm-qt b{font:600 15px var(--f-ui);display:flex;align-items:center;gap:4px}
+.hm-qt small{color:var(--ink2);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hm-h{font:600 18px var(--f-ui);margin:22px 4px 10px}
+.hm-cats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.hm-c{display:flex;flex-direction:column;gap:6px;text-align:left;border:0;background:var(--tile);color:var(--ink);border-radius:28px;padding:18px;transition:box-shadow .2s,transform .15s}
+.hm-c:hover{box-shadow:var(--m3-shadow2);transform:translateY(-2px)}
+.hm-c .hm-ci{background:color-mix(in srgb,var(--surface) 70%,transparent);margin-bottom:6px}
+.hm-cn{font:600 17px var(--f-ui)}
+.hm-cs{font-size:12.5px;color:var(--ink2);line-height:1.4}
+.hm-add>summary{display:flex;align-items:center;gap:14px;cursor:pointer;list-style:none}
+.hm-add>summary::-webkit-details-marker{display:none}
+.hm-add[open]>summary{margin-bottom:4px}.hm-add:not([open]){padding-block:16px}.hdet>summary{font:600 16px var(--f-ui);cursor:pointer}.hm-addt{display:flex;flex-direction:column}
+.hm-addt small{color:var(--ink2);font-size:12.5px}
+@media(max-width:900px){.hm-quick,.hm-cats{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:560px){.hm-name{font-size:24px!important}.hm-hero{padding:20px;border-radius:28px}.hm-t{font-size:21px}.hm-ha{width:100%}.hm-ha .btn{flex:1;justify-content:center}.hm-q{padding:12px}.hm-qi{width:40px;height:40px}.hm-c{padding:16px;border-radius:24px}}
+
+/* wide layout + inner screens */
+body:not(.exam-on) .wrap{max-width:none;padding-inline:clamp(12px,2.6vw,64px)}
+.hm{max-width:none}
+.swatches{display:flex;flex-wrap:wrap;gap:12px}
+.sw{width:44px;height:44px;border-radius:50%;border:3px solid transparent;box-shadow:var(--m3-shadow);cursor:pointer}
+.sw.on{border-color:var(--ink);outline:2px solid var(--surface);outline-offset:-5px}
+body:not(.exam-on) .wrap>.top{background:var(--surface);border-radius:28px;padding:10px 12px 10px 20px;margin-bottom:14px;box-shadow:var(--m3-shadow);align-items:center}
+body:not(.exam-on) .pgrid{grid-template-columns:repeat(auto-fill,minmax(min(100%,440px),1fr));gap:12px}
+body:not(.exam-on) .pgrid .paper{margin-top:0;border-radius:24px;padding:16px 18px;background:var(--surface2)}
+body:not(.exam-on) .pgrid .paper:hover{transform:translateY(-2px);box-shadow:var(--m3-shadow2)}
+body:not(.exam-on) .slider button{border:0;background:var(--surface2)}
+body:not(.exam-on) .slider button.on{background:var(--accent)}
+body:not(.exam-on) .tiles{grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
+body:not(.exam-on) .tile b{font:600 24px var(--f-ui);display:block;color:var(--accent)}
+body:not(.exam-on) .panel+.panel{margin-top:14px}
+body:not(.exam-on) .zoombox{border-radius:28px}
+body:not(.exam-on) .more .menu{border-radius:20px;padding:8px;min-width:200px}
+
+@media(min-width:861px){.xside .pal{grid-template-columns:repeat(4,minmax(0,1fr));justify-items:center;gap:10px 8px}.xside .pal .pb{width:100%;max-width:54px;height:40px;font-size:14px}}
+#wmark{position:fixed;inset:0;z-index:2147483000;pointer-events:none;user-select:none}
+
+/* wide-screen layouts for DPP, notebook, weak areas and category screens */
+.catgrid,.dppgrid,.nbgrid,.wkgrid{display:grid;gap:14px;align-items:start;grid-template-columns:minmax(300px,24%) minmax(0,1fr)}
+.dppgrid{grid-template-columns:minmax(0,1fr) minmax(320px,30%)}
+.catgrid>.panel,.dppgrid>.panel,.nbgrid>.panel,.wkgrid>.panel,.wkgrid>.wkside{margin:0!important}
+.catside,.dppside,.nbside,.wkside{position:sticky;top:12px;max-height:calc(100vh - 24px);overflow:auto;scrollbar-width:thin}
+.dppside{order:2}
+.catside .subjgrid,.catside .subjgrid.g4{grid-template-columns:minmax(0,1fr)!important;margin:6px 0 0!important}
+.slider.v{flex-direction:column;overflow:visible;scroll-snap-type:none;gap:6px;margin:4px 0 14px}
+.slider.v button{flex:none;display:flex;justify-content:space-between;align-items:center;border-radius:18px;padding:12px 18px}
+body:not(.exam-on) .nbside .tiles{grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.nbside .tile{padding:12px 10px!important}
+.nbside .row .btn{flex:1 1 100%}
+.wkcards{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,420px),1fr));gap:12px}
+.wkcards .paper{margin:0!important}
+@media(max-width:980px){.catgrid,.dppgrid,.nbgrid,.wkgrid{grid-template-columns:minmax(0,1fr)}.catside,.dppside,.nbside,.wkside{position:static;max-height:none}.dppside{order:0}.slider.v{flex-direction:row;overflow-x:auto}.slider.v button{flex:1 0 140px}}
 </style>
 <div id="app"></div>
 <script>window.addEventListener('error',function(e){var a=document.getElementById('app');if(a&&!a.children.length){a.innerHTML='<div style="padding:18px;font:14px/1.5 system-ui"><b>The app hit an error while starting.</b><pre style="white-space:pre-wrap;word-break:break-word">'+String(e.message||e).replace(/</g,'&lt;')+'\n'+String(e.filename||'').split('/').pop()+':'+(e.lineno||'')+'</pre><p>Send this text to get it fixed.</p></div>'}});</script>
@@ -583,7 +659,7 @@ function toast(m){let t=document.querySelector('.toast');if(!t){t=document.creat
 async function copyText(t){try{await navigator.clipboard.writeText(t);toast('Copied')}catch(e){const ta=document.createElement('textarea');ta.value=t;document.body.appendChild(ta);ta.select();try{document.execCommand('copy');toast('Copied')}catch(_){toast('Select and copy manually')}ta.remove()}}
 
 /* ---------- storage: browser copy always, account copy when the viewer provides it ---------- */
-const store={papers:LS.get('cmd.papers')||[],attempts:LS.get('cmd.attempts')||[],notes:LS.get('cmd.notes')||[],cloud:false,col:null,q:Promise.resolve(),
+const store={papers:LS.get('cmd.papers')||[],attempts:(LS.get('cmd.attempts')||[]).filter(a=>a&&Array.isArray(a.qs)),notes:LS.get('cmd.notes')||[],cloud:false,col:null,q:Promise.resolve(),
   mirror(){LS.set('cmd.papers',this.papers);LS.set('cmd.attempts',this.attempts);LS.set('cmd.notes',this.notes)},
   async init(){
     try{
@@ -596,7 +672,7 @@ const store={papers:LS.get('cmd.papers')||[],attempts:LS.get('cmd.attempts')||[]
       const all=[...remote];
       for(const d of [...this.papers,...this.attempts]) if(!have.has(d.id)){all.push(d);this.push(d)}
       this.papers=all.filter(d=>d.kind==='paper').sort((a,b)=>b.created-a.created);
-      this.attempts=all.filter(d=>d.kind==='attempt').sort((a,b)=>b.date-a.date);
+      this.attempts=all.filter(d=>d.kind==='attempt'&&Array.isArray(d.qs)).sort((a,b)=>b.date-a.date);
       this.cloud=true; this.mirror();
     }catch(e){console.warn('cloud storage unavailable',e)}
   },
@@ -722,8 +798,8 @@ const paperMax=p=>p.questions.reduce((s,q)=>s+q.marks,0);
 
 /* ---------- navigation ---------- */
 const V={view:'home',msg:null,analysisId:null,tab:'overview',filter:'all',secFilter:'all'};
-function go(view,extra){NOTIME=false;if(view!=='analysis'&&view!=='cat')V.fromCat=null;Object.assign(V,{view},extra||{});document.body.classList.toggle('exam-on',view==='exam');app.classList.toggle('is-exam',view==='exam');render();if(view!=='exam'){window.scrollTo(0,0);const w=app.querySelector('.wrap');if(w)w.classList.add('enter')}}
-function render(){if(store.attempts.some(x=>!x||!Array.isArray(x.qs)))store.attempts=store.attempts.filter(x=>x&&Array.isArray(x.qs));({home:renderHome,instr:renderInstr,exam:renderExam,analysis:renderAnalysis,practice:renderPractice,log:renderLog,import:renderImport,notebook:renderNotebook,weak:renderWeak,papers:renderAllPapers,cat:renderCat,combine:renderCombine})[V.view]()}
+function go(view,extra){NOTIME=false;if(view!=='analysis'&&view!=='cat')V.fromCat=null;Object.assign(V,{view},extra||{});document.body.classList.toggle('exam-on',view==='exam');app.classList.toggle('is-exam',view==='exam');render();if(view!=='exam'&&typeof wmSync==='function')wmSync();if(view!=='exam'){window.scrollTo(0,0);const w=app.querySelector('.wrap');if(w)w.classList.add('enter')}}
+function render(){if(store.attempts.some(x=>!x||!Array.isArray(x.qs)))store.attempts=store.attempts.filter(x=>x&&Array.isArray(x.qs));({home:renderHome,instr:renderInstr,exam:renderExam,analysis:renderAnalysis,practice:renderPractice,log:renderLog,import:renderImport,notebook:renderNotebook,weak:renderWeak,papers:renderAllPapers,cat:renderCat,combine:renderCombine,combo:renderCombo})[V.view]()}
 
 /* ---------- categories: full syllabus, sectional, topic-wise ---------- */
 const AREAS=['VARC','DILR','QA'],AREA_LABEL={VARC:'VA / RC',DILR:'DILR',QA:'Quant'};
@@ -755,7 +831,21 @@ function paperCat(p){
   if(p.derived)return p.srcSec!=null?'sectional':'topic';
   return p.sections.length>1?'full':'sectional';
 }
-const attPaper=a=>store.papers.find(x=>x.id===a.paperId);
+const attPaper=a=>a.vp||store.papers.find(x=>x.id===a.paperId);
+const curAtt=()=>V.analysisId==='__cx'?V.cxA:curAtt();
+const findAtt=id=>id==='__cx'?V.cxA:store.attempts.find(a=>a.id===id);
+/* saving notes/AI answers made inside the combined view writes them back to the real attempts */
+function saveAtt(A){
+  if(!A||!A.virtual){saveAtt(A);return}
+  const by={};A.qs.forEach(x=>{(by[x.aid]=by[x.aid]||[]).push(x)});
+  Object.keys(by).forEach(aid=>{const o=store.attempts.find(a=>a.id===aid);if(!o)return;let ch=false;
+    by[aid].forEach(x=>{
+      const t=(A.tags||{})[x.id],ot=(o.tags||{})[x.src]||undefined;
+      if(t!==ot){o.tags=o.tags||{};if(t)o.tags[x.src]=t;else delete o.tags[x.src];ch=true}
+      const q=(A.qai||{})[x.id],oq=(o.qai||{})[x.src];
+      if(JSON.stringify(q||null)!==JSON.stringify(oq||null)){o.qai=o.qai||{};if(q&&q.length)o.qai[x.src]=q;else delete o.qai[x.src];ch=true}});
+    if(ch)store.save(o)});
+}
 /* ---------- percentile table per paper: you give marks vs percentile, attempts are interpolated ---------- */
 function parsePct(txt){
   const rows=[],bad=[];
@@ -830,24 +920,30 @@ function papersListHtml(q){
       <div class="row"><button class="btn pri sm" data-act="start" data-id="${p.id}">Start</button><button class="btn sm" data-act="rename" data-id="${p.id}">Rename</button><button class="btn sm" data-act="pctl" data-id="${p.id}">${p.pct&&p.pct.length?'Percentile ✓':'Percentile'}</button><button class="btn sm" data-act="expjson" data-id="${p.id}">Export JSON</button><button class="btn sm" data-act="logpast" data-id="${p.id}">Log past attempt</button><button class="btn sm danger" data-act="delpaper" data-id="${p.id}">Delete</button></div></div>`}).join(''):`<p class="sub">No papers yet. Add one on the left, or load the sample to see how the exam screen and analysis look.</p>`}
     ${sets.length?`<h3 style="margin-top:20px">DPP sets and section tests</h3>`+sets.map(p=>{const a=atts.filter(x=>x.paperId===p.id);return `<div class="paper"><div>${titleCell(p)}<div class="sub" style="font-size:12px">${p.questions.length} questions · ${p.sections[0].minutes} min${a.length?' · '+a.length+' attempt'+(a.length>1?'s':''):''}</div></div><div class="row"><button class="btn pri sm" data-act="start" data-id="${p.id}">Start</button><button class="btn sm" data-act="rename" data-id="${p.id}">Rename</button><button class="btn sm" data-act="pctl" data-id="${p.id}">${p.pct&&p.pct.length?'Percentile ✓':'Percentile'}</button><button class="btn sm" data-act="expjson" data-id="${p.id}">Export JSON</button><button class="btn sm" data-act="logpast" data-id="${p.id}">Log past attempt</button><button class="btn sm danger" data-act="delpaper" data-id="${p.id}">Delete</button></div></div>`}).join(''):''}`;
 }
+const IC={bolt:'M11 21h-1l1-7H7.5c-.58 0-.57-.32-.38-.66L13 3h1l-1 7h3.5c.49 0 .56.33.47.51C12.96 17.55 11 21 11 21z',warn:'M12 2L1 21h22L12 2zm1 14h-2v-2h2v2zm0-4h-2V8h2v4z',insights:'M21 8c-1.45 0-2.26 1.44-1.93 2.51l-3.55 3.56c-.3-.09-.74-.09-1.04 0l-2.55-2.55C12.27 10.45 11.46 9 10 9c-1.45 0-2.27 1.44-1.93 2.52l-4.56 4.55C2.44 15.74 1 16.55 1 18c0 1.1.9 2 2 2 1.45 0 2.26-1.44 1.93-2.51l4.55-4.56c.3.09.74.09 1.04 0l2.55 2.55C12.73 16.55 13.54 18 15 18c1.45 0 2.27-1.44 1.93-2.52l3.56-3.55c1.07.33 2.51-.48 2.51-1.93 0-1.1-.9-2-2-2z',layers:'M11.99 18.54l-7.37-5.73L3 14.07l9 7 9-7-1.63-1.27-7.38 5.74zM12 16l7.36-5.73L21 9l-9-7-9 7 1.63 1.27L12 16z',doc:'M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z',pie:'M11 2v20c-5.07-.5-9-4.79-9-10s3.93-9.5 9-10zm2.03 0v8.99H22c-.47-4.74-4.24-8.52-8.97-8.99zm0 11.01V22c4.74-.47 8.5-4.25 8.97-8.99h-8.97z',topic:'M12 2l-5.5 9h11L12 2zm5.5 11c-2.49 0-4.5 2.01-4.5 4.5s2.01 4.5 4.5 4.5 4.5-2.01 4.5-4.5-2.01-4.5-4.5-4.5zM3 21.5h8v-8H3v8z',timer:'M15 1H9v2h6V1zm-4 13h2V8h-2v6zm8.03-6.61l1.42-1.42c-.43-.51-.9-.99-1.41-1.41l-1.42 1.42C16.07 4.74 14.12 4 12 4c-4.97 0-9 4.03-9 9s4.02 9 9 9 9-4.03 9-9c0-2.12-.74-4.07-1.97-5.61zM12 20c-3.87 0-7-3.13-7-7s3.13-7 7-7 7 3.13 7 7-3.13 7-7 7z',more:'M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z',add:'M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z',play:'M8 5v14l11-7z'};
+function ic(n){return `<svg class="ic" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="currentColor"><path d="${IC[n]||''}"/></svg>`}
 function renderHome(){
   const sess=LS.get('cmd.session');
   const papers=store.papers.filter(p=>!p.derived),sets=store.papers.filter(p=>p.derived),atts=store.attempts;
-  app.innerHTML=`<div class="wrap">
-  <div class="top"><div class="brand">CAT Mock Desk<small>practice console</small></div>
-   <div class="row homebar"><input class="nm" id="candname" value="${esc(candName())}" placeholder="Your name" aria-label="Your name" maxlength="40"><button class="btn sm pri" data-act="practice">DPP</button>${(()=>{const d=typeof dueCount==='function'?dueCount():0;return `<button class="btn sm" data-act="notebook"${d?` title="${d} due for review"`:''}>Mistakes${d?` <span class="dueb">${d}</span>`:''}</button><button class="btn sm" data-act="weak">Weak areas</button>`})()}
-    <details class="more"><summary class="btn sm" aria-label="More options">More ▾</summary><div class="menu"><button class="btn sm" data-act="syopen">Cloud sync${typeof SY!=='undefined'&&SY.refresh?' · on':''}</button>${window.Capacitor?'':`<button class="btn sm" data-act="fullscreen">${document.fullscreenElement?'Exit full screen':'Full screen'}</button>`}${window.desk?'<button class="btn sm" data-act="backup">Export backup</button><button class="btn sm" data-act="restore">Import backup</button>':''}<div class="sub" style="font-size:12px;padding:6px 12px">${window.desk?'History saved on this computer':window.Capacitor?'History saved on this phone':store.cloud?'History saved to your account':'History saved in this browser'}</div></div></details></div></div>
-  ${sess&&store.papers.find(p=>p.id===sess.paperId)?`<div class="banner"><div><b>Test in progress:</b> ${esc(sess.title)}<div class="sub">Your answers and timers were saved when you left.</div></div><div class="row"><button class="btn pri" data-act="resume">Resume test</button><button class="btn" data-act="discard">Discard</button></div></div>`:''}
-  ${(()=>{const d=typeof dueCount==='function'?dueCount():0;return d?`<div class="banner" style="background:var(--accent-soft);border-color:var(--accent);padding:8px 14px"><div><b>${d} mistake${d>1?'s are':' is'} due for review</b></div><div class="row"><button class="btn pri sm" data-act="nbstart" data-set="due">Practise them now</button><button class="btn sm" data-act="notebook">Open notebook</button></div></div>`:''})()}
-  <div class="cattiles" style="margin-top:0">${['full','sectional','topic','drill'].map(c=>{
+  const due=typeof dueCount==='function'?dueCount():0;
+  const inprog=sess&&store.papers.find(p=>p.id===sess.paperId);
+  const nPap=papers.length+sets.length;
+  const tiles=[['practice','bolt','DPP','Daily practice',''],['notebook','warn','Mistakes','Review notebook',due?`<span class="dueb">${due}</span>`:''],['weak','insights','Weak areas','Find gaps',''],['combo','layers','Combined','Many mocks','']];
+  app.innerHTML=`<div class="wrap hm">
+  <header class="hm-head"><div class="hm-hi"><div class="hm-hello">Hello,</div><input class="nm hm-name" id="candname" value="${esc(candName())}" placeholder="Your name" aria-label="Your name" maxlength="40"></div>
+   <details class="more"><summary class="hm-ic" aria-label="Menu">${ic('more')}</summary><div class="menu"><button class="btn sm" data-act="theme">Theme &amp; colours</button><button class="btn sm" data-act="wmopen">Exam watermark (CAT ID)</button><button class="btn sm" data-act="syopen">Cloud sync${typeof SY!=='undefined'&&SY.refresh?' · on':''}</button>${window.Capacitor?'':`<button class="btn sm" data-act="fullscreen">${document.fullscreenElement?'Exit full screen':'Full screen'}</button>`}${window.desk?'<button class="btn sm" data-act="backup">Export backup</button><button class="btn sm" data-act="restore">Import backup</button>':''}<div class="sub" style="font-size:12px;padding:6px 12px">${window.desk?'History saved on this computer':window.Capacitor?'History saved on this phone':store.cloud?'History saved to your account':'History saved in this browser'}</div></div></details></header>
+  <section class="hm-hero">${inprog?`<div class="hm-hl"><div class="hm-k">Test in progress</div><div class="hm-t">${esc(sess.title)}</div><div class="hm-s">Answers and timers were saved when you left.</div></div><div class="hm-ha"><button class="btn pri" data-act="resume">${ic('play')} Resume test</button><button class="btn" data-act="discard">Discard</button></div>`
+   :`<div class="hm-hl"><div class="hm-k">CAT Mock Desk</div><div class="hm-t">${due?`${due} mistake${due>1?'s':''} due for review`:atts.length?'Keep the streak going':'Ready for your first practice?'}</div><div class="hm-s">${nPap} paper${nPap===1?'':'s'} · ${atts.length} attempt${atts.length===1?'':'s'}${due?' · quick revision keeps them fresh':''}</div></div><div class="hm-ha">${due?`<button class="btn pri" data-act="nbstart" data-set="due">${ic('play')} Revise now</button>`:`<button class="btn pri" data-act="practice">${ic('bolt')} Start DPP</button>`}${due?'<button class="btn" data-act="practice">DPP</button>':''}</div>`}</section>
+  <section class="hm-quick">${tiles.map(([act,i,n,d,b])=>`<button class="hm-q" data-act="${act}"><span class="hm-qi">${ic(i)}</span><span class="hm-qt"><b>${n}${b}</b><small>${d}</small></span></button>`).join('')}</section>
+  <h2 class="hm-h">Your papers</h2>
+  <div class="hm-cats">${['full','sectional','topic','drill'].map(c=>{
     const ps=store.papers.filter(p=>paperCat(p)===c),as=atts.filter(x=>attCat(x)===c),avg=as.length?Math.round(as.reduce((s,x)=>s+(x.max?x.score/x.max*100:0),0)/as.length):null;
-    return `<button class="cattile" style="--tile:var(${CATS[c].tint});min-height:0;padding:16px 20px" data-act="opencat" data-c="${c}"><span class="ct-name">${CATS[c].name}</span>
-      <span class="ct-stats"><span><b class="num">${ps.length}</b> paper${ps.length===1?'':'s'}</span><span><b class="num">${as.length}</b> attempt${as.length===1?'':'s'}</span>${avg!=null?`<span>avg <b class="num">${avg}%</b></span>`:''}</span><span class="ct-go">Open ›</span></button>`}).join('')}</div>
+    const ci={full:'doc',sectional:'pie',topic:'topic',drill:'timer'}[c];
+    return `<button class="hm-c" style="--tile:var(${CATS[c].tint})" data-act="opencat" data-c="${c}"><span class="hm-ci">${ic(ci)}</span><span class="hm-cn">${CATS[c].name.replace(' mock','')}</span><span class="hm-cs">${ps.length} paper${ps.length===1?'':'s'} · ${as.length} attempt${as.length===1?'':'s'}${avg!=null?` · avg ${avg}%`:''}</span></button>`}).join('')}</div>
   <div class="panel" style="margin-top:14px"><h2>Subject progress</h2><div class="sub" style="margin-bottom:10px;font-size:12.5px">Score as a percentage of marks available, from full syllabus and sectional mocks. ${matchMedia('(pointer:coarse)').matches?'Tap':'Click'} a graph to zoom.</div>
    <div class="subjgrid">${AREAS.map(a=>subjectCard(a,subjectPoints(a,['full','sectional']))).join('')}</div></div>
-  <div class="panel stack" style="margin-top:14px;gap:10px">
-    <div class="row" style="justify-content:space-between;align-items:center"><h2 style="margin:0">Add a practice paper</h2>
-     <div class="row" style="gap:8px"><span class="sub" style="font-size:12px">Add it as</span><div class="seg">${[['auto','Auto'],['full','Full syllabus'],['sectional','Sectional'],['topic','Topic-wise'],['drill','Drill']].map(([k,l])=>`<button class="${(V.addCat||'auto')===k?'on':''}" data-act="addcat" data-v="${k}">${l}</button>`).join('')}</div></div></div>
+  <details class="panel hm-add stack" style="margin-top:14px"${V.msg?' open':''}><summary><span class="hm-ci">${ic('add')}</span><span class="hm-addt"><b>Add a practice paper</b><small>Import a PDF, JSON or pasted text</small></span></summary><div class="stack" style="gap:10px;margin-top:12px">
+    <div class="row" style="gap:8px;align-items:center"><span class="sub" style="font-size:12px">Add it as</span><div class="seg">${[['auto','Auto'],['full','Full syllabus'],['sectional','Sectional'],['topic','Topic-wise'],['drill','Drill']].map(([k,l])=>`<button class="${(V.addCat||'auto')===k?'on':''}" data-act="addcat" data-v="${k}">${l}</button>`).join('')}</div></div>
     <div class="dropbar drop" id="drop"><span class="grow">Drop a PDF or JSON file here, or</span><button class="btn pri sm" data-act="pick">Choose file</button><button class="btn sm" data-act="importpdf">Import PDF or text…</button><button class="btn sm" data-act="combine">Combine sections…</button><button class="btn sm" data-act="sample">Try a sample paper</button><input type="file" id="file" accept=".pdf,.json,.txt,application/pdf,application/json,text/plain" multiple hidden></div>
     ${V.msg?`<div class="msg ${V.msg.t}" style="white-space:pre-wrap">${esc(V.msg.m)}</div>`:''}
     <details><summary>Paste text or JSON, and the AI prompt</summary>
@@ -855,7 +951,7 @@ function renderHome(){
       <div class="sub" style="margin:10px 0 4px">Prompt to give your AI so the paper imports cleanly:</div>
       <pre class="prompt" id="aiprompt">${esc(AI_PROMPT)}</pre><button class="btn sm" data-act="copyprompt">Copy prompt</button>
       <div class="sub" style="margin-top:8px">If the paper is a PDF, ask the AI to convert it into this JSON format first. Questions that share a passage or data set repeat the same passage text.</div></details>
-  </div>
+  </div></details>
   <details class="panel hdet" style="margin-top:14px"><summary>Attempt history (${atts.length})</summary>
     ${atts.length?`<div class="tablewrap" style="max-height:360px;overflow:auto;margin-top:8px"><table class="hist"><thead><tr><th>Paper</th><th>Date</th><th>Score</th><th>Accuracy</th><th>Attempted</th><th></th></tr></thead><tbody>${atts.map(a=>`<tr><td>${esc(a.title)}${a.imported?' <span class="chip">logged</span>':''}</td><td>${fmtDate(a.date)}</td><td class="num">${r1(a.score)}/${a.max}</td><td class="num">${a.accuracy}%</td><td class="num">${a.attempted}/${a.qs.length}</td><td><div class="row"><button class="btn sm" data-act="analysis" data-id="${a.id}">Analysis</button><button class="btn sm danger" data-act="delatt" data-id="${a.id}">Delete</button></div></td></tr>`).join('')}</tbody></table></div>`:`<p class="sub">Finished attempts appear here with their full analysis.</p>`}
   </details>${footerHtml()}</div>`;
@@ -1133,10 +1229,8 @@ function groupRows(list,key,order){
 }
 
 /* ---------- analysis page ---------- */
-function renderAnalysis(){
-  const A=store.attempts.find(x=>x.id===V.analysisId);if(!A){go('home');return}
+function analysisParts(A,P){
   NOTIME=!!A.noTime;
-  const P=store.papers.find(x=>x.id===A.paperId);
   const T=agg(A.qs);const used=A.secs.reduce((a,s)=>a+s.used,0),allot=A.secs.reduce((a,s)=>a+s.minutes*60,0);
   const tabs=[['overview','Overview'],['sections','Sections'],['topics','Topics'],['time','Time'],['review','Question review'],['ai','AI coach']].filter(t=>!(A.noTime&&t[0]==='time'));
   let body='';
@@ -1171,6 +1265,12 @@ function renderAnalysis(){
      ${Object.keys(tc).length?`<div class="sub" style="margin-top:10px">Your mistake reasons: ${Object.keys(tc).map(k=>esc(k)+' ('+tc[k]+')').join(' · ')}</div>`:`<div class="sub" style="margin-top:10px">Open a question and tag why you missed it. The tags build a mistake profile here.</div>`}</div>
      <div style="margin-top:12px">${revList(A,P,list)}</div>`;
   }
+  return {tabs,body};
+}
+function renderAnalysis(){
+  if(V.analysisId==='__cx')return renderCombo();
+  const A=curAtt();if(!A){go('home');return}
+  const P=attPaper(A),{tabs,body}=analysisParts(A,P);
   app.innerHTML=`<div class="wrap"><div class="top"><div class="brand">Test analysis<small>${esc(A.mode==='cat'?'sectional timing':'free navigation')}</small></div><div class="row"><button class="btn" data-act="retry" data-id="${A.id}" ${P&&A.qs.some(x=>x.status!=='correct')?'':'disabled'}>Retry mistakes (${A.qs.filter(x=>x.status!=='correct').length})</button><button class="btn" data-act="retake" data-id="${A.paperId}" ${P?'':'disabled'}>Retake paper</button>${V.fromCat?'<button class="btn" data-act="backcat">Back to list</button>':''}<button class="btn pri" data-act="home">Home</button></div></div>
    <div class="tabs">${tabs.map(([k,l])=>`<button class="${V.tab===k?'on':''}" data-act="tab" data-t="${k}">${l}</button>`).join('')}</div>${body}</div>`;
 }
@@ -1185,7 +1285,7 @@ function revItem(A,P,x,o){
   const opts=pq&&pq.type==='mcq'?`<div class="opts">${pq.options.map((o,k)=>`<div class="${k===pq.ai?'c':(k===x.given?'w':'')}">${String.fromCharCode(65+k)}. ${stepHtml(o)}${k===pq.ai?'  ✓ correct':''}${k===x.given&&k!==pq.ai?'  ✗ your answer':''}${k===x.given&&k===pq.ai?'  (your answer)':''}</div>`).join('')}</div>`:'';
   return `<details class="rev"${o.open?' open':''}><summary>${o.src?`<span class="chip ${o.cur?'on':''}">${esc(o.src)}</span>`:''}<span class="qn">${esc(x.secName)} ${x.n}</span><span class="pill ${x.status}">${x.status==='skipped'?'blank':x.status}</span><span class="qt">${pq?stepHtml(pq.text.replace(/\s+/g,' ')):esc(x.topic)}</span><span class="sub num">${fmtT(x.time)}</span><span class="num ${x.got>0?'good':x.got<0?'bad':'sub'}">${x.got>0?'+':''}${x.got}</span></summary>
    <div class="revbody">
-    <div class="chips"><span class="chip">${esc(x.topic)}</span><span class="chip">${x.difficulty}</span><span class="chip">time ${fmtT(x.time)} vs ${fmtT(ideal)} available</span><span class="chip">opened ${x.visits}×</span>${x.ch?`<span class="chip">answer changed ${x.ch}×</span>`:''}${x.mk?'<span class="chip">marked for review</span>':''}</div>
+    <div class="chips">${x.srcTitle?`<span class="chip">${esc(x.srcTitle)}</span>`:''}<span class="chip">${esc(x.topic)}</span><span class="chip">${x.difficulty}</span><span class="chip">time ${fmtT(x.time)} vs ${fmtT(ideal)} available</span><span class="chip">opened ${x.visits}×</span>${x.ch?`<span class="chip">answer changed ${x.ch}×</span>`:''}${x.mk?'<span class="chip">marked for review</span>':''}</div>
     ${pq&&pq.passage?`<details><summary class="sub">Show passage / data set</summary><div style="white-space:pre-wrap;font-family:var(--f-serif);margin-top:6px">${richText(pq.passage)}</div></details>`:''}
     ${pq?`<div style="white-space:pre-wrap;font-family:var(--f-serif);font-size:15px">${richText(pq.text)}</div>`:'<div class="sub">The paper was deleted, so question text is unavailable.</div>'}
     ${opts}
@@ -1209,7 +1309,7 @@ function aggRow(label,l,o){
 }
 function topicTable(list,showSec){
   const g=groupBy(list,'topic'),keys=Object.keys(g).sort((a,b)=>lostOf(g[b])-lostOf(g[a]));let rows='';
-  const AA=store.attempts.find(x=>x.id===V.analysisId),cols=showSec?9:8,tq=(key,t,sb)=>(AA&&V.topicOpen&&V.topicOpen.has(key))?`<tr class="tqrow"><td colspan="${cols}"><div class="tqin">${topicQuestionsHtml(AA,t,sb)}</div></td></tr>`:'';
+  const AA=curAtt(),cols=showSec?9:8,tq=(key,t,sb)=>(AA&&V.topicOpen&&V.topicOpen.has(key))?`<tr class="tqrow"><td colspan="${cols}"><div class="tqin">${topicQuestionsHtml(AA,t,sb)}</div></td></tr>`:'';
   keys.forEach(k=>{const l=g[k];rows+=aggRow(k,l,{key:k,sec:showSec?[...new Set(l.map(x=>x.secName))].join(', '):null})+tq(k,k,'');
     const subs=groupBy(l.filter(x=>x.sub),'sub'),sk=Object.keys(subs).sort((a,b)=>lostOf(subs[b])-lostOf(subs[a]));
     sk.forEach(t=>{rows+=aggRow(t,subs[t],{sub:1,key:k+'›'+t,sec:showSec?'':null})+tq(k+'›'+t,k,t)})});
@@ -1328,7 +1428,7 @@ app.addEventListener('click',e=>{const t=e.target.closest('[data-act]');if(!t||t
 app.addEventListener('change',e=>{
   const t=e.target;
   if(t.dataset.sel&&X){X.pend=+t.value}
-  else if(t.dataset.tag){const A=store.attempts.find(x=>x.id===V.analysisId);if(A){A.tags=A.tags||{};if(t.value)A.tags[t.dataset.tag]=t.value;else delete A.tags[t.dataset.tag];store.save(A)}}
+  else if(t.dataset.tag){const A=curAtt();if(A){A.tags=A.tags||{};if(t.value)A.tags[t.dataset.tag]=t.value;else delete A.tags[t.dataset.tag];saveAtt(A)}}
 });
 app.addEventListener('input',e=>{if(e.target.dataset.tita&&X)X.pend=e.target.value});
 document.addEventListener('visibilitychange',()=>{if(document.hidden)saveSession();else if(X)X.last=Date.now()});
@@ -1498,8 +1598,8 @@ async function aiAsk(prompt){
   return r.text;
 }
 function aiTab(A){
-  if(!AIS.loaded){aiLoad().then(()=>{if(V.view==='analysis'&&V.tab==='ai')renderAnalysis()});return '<div class="panel sub">Loading…</div>'}
-  const P=store.papers.find(x=>x.id===A.paperId),prompt=buildAiPrompt(A,P);
+  if(!AIS.loaded){aiLoad().then(()=>{if((V.view==='analysis'||V.view==='combo')&&V.tab==='ai')renderAnalysis()});return '<div class="panel sub">Loading…</div>'}
+  const P=attPaper(A),prompt=buildAiPrompt(A,P);
   const form=DESK?`<div class="row" style="align-items:flex-end">
     <div class="field"><label for="aiprov">Provider</label><select id="aiprov">${['gemini','anthropic','openai'].map(k=>`<option value="${k}" ${AIS.provider===k?'selected':''}>${AI_LABEL[k]}</option>`).join('')}</select></div>
     <div class="field"><label for="aimodel">Model</label><input id="aimodel" value="${esc(/^gemini-2\.5-pro/.test(AIS.model||'')?'':(AIS.model||''))}" placeholder="${esc(AI_MODEL[AIS.provider]||'model name')}"></div>
@@ -1520,15 +1620,15 @@ acts.aisave=async()=>{
   const v=id=>(document.getElementById(id)||{}).value||'';
   try{const r=await window.desk.setSettings({provider:v('aiprov'),model:v('aimodel').trim(),baseUrl:v('aiurl').trim(),key:v('aikey').trim()});Object.assign(AIS,r);toast('Settings saved');V.aiErr='';renderAnalysis()}catch(e){V.aiErr=e.message||String(e);renderAnalysis()}
 };
-acts.aicopy=()=>{const A=store.attempts.find(x=>x.id===V.analysisId);if(A)copyText(buildAiPrompt(A,store.papers.find(x=>x.id===A.paperId)))};
+acts.aicopy=()=>{const A=curAtt();if(A)copyText(buildAiPrompt(A,attPaper(A)))};
 acts.airun=async()=>{
-  const A=store.attempts.find(x=>x.id===V.analysisId);if(!A)return;
+  const A=curAtt();if(!A)return;
   V.aiBusy=true;V.aiErr='';renderAnalysis();
-  try{const text=await aiAsk(buildAiPrompt(A,store.papers.find(x=>x.id===A.paperId)));
+  try{const text=await aiAsk(buildAiPrompt(A,attPaper(A)));
     if(!text||!String(text).trim())throw new Error('The AI returned an empty answer.');
-    A.ai={text:String(text),at:Date.now(),by:AI_LABEL[AIS.provider]+(DESK&&AIS.model?' · '+AIS.model:(DESK&&AI_MODEL[AIS.provider]?' · '+AI_MODEL[AIS.provider]:''))};store.save(A)}
+    A.ai={text:String(text),at:Date.now(),by:AI_LABEL[AIS.provider]+(DESK&&AIS.model?' · '+AIS.model:(DESK&&AI_MODEL[AIS.provider]?' · '+AI_MODEL[AIS.provider]:''))};saveAtt(A)}
   catch(e){V.aiErr=(e&&e.message)||String(e)}
-  V.aiBusy=false;if(V.view==='analysis')renderAnalysis();
+  V.aiBusy=false;if(V.view==='analysis'||V.view==='combo')renderAnalysis();
 };
 /* desktop backup */
 acts.backup=async()=>{try{const ok=await window.desk.exportBackup(JSON.stringify({app:'cat-mock-desk',papers:store.papers,attempts:store.attempts,notes:store.notes}));toast(ok?'Backup saved':'Cancelled')}catch(e){toast('Backup failed')}};
@@ -1602,8 +1702,8 @@ function renderPractice(){
   const chips=(kind,counts,sel)=>Object.keys(counts).sort().map(k=>`<button class="chip ${sel.has(k)?'on':''}" data-act="pbtoggle" data-kind="${kind}" data-v="${esc(k)}">${esc(k)} <span class="num">${counts[k]}</span></button>`).join('');
   const list=pb.pick==='manual'?`<div class="row" style="margin:6px 0"><button class="btn sm" data-act="pbselall">Select all shown</button><button class="btn sm" data-act="pbselnone">Clear selection</button><span class="sub">${n} selected of ${m.length}</span></div>
      <div style="max-height:420px;overflow:auto;border:1px solid var(--line);border-radius:12px">${m.slice(0,300).map(it=>`<label class="opt" style="border-bottom:1px solid var(--line);border-radius:0"><input type="checkbox" data-pbq="${esc(it.key)}" ${pb.sel.has(it.key)?'checked':''}><span><b class="num">${esc(it.sec)} ${it.i+1}</b> · ${esc(it.q.topic)}${it.q.sub?' › '+esc(it.q.sub):''} · ${it.q.difficulty}<br><span class="sub">${esc(it.q.text.replace(/\s+/g,' ').slice(0,110))}</span></span></label>`).join('')}</div>`:'';
-  app.innerHTML=`<div class="wrap" style="max-width:900px"><div class="top"><div class="brand">DPP builder<small>daily practice</small></div><button class="btn" data-act="home">Back</button></div>
-   ${all.length?`<div class="panel stack">
+  app.innerHTML=`<div class="wrap"><div class="top"><div class="brand">DPP builder<small>daily practice</small></div><button class="btn" data-act="home">Back</button></div>
+   ${all.length?`<div class="dppgrid"><div class="panel stack">
     <div class="sub">Build a short practice set from the questions in your papers. Choose how many questions, which ones, and how long you get. It runs on the same exam screen.</div>
     <div><h3>Section</h3><div class="chips">${chips('secs',cnt(it=>it.sec),pb.secs)}</div></div>
     <div><h3>Topic</h3><div class="chips">${chips('topics',cnt(it=>it.q.topic),pb.topics)}</div></div>
@@ -1611,13 +1711,15 @@ function renderPractice(){
     <div><h3>Which questions</h3><div class="seg">${[['all','All'],['mistakes','Only my mistakes'],['fresh','Not attempted yet']].map(([k,l])=>`<button class="${pb.src===k?'on':''}" data-act="pbsrc" data-v="${k}">${l}</button>`).join('')}</div>
      <div class="sub" style="margin-top:6px">Mistakes means wrong, left blank or never opened the last time you saw it.</div></div>
     <div><h3>How to choose</h3><div class="seg">${[['auto','Pick for me'],['manual','I will choose the questions']].map(([k,l])=>`<button class="${pb.pick===k?'on':''}" data-act="pbpick" data-v="${k}">${l}</button>`).join('')}</div></div>
-    ${pb.pick==='auto'?`<div class="field" style="max-width:180px"><label for="pbcount">Number of questions</label><input id="pbcount" type="number" min="1" max="200" value="${pb.count}"></div>`:list}
+    ${pb.pick==='auto'?'':list}</div>
+    <aside class="panel stack dppside"><h2>Your set</h2>
+    ${pb.pick==='auto'?`<div class="field"><label for="pbcount">Number of questions</label><input id="pbcount" type="number" min="1" max="200" value="${pb.count}"></div>`:''}
     <div class="row"><div class="field" style="max-width:150px"><label for="pbmins">Total minutes</label><input id="pbmins" type="number" min="1" max="300" value="${mins}"></div>
      <div class="field" style="max-width:170px"><label for="pbperq">or minutes per question</label><input id="pbperq" type="number" min="0.5" max="20" step="0.5" value="${pb.perq}"></div>
      <div class="field"><label for="pbtitle">Set name (optional)</label><input id="pbtitle" value="${esc(pb.title)}" placeholder="DPP ${new Date().toLocaleDateString(undefined,{day:'numeric',month:'short'})}" maxlength="80"></div></div>
     <div class="sub" style="font-size:12px">You can still switch to a stopwatch or turn on instant answer checking on the next screen.</div>
     <div class="msg ${n?'info':'err'}">${n?n+' question'+(n>1?'s':'')+' selected, '+mins+' minutes.':(pb.pick==='manual'?'Tick at least one question.':'No questions match these filters.')}</div>
-    <div class="row"><button class="btn pri" data-act="pbstart" ${n?'':'disabled'}>Build and start</button></div></div>`
+    <div class="row"><button class="btn pri" data-act="pbstart" ${n?'':'disabled'}>Build and start</button></div></aside></div>`
    :`<div class="panel"><p class="sub">Add at least one paper first. Questions are drawn from your uploaded papers.</p></div>`}</div>`;
   window.scrollTo(0,sy);
 }
@@ -1640,7 +1742,7 @@ acts.pbstart=()=>{
   V.paperId=d.id;V.mode='cat';V.scope='all';V.tmv=null;V.untimed=false;V.instant=false;go('instr');
 };
 acts.retry=t=>{
-  const A=store.attempts.find(x=>x.id===t.dataset.id),P=A&&store.papers.find(x=>x.id===A.paperId);if(!A||!P)return;
+  const A=store.attempts.find(x=>x.id===t.dataset.id),P=A&&attPaper(A);if(!A||!P)return;
   const items=A.qs.filter(x=>x.status!=='correct').map(x=>({q:P.questions[x.n-1],key:P.id+':'+x.id})).filter(it=>it.q);
   if(!items.length)return;
   const d=buildDerived(items,'Retry: '+A.title+' · '+items.length+' Q',Math.max(5,items.length*2),'Retry');
@@ -2194,6 +2296,159 @@ async function aiRead(){
   }catch(e){IM.err='AI reading failed: '+(e.message||e)}
   IM.aiBusy=false;renderReview();
 }
+/* ---------- combined analysis: pick several attempts, see subjects and topics together ---------- */
+const CX_COL={VARC:'var(--accent)',DILR:'var(--warn)',QA:'var(--good)',Other:'var(--mark)'};
+const cxLabel=k=>AREA_LABEL[k]||'Other';
+function cxState(){if(!V.cx)V.cx={sel:new Set(),cat:'all'};return V.cx}
+function cxAttempts(){const c=cxState().cat;return [...store.attempts].filter(a=>c==='all'||attCat(a)===c).sort((a,b)=>b.date-a.date)}
+function cxFlat(ids){
+  const out=[];
+  store.attempts.filter(a=>ids.has(a.id)).sort((a,b)=>a.date-b.date).forEach((a,ai)=>{
+    a.qs.forEach(x=>{out.push(Object.assign({},x,{aid:a.id,ai,nt:!!a.noTime,area:areaOfName(x.secName)||topicArea(x.topic)||'Other',got:typeof x.got==='number'?x.got:(x.status==='correct'?x.marks:(x.status==='wrong'?-(x.neg||0):0))}))});
+  });
+  return out;
+}
+function cxTrend(atts,flat){
+  if(atts.length<2)return '<p class="sub">Pick at least two attempts to see how each subject moves over time.</p>';
+  const areas=AREAS.concat(flat.some(x=>x.area==='Other')?['Other']:[]).filter(k=>flat.some(x=>x.area===k));
+  const W=640,H=230,L=38,R=14,T=14,B=34,n=atts.length;
+  const X=i=>L+(n===1?0:(W-L-R)*i/(n-1)),Y=v=>T+(H-T-B)*(1-v/100);
+  let g='';[0,25,50,75,100].forEach(v=>{g+=`<line x1="${L}" x2="${W-R}" y1="${Y(v)}" y2="${Y(v)}" stroke="var(--line)"/><text class="v" x="${L-6}" y="${Y(v)+4}" text-anchor="end">${v}%</text>`});
+  atts.forEach((a,i)=>{if(n<=12||i%Math.ceil(n/10)===0)g+=`<text class="v" x="${X(i)}" y="${H-14}" text-anchor="middle">${i+1}</text>`});
+  const series=[{k:'All',col:'var(--ink)',dash:'5 4',list:flat}].concat(areas.map(k=>({k,col:CX_COL[k],list:flat.filter(x=>x.area===k)})));
+  series.forEach(s=>{
+    const pts=[];atts.forEach((a,i)=>{const a2=agg(s.list.filter(x=>x.aid===a.id));if(a2.attempted)pts.push({i,v:a2.acc,a2,t:a.title})});
+    if(!pts.length)return;
+    g+=`<polyline fill="none" stroke="${s.col}" stroke-width="2" ${s.dash?`stroke-dasharray="${s.dash}"`:''} points="${pts.map(p=>X(p.i)+','+Y(p.v)).join(' ')}"/>`;
+    pts.forEach(p=>{g+=`<circle cx="${X(p.i)}" cy="${Y(p.v)}" r="4" fill="${s.col}"><title>${esc(s.k==='All'?'All subjects':cxLabel(s.k))} · ${esc(p.t)}: ${p.v}% (${p.a2.correct}/${p.a2.attempted})</title></circle>`});
+  });
+  const leg=series.map(s=>`<span class="chip"><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${s.col};margin-right:6px"></span>${s.k==='All'?'All subjects':cxLabel(s.k)}</span>`).join('');
+  return `<div class="chips" style="margin-bottom:8px">${leg}</div><svg class="chart" style="max-width:760px" viewBox="0 0 ${W} ${H}" role="img" aria-label="Accuracy by subject across the selected attempts">${g}<text x="${(L+W-R)/2}" y="${H-1}" text-anchor="middle">Attempts in date order (numbers match the table below)</text></svg>`;
+}
+function cxTopicTable(list,area){
+  const g=groupBy(list,'topic'),keys=Object.keys(g).sort((a,b)=>lostOf(g[b])-lostOf(g[a]));let rows='';
+  const AA=curAtt(),tq=(key,t,sb)=>(AA&&V.topicOpen&&V.topicOpen.has(key))?`<tr class="tqrow"><td colspan="8"><div class="tqin">${topicQuestionsHtml(AA,t,sb,area)}</div></td></tr>`:'';
+  keys.forEach(k=>{const l=g[k],kk=area+'¦'+k;rows+=aggRow(k,l,{key:kk})+tq(kk,k,'');
+    const subs=groupBy(l.filter(x=>x.sub),'sub'),sk=Object.keys(subs).sort((a,b)=>lostOf(subs[b])-lostOf(subs[a]));
+    if(sk.length>1||(sk.length===1&&subs[sk[0]].length<l.length))sk.forEach(t=>{const k2=area+'¦'+k+'›'+t;rows+=aggRow(t,subs[t],{sub:1,key:k2})+tq(k2,k,t)})});
+  return `<div class="tablewrap"><table class="hist"><thead><tr><th>Topic</th><th>Qs</th><th>Accuracy</th><th>Outcome</th><th>Marks</th><th>Lost</th><th>Avg time</th><th>Verdict</th></tr></thead><tbody>${rows}</tbody></table></div><div class="sub" style="font-size:12px;margin-top:6px">Click any topic row to open its questions, including the same topic from attempts you did not tick.</div>`;
+}
+function cxResults(){
+  const st=cxState(),ids=st.sel;
+  const atts=store.attempts.filter(a=>ids.has(a.id)).sort((a,b)=>a.date-b.date);
+  if(!atts.length)return `<div class="panel"><p class="sub">Tick the attempts you want to combine. Subjects and topics from all of them are added together here.</p></div>`;
+  const flat=cxFlat(ids),T=agg(flat),timed=flat.filter(x=>!x.nt&&x.status!=='unseen'),avgT=timed.length?timed.reduce((s,x)=>s+x.time,0)/timed.length:0;
+  const areas=AREAS.concat(flat.some(x=>x.area==='Other')?['Other']:[]).filter(k=>flat.some(x=>x.area===k));
+  const ins=[];
+  const tg=groupBy(flat,'topic'),tl=Object.keys(tg).map(k=>({k,area:cxLabel(tg[k][0].area),...agg(tg[k])})).filter(x=>x.attempted>=3);
+  const weak=tl.filter(x=>x.acc<65).sort((a,b)=>(b.max-b.score)-(a.max-a.score)).slice(0,4);
+  if(weak.length)ins.push(`<li class="bad"><b>Weakest topics across these attempts</b>${weak.map(x=>esc(x.k)+' ('+esc(x.area)+') '+x.acc+'%, '+r1(x.max-x.score)+' marks lost').join(' · ')}</li>`);
+  const strong=tl.filter(x=>x.acc>=80).sort((a,b)=>b.attempted-a.attempted).slice(0,4);
+  if(strong.length)ins.push(`<li class="good"><b>Reliable topics</b>${strong.map(x=>esc(x.k)+' ('+esc(x.area)+') '+x.acc+'%').join(' · ')}</li>`);
+  const byArea=areas.map(k=>({k,...agg(flat.filter(x=>x.area===k))})).filter(x=>x.attempted);
+  if(byArea.length>1){const lo=[...byArea].sort((a,b)=>a.acc-b.acc)[0],hi=[...byArea].sort((a,b)=>b.acc-a.acc)[0];
+    if(lo.k!==hi.k)ins.push(`<li class="warn"><b>Subject balance</b>${esc(cxLabel(hi.k))} is your strongest at ${hi.acc}% and ${esc(cxLabel(lo.k))} the weakest at ${lo.acc}%. ${esc(cxLabel(lo.k))} lost ${r1(lo.max-lo.score)} marks over ${lo.n} questions.</li>`)}
+  if(atts.length>=2){const half=Math.ceil(atts.length/2),early=new Set(atts.slice(0,half).map(a=>a.id)),late=new Set(atts.slice(half).map(a=>a.id));
+    const e=agg(flat.filter(x=>early.has(x.aid))),l=agg(flat.filter(x=>late.has(x.aid)));
+    if(e.attempted&&l.attempted)ins.push(`<li class="${l.acc>=e.acc?'good':'warn'}"><b>Trend</b>Accuracy in your earlier ${half} attempt${half>1?'s':''} was ${e.acc}%, in the later ${atts.length-half} it is ${l.acc}% (${l.acc>=e.acc?'+':''}${l.acc-e.acc} points).</li>`)}
+  const subjCards=areas.map(k=>{
+    const l=flat.filter(x=>x.area===k),a=agg(l),lost=a.max-a.score,tt=l.filter(x=>!x.nt&&x.status!=='unseen'),at=tt.length?tt.reduce((s,x)=>s+x.time,0)/tt.length:0;
+    const per=atts.map(t=>({t,a:agg(l.filter(x=>x.aid===t.id))})).filter(p=>p.a.attempted);
+    const tr=per.length>=2?`${per[0].a.acc}% → ${per[per.length-1].a.acc}%`:'';
+    const tg2=groupBy(l,'topic'),worst=Object.keys(tg2).map(t=>({t,a:agg(tg2[t])})).filter(x=>x.a.attempted>=2).sort((x,y)=>(y.a.max-y.a.score)-(x.a.max-x.a.score))[0];
+    return `<div class="subj"><div class="row" style="justify-content:space-between"><h3 style="margin:0;color:${CX_COL[k]}">${esc(cxLabel(k))}</h3><span class="chip">${per.length} attempt${per.length===1?'':'s'}</span></div>
+     <div class="score" style="font-size:36px;margin:6px 0">${a.attempted?a.acc+'%':'–'}<small> accuracy</small></div>${outcomeBar(a)}
+     <div class="sub" style="font-size:12.5px;margin-top:8px">${a.n} questions · <b class="num">${r1(a.score)}/${a.max}</b> marks · <b class="num bad">−${r1(lost)}</b> lost${at?' · avg '+fmtT0(at):''}${tr?'<br>Trend over attempts: '+tr:''}${worst&&worst.a.acc<80?'<br>Biggest leak: '+esc(worst.t)+' ('+worst.a.acc+'%)':''}</div></div>`;
+  }).join('');
+  const cols=areas;
+  const attRows=atts.map((t,i)=>{const l=flat.filter(x=>x.aid===t.id),a=agg(l);
+    return `<tr><td class="num">${i+1}</td><td style="min-width:160px"><b>${esc(t.title)}</b><div class="sub" style="font-size:12px">${fmtDate(t.date)}</div></td><td><span class="chip">${esc((CATS[attCat(t)]||{}).name||'')}</span></td><td class="num">${r1(a.score)}/${a.max}</td><td class="num">${a.attempted?a.acc+'%':'–'}</td>${cols.map(k=>{const s=agg(l.filter(x=>x.area===k));return `<td class="num ${s.attempted?(s.acc>=75?'good':s.acc<50?'bad':'warn'):''}">${s.attempted?s.acc+'%':'–'}</td>`}).join('')}</tr>`}).join('');
+  const subjTabs=`<div class="chips" style="margin-bottom:10px">${[['all','All subjects'],...areas.map(k=>[k,cxLabel(k)])].map(([k,l])=>`<button class="chip ${(st.area||'all')===k?'on':''}" data-act="cxarea" data-f="${k}">${esc(l)}</button>`).join('')}</div>`;
+  const shown=(st.area&&st.area!=='all')?flat.filter(x=>x.area===st.area):flat;
+  const topicSec=(st.area&&st.area!=='all')?cxTopicTable(shown,st.area):areas.map(k=>`<h3 class="grp2" style="color:${CX_COL[k]}">${esc(cxLabel(k))}</h3>${cxTopicTable(flat.filter(x=>x.area===k),k)}`).join('');
+  return `<div class="panel stack"><h2 style="margin:0">Combined result of ${atts.length} attempt${atts.length>1?'s':''}</h2>
+    <div class="tiles" style="margin-top:0"><div class="tile"><b>${atts.length}</b><span>attempts</span></div><div class="tile"><b>${T.n}</b><span>questions</span></div><div class="tile"><b>${r1(T.score)}<small style="font-size:13px">/${T.max}</small></b><span>marks</span></div><div class="tile"><b>${T.attempted?T.acc+'%':'–'}</b><span>accuracy</span></div><div class="tile"><b class="bad">−${r1(T.max-T.score)}</b><span>marks lost</span></div><div class="tile"><b>${avgT?fmtT0(avgT):'–'}</b><span>avg time / question</span></div></div>
+    ${ins.length?`<ul class="ins" style="margin:0">${ins.join('')}</ul>`:''}</div>
+   <div class="panel" style="margin-top:16px"><h3>By subject</h3><div class="subjgrid">${subjCards}</div></div>
+   <div class="panel" style="margin-top:16px"><h3>Accuracy over time, by subject</h3>${cxTrend(atts,flat)}</div>
+   <div class="panel" style="margin-top:16px"><h3>Where the marks went (by topic)</h3>${subjTabs}${lossChart(shown)}</div>
+   <div class="panel" style="margin-top:16px"><h3>Topics inside each subject</h3>${topicSec}</div>
+   <div class="panel" style="margin-top:16px"><h3>The attempts you combined</h3><div class="tablewrap"><table class="hist"><thead><tr><th>#</th><th>Attempt</th><th>Type</th><th>Score</th><th>Accuracy</th>${cols.map(k=>`<th>${esc(cxLabel(k))}</th>`).join('')}</tr></thead><tbody>${attRows}</tbody></table></div></div>`;
+}
+function cxListHtml(){
+  const st=cxState(),list=cxAttempts();
+  if(!list.length)return '<p class="sub">No attempts in this category yet.</p>';
+  return list.map(a=>`<label class="paper" style="grid-template-columns:auto minmax(0,1fr) auto;gap:10px;cursor:pointer;align-items:center"><input type="checkbox" data-cx="${a.id}" ${st.sel.has(a.id)?'checked':''} style="width:18px;height:18px"><div style="min-width:0"><div class="t" style="white-space:normal">${esc(a.title)}</div><div class="sub" style="font-size:12.5px">${fmtDate(a.date)} · ${esc((CATS[attCat(a)]||{}).name||'')}${a.imported?' · logged':''}</div></div><div class="num" style="font-size:13px;text-align:right">${r1(a.score)}/${a.max}<div class="sub" style="font-size:12px">${a.accuracy}%</div></div></label>`).join('');
+}
+/* the selected attempts become one virtual attempt (subjects as sections), so every paper-analysis feature works on it */
+function cxBuild(ids){
+  const atts=store.attempts.filter(a=>ids.has(a.id)).sort((a,b)=>a.date-b.date);
+  if(!atts.length)return null;
+  const items=[];
+  atts.forEach((a,ai)=>{
+    const pa=attPaper(a),cnt={};a.qs.forEach(x=>{cnt[x.sec]=(cnt[x.sec]||0)+1});
+    a.qs.forEach(x=>{
+      const area=areaOfName(x.secName)||topicArea(x.topic)||'Other',sc=a.secs[x.sec];
+      const pq=pa&&pa.questions[x.n-1]&&pa.questions[x.n-1].id===x.id?pa.questions[x.n-1]:null;
+      items.push({a,ai,x,area,ideal:sc&&cnt[x.sec]?sc.minutes*60/cnt[x.sec]:0,pq});
+    });
+  });
+  const order=AREAS.concat(['Other']),areas=order.filter(k=>items.some(i=>i.area===k));
+  items.sort((p,q)=>order.indexOf(p.area)-order.indexOf(q.area));
+  const qs=[],questions=[],tags={},qai={};let n=0;
+  items.forEach(it=>{
+    n++;const si=areas.indexOf(it.area),nid='c'+it.ai+'_'+it.x.id;
+    qs.push(Object.assign({},it.x,{id:nid,n,sec:si,secName:cxLabel(it.area),aid:it.a.id,src:it.x.id,on:it.x.n,srcTitle:it.a.title,area:it.area,nt:!!it.a.noTime,ai:it.ai,got:typeof it.x.got==='number'?it.x.got:(it.x.status==='correct'?it.x.marks:(it.x.status==='wrong'?-(it.x.neg||0):0))}));
+    questions.push(it.pq?Object.assign({},it.pq,{id:nid,sec:si}):{id:'__none',type:it.x.type,text:'',options:[],marks:it.x.marks,neg:it.x.neg});
+    if((it.a.tags||{})[it.x.id])tags[nid]=it.a.tags[it.x.id];
+    if((it.a.qai||{})[it.x.id])qai[nid]=it.a.qai[it.x.id];
+  });
+  const secs=areas.map(k=>{const l=items.filter(i=>i.area===k);return {name:cxLabel(k),minutes:Math.max(.1,l.reduce((t,i)=>t+i.ideal,0)/60),used:Math.round(l.reduce((t,i)=>t+i.x.time,0))}});
+  const T=agg(qs),correct=T.correct,wrong=T.wrong,title='Combined · '+atts.length+' attempt'+(atts.length>1?'s':'');
+  return {id:'__cx',kind:'attempt',virtual:true,paperId:'__cxp',title,date:atts[atts.length-1].date,mode:'free',noTime:atts.every(a=>a.noTime),qs,tags,qai,secs,
+    score:T.score,max:T.max,correct,wrong,attempted:correct+wrong,accuracy:pct(correct,correct+wrong),
+    vp:{id:'__cxp',kind:'paper',title,sections:secs,questions}};
+}
+function cxPaintRes(){
+  const st=cxState(),box=document.getElementById('cxres');if(!box)return;
+  const key=[...st.sel].sort().join(',');
+  if(V.cxKey!==key||!V.cxA){V.cxKey=key;V.cxA=cxBuild(st.sel);if(V.tab==='time'&&V.cxA&&V.cxA.noTime)V.tab='overview'}
+  const A=V.cxA;V.analysisId='__cx';
+  if(!A){box.innerHTML=cxResults();cxCount();return}
+  const P=A.vp,parts=analysisParts(A,P);
+  let body=parts.body;
+  if(V.tab==='overview'){
+    const ins=buildInsights(A);
+    body=cxResults()+`<div class="panel" style="margin-top:16px"><h3>What the data says (all selected attempts together)</h3>${ins.length?`<ul class="ins">${ins.map(i=>`<li class="${i.cls}"><b>${esc(i.title)}</b>${esc(i.text)}</li>`).join('')}</ul>`:'<p class="sub">Not enough activity to draw conclusions.</p>'}</div>`;
+  }
+  box.innerHTML=`<div class="tabs" style="margin-top:0">${parts.tabs.map(([k,l])=>`<button class="${V.tab===k?'on':''}" data-act="tab" data-t="${k}">${k==='sections'?'Subjects':l}</button>`).join('')}</div>${body}`;
+  cxCount();
+}
+function renderCombo(){
+  const st=cxState();
+  const valid=new Set(store.attempts.map(a=>a.id));[...st.sel].forEach(id=>{if(!valid.has(id))st.sel.delete(id)});
+  V.analysisId='__cx';
+  if(document.getElementById('cxres')&&document.querySelector('.cxgrid')){cxPaintRes();return}
+  app.innerHTML=`<div class="wrap"><div class="top"><div class="brand">Combined analysis<small>many mocks, one picture</small></div><div class="row"><button class="btn sm" data-act="weak">Weak areas</button><button class="btn sm" data-act="home">Back</button></div></div>
+  <div class="cxgrid"><aside class="panel stack cxside"><div><h2>Pick the attempts</h2><div class="sub" style="font-size:13px">Tick any mix of full, sectional, topic-wise and drill attempts. They are merged into one analysis with VA / RC, DILR and Quant as the subjects.</div></div>
+   <div class="chips">${[['all','All'],...Object.keys(CATS).map(k=>[k,CATS[k].name])].map(([k,l])=>`<button class="chip ${st.cat===k?'on':''}" data-act="cxcat" data-f="${k}">${esc(l)}</button>`).join('')}</div>
+   <div class="row"><button class="btn sm" data-act="cxall">Select all shown</button><button class="btn sm" data-act="cxlatest">Latest of each paper</button><button class="btn sm" data-act="cxclear">Clear</button></div><div class="sub" id="cxcount"></div>
+   <div class="plist" id="cxlist">${cxListHtml()}</div></aside>
+  <main class="cxmain" id="cxres"></main></div>${footerHtml()}</div>`;
+  cxPaintRes();
+}
+function cxCount(){const e=document.getElementById('cxcount');if(e)e.textContent=cxState().sel.size+' selected'}
+function cxRefresh(listToo){if(listToo){const l=document.getElementById('cxlist');if(l)l.innerHTML=cxListHtml()}cxPaintRes()}
+Object.assign(acts,{
+  combo(){V.cx=null;V.cxA=null;V.cxKey=null;Object.assign(V,{tab:'overview',filter:'all',secFilter:'all',tsec:'all',group:'order',topicOpen:new Set()});go('combo')},
+  cxcat(t){const s=cxState();s.cat=t.dataset.f;const sh=document.querySelector('.cxgrid');if(sh)sh.remove();renderCombo()},
+  cxarea(t){const s=cxState();s.area=t.dataset.f;cxPaintRes()},
+  cxall(){const s=cxState();cxAttempts().forEach(a=>s.sel.add(a.id));cxRefresh(true)},
+  cxclear(){cxState().sel.clear();cxRefresh(true)},
+  cxlatest(){const s=cxState(),seen=new Set();cxAttempts().forEach(a=>{const k=a.paperId||a.title;if(!seen.has(k)){seen.add(k);s.sel.add(a.id)}});cxRefresh(true)}
+});
+document.addEventListener('change',e=>{const t=e.target;if(!t||!t.dataset||!t.dataset.cx||V.view!=='combo')return;
+  const s=cxState();if(t.checked)s.sel.add(t.dataset.cx);else s.sel.delete(t.dataset.cx);s.area='all';cxPaintRes()});
 Object.assign(acts,{
   mksec(t){const p=store.papers.find(x=>x.id===t.dataset.id);if(!p)return;
     const had=store.papers.filter(x=>x.derived&&x.srcPaper===p.id&&x.srcSec!=null).length;const n=sectionalSets(p).length;
@@ -2325,9 +2580,9 @@ function renderNotebook(){
      <div class="row" style="margin-top:10px;gap:8px">${m.disc?`<button class="btn sm pri" data-act="nbone" data-op="restore" data-k="${esc(m.key)}">Restore to notebook</button>`
       :`${m.mastered&&!m.forced?'':`<button class="btn sm pri" data-act="nbone" data-op="learned" data-k="${esc(m.key)}">${m.mastered?'Already learned':'Mark as learned'}</button>`}${m.forced?`<button class="btn sm" data-act="nbone" data-op="reopen" data-k="${esc(m.key)}">Back to open</button>`:''}<button class="btn sm danger" data-act="nbone" data-op="discard" data-k="${esc(m.key)}">Discard</button>`}</div></div></details>`;
   };
-  app.innerHTML=`<div class="wrap" style="max-width:980px"><div class="top"><div class="brand">Mistake notebook<small>revise until it sticks</small></div><div class="row"><button class="btn sm" data-act="weak">Weak areas</button><button class="btn sm" data-act="home">Back</button></div></div>
-  <div class="stack">
-  <div class="panel stack">
+  app.innerHTML=`<div class="wrap"><div class="top"><div class="brand">Mistake notebook<small>revise until it sticks</small></div><div class="row"><button class="btn sm" data-act="weak">Weak areas</button><button class="btn sm" data-act="home">Back</button></div></div>
+  <div class="nbgrid">
+  <div class="panel stack nbside">
    <div class="tiles" style="margin-top:0"><div class="tile"><b class="${due.length?'bad':''}">${due.length}</b><span>due for review now</span></div><div class="tile"><b>${open.length}</b><span>still open</span></div><div class="tile"><b class="good">${mast.length}</b><span>mastered</span></div></div>
    <div class="sub">Every question you got wrong or left blank lands here. It is scheduled for another try ${REVIEW_DAYS} days after you last saw it, and it leaves the open list once you answer it correctly ${NEED_RIGHT} times in a row. Re-attempts are counted automatically, whether from here, a DPP or a full paper.</div>
    <div class="row"><button class="btn pri" data-act="nbstart" data-set="due" ${due.length?'':'disabled'}>Practise what is due (${due.length})</button><button class="btn" data-act="nbstart" data-set="open" ${open.filter(m=>m.pool).length?'':'disabled'}>Practise all open (${open.filter(m=>m.pool).length})</button></div>
@@ -2371,14 +2626,14 @@ function renderWeak(){
       <div class="sub" style="font-size:12.5px"><b class="num">${s.acc}%</b> accuracy over ${s.n} question${s.n>1?'s':''} · <b class="num bad">−${r1(s.lost)}</b> marks lost${s.recent!=null&&s.n>=6?' · last 10: '+s.recent+'%':''}${tr}${s.avgT?' · avg '+fmtT0(s.avgT):''}${s.open?' · '+s.open+' open mistake'+(s.open>1?'s':''):''}</div>
       ${subs.length?`<div class="chips" style="margin-top:6px">${subs.map(([k,u])=>`<span class="chip">${esc(k)} ${u.c}/${u.n}</span>`).join('')}</div>`:''}</div>
      <div><button class="btn sm" data-act="wkone" data-t="${esc(s.topic)}" ${avail[s.topic]?'':'disabled'}>Practise</button></div></div>`};
-  app.innerHTML=`<div class="wrap" style="max-width:980px"><div class="top"><div class="brand">Weak areas<small>where your marks go</small></div><div class="row"><button class="btn sm" data-act="notebook">Mistake notebook</button><button class="btn sm" data-act="home">Back</button></div></div>
-  ${rank.length?`<div class="stack"><div class="panel stack"><div><h2>Your weakest topics</h2><div class="sub">Ranked by marks lost across all your attempts, so the topics costing you most come first. Tick the ones to include, then build a practice set that leans on them.</div></div>
+  app.innerHTML=`<div class="wrap"><div class="top"><div class="brand">Weak areas<small>where your marks go</small></div><div class="row"><button class="btn sm" data-act="notebook">Mistake notebook</button><button class="btn sm" data-act="home">Back</button></div></div>
+  ${rank.length?`<div class="wkgrid"><div class="wkside stack"><div class="panel stack"><div><h2>Your weakest topics</h2><div class="sub">Ranked by marks lost across all your attempts, so the topics costing you most come first. Tick the ones to include, then build a practice set that leans on them.</div></div>
     <div class="row" style="align-items:flex-end"><label class="field" style="max-width:150px;min-width:120px"><span class="sub">Questions</span><input id="wkcount" type="number" min="3" max="100" value="${wk.count}"></label>
      <label class="field" style="max-width:170px;min-width:130px"><span class="sub">Minutes per question</span><input id="wkperq" type="number" min="0.5" max="10" step="0.5" value="${wk.perq}"></label>
      <button class="btn pri" data-act="wkbuild" ${chosen.length?'':'disabled'}>Build my weakness DPP</button></div>
     <div class="sub" style="font-size:12.5px">${chosen.length?'Mix: '+chosen.map(s=>esc(s.topic)).join(', ')+'. Open mistakes come first, then questions you have not tried, then ones you got right.':'Tick at least one topic that still has questions in your papers.'}</div></div>
-   <div class="panel">${rank.slice(0,12).map(card).join('')}${rank.length>12?`<div class="sub" style="margin-top:8px">and ${rank.length-12} more topics with smaller losses</div>`:''}</div>
-   ${thin.length?`<div class="panel"><h3>No weakness showing yet</h3><div class="chips">${thin.map(s=>`<span class="chip">${esc(s.topic)} · ${s.n}Q${s.lost===0?' · no marks lost':' · too few questions'}</span>`).join('')}</div></div>`:''}</div>`
+   ${thin.length?`<div class="panel"><h3>No weakness showing yet</h3><div class="chips">${thin.map(s=>`<span class="chip">${esc(s.topic)} · ${s.n}Q${s.lost===0?' · no marks lost':' · too few questions'}</span>`).join('')}</div></div>`:''}</div>
+   <div class="panel wkmain"><div class="wkcards">${rank.slice(0,24).map(card).join('')}</div>${rank.length>24?`<div class="sub" style="margin-top:8px">and ${rank.length-24} more topics with smaller losses</div>`:''}</div></div>`
   :`<div class="panel"><p class="sub">${st.length?'No topic has enough data yet. A topic needs at least 2 attempted questions with marks lost before it is ranked.':'Finish an attempt, or log a past one, and your weakest topics are ranked here.'}</p></div>`}
   ${footerHtml()}</div>`;
 }
@@ -2479,7 +2734,7 @@ function renderCat(){
   const c=V.catv||'full';if(!V.carea||(c==='topic'&&V.carea==='all'))V.carea=c==='topic'?'VARC':'all';
   if(c==='full')V.carea='all';
   const area=V.carea,tab=V.ctab||'papers',info=CATS[c];
-  const slider=c==='full'?'':`<div class="slider" role="tablist">${catAreas(c).map(x=>{const n=catPapers(c,x).length;return `<button role="tab" aria-selected="${x===area}" class="${x===area?'on':''}" data-act="carea" data-v="${x}">${x==='all'?'All':AREA_LABEL[x]}<small>${n}</small></button>`}).join('')}</div>`;
+  const slider=c==='full'?'':`<div class="slider v" role="tablist">${catAreas(c).map(x=>{const n=catPapers(c,x).length;return `<button role="tab" aria-selected="${x===area}" class="${x===area?'on':''}" data-act="carea" data-v="${x}">${x==='all'?'All':AREA_LABEL[x]}<small>${n}</small></button>`}).join('')}</div>`;
   let body='';
   if(tab==='papers'){
     const list=catPapers(c,area,V.cq);
@@ -2503,7 +2758,7 @@ function renderCat(){
      :`<p class="sub">No attempts in ${area==='all'||c==='full'?'this category':AREA_LABEL[area]} yet. Start a paper from the Papers tab and the analysis appears here.</p>`;
   }
   app.innerHTML=`<div class="wrap"><div class="top"><div class="brand">${esc(info.name)}<small>${(n=>n+' paper'+(n===1?'':'s'))(store.papers.filter(p=>paperCat(p)===c).length)}</small></div><div class="row"><button class="btn sm" data-act="home">Back</button></div></div>
-   <div class="panel">${slider}${catGraphs(c,area)}<div class="seg" style="margin-bottom:14px"><button class="${tab==='papers'?'on':''}" data-act="ctab" data-v="papers">Papers</button><button class="${tab==='analysis'?'on':''}" data-act="ctab" data-v="analysis">Analysis</button></div>${body}</div>${footerHtml()}</div>`;
+   <div class="catgrid"><aside class="panel catside">${c==='full'?'':'<h3>Subject</h3>'}${slider}<h3 style="margin-top:6px">Progress</h3>${catGraphs(c,area)}</aside><div class="panel catmain"><div class="seg" style="margin-bottom:14px"><button class="${tab==='papers'?'on':''}" data-act="ctab" data-v="papers">Papers</button><button class="${tab==='analysis'?'on':''}" data-act="ctab" data-v="analysis">Analysis</button></div>${body}</div></div>${footerHtml()}</div>`;
 }
 Object.assign(acts,{
   addcat(t){V.addCat=t.dataset.v;render()},
@@ -2513,6 +2768,62 @@ Object.assign(acts,{
   backcat(){const f=V.fromCat||{};V.catv=f.c||V.catv;V.carea=f.a||V.carea;V.ctab=f.t||'analysis';go('cat')},
   catadd(){V.addCat=V.catv;IM.stage='pick';IM.err='';IM.busy='';go('import')}
 });
+
+/* ---------- colour theme (Material You style, from any seed colour) ---------- */
+const THEME_PRESETS=['#0B57D0','#6750A4','#B3261E','#C2185B','#00796B','#2E7D32','#F57C00','#6D4C41','#00838F','#455A64'];
+let THEME_MEM=null;function getTheme(){return Object.assign({},LS.get('cmd.theme')||THEME_MEM||{})}function setTheme(T){THEME_MEM=T;LS.set('cmd.theme',T)}
+function hexToHsl(h){h=(h||'').replace('#','');if(h.length===3)h=h.split('').map(c=>c+c).join('');const n=parseInt(h,16);if(!(h.length===6)||isNaN(n))return[217,90,40];let r=(n>>16&255)/255,g=(n>>8&255)/255,b=(n&255)/255;const mx=Math.max(r,g,b),mn=Math.min(r,g,b),d=mx-mn;let H=0,S=0;const L=(mx+mn)/2;if(d){S=d/(1-Math.abs(2*L-1));H=mx===r?((g-b)/d)%6:mx===g?(b-r)/d+2:(r-g)/d+4;H=Math.round((H*60+360)%360)}return[H,Math.round(S*100),Math.round(L*100)]}
+function themeCss(hex){
+  const [h,s0]=hexToHsl(hex),gray=s0<8,S=gray?0:Math.max(45,Math.min(s0,90)),H=h;
+  const L={bg:`hsl(${H} ${gray?0:45}% 97%)`,s2:`hsl(${H} ${gray?0:40}% 94%)`,line:`hsl(${H} ${gray?0:25}% 87%)`,acc:`hsl(${H} ${S}% 38%)`,soft:`hsl(${H} ${gray?0:75}% 91%)`,g1:`hsl(${H} ${gray?0:80}% 93%)`,g2:`hsl(${(H+50)%360} ${gray?0:70}% 94%)`};
+  const D={bg:`hsl(${H} ${gray?0:18}% 8%)`,sf:`hsl(${H} ${gray?0:15}% 12%)`,s2:`hsl(${H} ${gray?0:15}% 17%)`,line:`hsl(${H} ${gray?0:12}% 27%)`,acc:`hsl(${H} ${Math.max(S,60)}% 80%)`,ink:`hsl(${H} 60% 14%)`,soft:`hsl(${H} ${gray?0:40}% 24%)`,g1:`hsl(${H} ${gray?0:45}% 14%)`,g2:`hsl(${(H+50)%360} ${gray?0:40}% 14%)`};
+  const light=`--bg:${L.bg};--surface:#fff;--surface2:${L.s2};--line:${L.line};--accent:${L.acc};--accent-ink:#fff;--accent-soft:${L.soft};background:radial-gradient(1000px 500px at 10% -10%,${L.g1} 0,transparent 60%),radial-gradient(800px 400px at 100% 0,${L.g2} 0,transparent 55%),${L.bg}`;
+  const dark=`--bg:${D.bg};--surface:${D.sf};--surface2:${D.s2};--line:${D.line};--accent:${D.acc};--accent-ink:${D.ink};--accent-soft:${D.soft};background:radial-gradient(1000px 500px at 10% -10%,${D.g1} 0,transparent 60%),radial-gradient(800px 400px at 100% 0,${D.g2} 0,transparent 55%),${D.bg}`;
+  return `body:not(.exam-on){${light}}@media(prefers-color-scheme:dark){:root:not([data-theme="light"]) body:not(.exam-on){${dark}}}:root[data-theme="dark"] body:not(.exam-on){${dark}}:root[data-theme="light"] body:not(.exam-on){${light}}body:not(.exam-on) .brand::before{background:linear-gradient(135deg,var(--accent),var(--accent-soft))}`;
+}
+function applyTheme(){
+  const T=getTheme();let st=document.getElementById('themecss');
+  if(T.mode==='light'||T.mode==='dark')document.documentElement.setAttribute('data-theme',T.mode);else document.documentElement.removeAttribute('data-theme');
+  if(!T.hex){if(st)st.remove();return}
+  if(!st){st=document.createElement('style');st.id='themecss';document.head.appendChild(st)}
+  st.textContent=themeCss(T.hex);
+}
+function themePanel(){
+  const T=getTheme(),cur=(T.hex||'#0B57D0').toLowerCase(),m=T.mode||'auto';
+  return `<div class="stack" style="gap:16px"><div><div style="font-weight:600;margin-bottom:8px">Pick a colour</div><div class="swatches">${THEME_PRESETS.map(c=>`<button class="sw${c.toLowerCase()===cur&&T.hex?' on':''}" style="background:${c}" data-act="settheme" data-c="${c}" aria-label="Colour ${c}"></button>`).join('')}</div></div>
+   <label class="row" style="gap:12px;align-items:center"><span style="font-weight:600">Any colour</span><input type="color" id="themepick" value="${cur}" style="width:56px;height:40px;border:0;background:none;padding:0;cursor:pointer"><span class="sub">choose from the full colour picker</span></label>
+   <div><div style="font-weight:600;margin-bottom:8px">Mode</div><div class="seg">${[['auto','Auto'],['light','Light'],['dark','Dark']].map(([k,l])=>`<button class="${m===k?'on':''}" data-act="thememode" data-v="${k}">${l}</button>`).join('')}</div></div>
+   <div><button class="btn sm" data-act="settheme" data-c="">Reset to default</button></div></div>`;
+}
+Object.assign(acts,{
+  theme(){openPanel('Theme','Choose your colour',themePanel())},
+  settheme(t){const T=getTheme();T.hex=t.dataset.c||'';setTheme(T);applyTheme();openPanel('Theme','Choose your colour',themePanel())},
+  thememode(t){const T=getTheme();T.mode=t.dataset.v;setTheme(T);applyTheme();openPanel('Theme','Choose your colour',themePanel())}
+});
+document.addEventListener('click',e=>{const t=e.target.closest&&e.target.closest('#zoomov [data-act="wmopen"]');if(t)acts.wmopen()});
+document.addEventListener('click',e=>{const t=e.target.closest&&e.target.closest('#zoomov [data-act="settheme"],#zoomov [data-act="thememode"]');if(t)acts[t.dataset.act](t)});
+document.addEventListener('input',e=>{const t=e.target;if(t&&t.id==='themepick'){const T=getTheme();T.hex=t.value;setTheme(T);applyTheme()}});
+applyTheme();
+
+/* ---------- exam watermark (your CAT ID) ---------- */
+function getWm(){try{return Object.assign({on:true,id:''},JSON.parse(localStorage.getItem('cmd.wm')||'null')||WM_MEM||{})}catch(e){return Object.assign({on:true,id:''},WM_MEM||{})}}
+let WM_MEM=null;
+function setWm(w){WM_MEM=w;try{localStorage.setItem('cmd.wm',JSON.stringify(w))}catch(e){}}
+function wmSync(){
+  let el=document.getElementById('wmark');const w=getWm();
+  if(V.view!=='exam'||!w.on||!w.id.trim()){if(el)el.remove();return}
+  if(!el){el=document.createElement('div');el.id='wmark';document.body.appendChild(el)}
+  const t=w.id.trim().slice(0,40).replace(/[<>&"']/g,'');
+  const svg=`<svg xmlns="http://www.w3.org/2000/svg" width="320" height="190"><text x="160" y="95" text-anchor="middle" transform="rotate(-28 160 95)" font-family="Arial,sans-serif" font-size="22" font-weight="700" fill="#000" fill-opacity="0.09">${t}</text></svg>`;
+  el.style.backgroundImage=`url("data:image/svg+xml;utf8,${encodeURIComponent(svg)}")`;
+}
+function wmPanel(){const w=getWm();return `<div class="stack" style="gap:14px"><div class="sub">Your CAT ID is shown faintly across the screen while you give a paper, like the real exam.</div>
+  <label class="field" style="max-width:360px"><span style="font-weight:600">CAT ID / registration number</span><input id="wmid" value="${esc(w.id)}" placeholder="e.g. CAT26 123456" maxlength="40" autocomplete="off"></label>
+  <label class="row" style="gap:8px"><input type="checkbox" id="wmon" ${w.on?'checked':''}> Show watermark during tests</label></div>`}
+{const _re=renderExam;renderExam=function(){_re.apply(this,arguments);wmSync()}}
+Object.assign(acts,{wmopen(){openPanel('Exam watermark','Your CAT ID',wmPanel())}});
+document.addEventListener('input',e=>{const t=e.target;if(t&&t.id==='wmid'){const w=getWm();w.id=t.value;setWm(w)}});
+document.addEventListener('change',e=>{const t=e.target;if(t&&t.id==='wmon'){const w=getWm();w.on=t.checked;setWm(w)}});
 app.addEventListener('input',e=>{if(V.view==='cat'&&e.target.id==='cq'){V.cq=e.target.value;const pos=e.target.selectionStart;renderCat();const i=document.getElementById('cq');if(i){i.focus();i.setSelectionRange(pos,pos)}}});
 app.addEventListener('change',e=>{
   const t=e.target;if(V.view!=='cat')return;
@@ -2565,13 +2876,14 @@ function paperGroup(head,meta,items,cur){
   const c=items.filter(i=>i.x.status==='correct').length,w=items.filter(i=>i.x.status==='wrong').length,b=items.length-c-w;
   return `<details class="pg"${cur?' open':' data-other="1"'}><summary class="pgh${cur?' cur':''}"><span class="pgc"></span><b>${esc(head)}</b><span class="sub">${meta?esc(meta)+' · ':''}${items.length} question${items.length===1?'':'s'} · ${c} correct · ${w} wrong · ${b} blank</span></summary>${items.map(i=>revItem(i.B,i.PB,i.x,{noTag:!cur})).join('')}</details>`;
 }
-function topicQuestionsHtml(A,topic,sub){
-  const match=x=>x.topic===topic&&(!sub||x.sub===sub);
-  const keyOf=(B,x)=>{const PB=attPaper(B),q=PB&&PB.questions[x.n-1];return (q&&q.srcKey)||(B.paperId+':'+x.id)};
+function topicQuestionsHtml(A,topic,sub,area){
+  const areaOf=x=>x.area||areaOfName(x.secName)||topicArea(x.topic)||'Other';
+  const match=x=>x.topic===topic&&(!sub||x.sub===sub)&&(!area||areaOf(x)===area);
+  const keyOf=(B,x)=>{if(B.virtual){const o=store.attempts.find(a=>a.id===x.aid);return o?keyOf(o,{n:x.on,id:x.src}):B.id+':'+x.id}const PB=attPaper(B),q=PB&&PB.questions[x.n-1];return (q&&q.srcKey)||(B.paperId+':'+x.id)};
   const seen=new Set(),P=attPaper(A);
   const mine=A.qs.filter(match);mine.forEach(x=>seen.add(keyOf(A,x)));
   let h='<div class="tq">';
-  h+=mine.length?paperGroup('This paper · '+A.title,({full:'Full syllabus',sectional:'Sectional',topic:'Topic-wise',drill:'Drill'}[attCat(A)]||''),mine.map(x=>({B:A,PB:P,x})),true):'<div class="pg"><div class="pgh cur"><b>This paper · '+esc(A.title)+'</b><span class="sub">no questions from this topic</span></div></div>';
+  h+=mine.length?paperGroup((A.virtual?'Your selected attempts':'This paper · '+A.title),(A.virtual?'':({full:'Full syllabus',sectional:'Sectional',topic:'Topic-wise',drill:'Drill'}[attCat(A)]||'')),mine.map(x=>({B:A,PB:P,x})),true):'<div class="pg"><div class="pgh cur"><b>This paper · '+esc(A.title)+'</b><span class="sub">no questions from this topic</span></div></div>';
   const by=new Map();
   [...store.attempts].filter(B=>B.id!==A.id).sort((a,b)=>b.date-a.date).forEach(B=>{
     const PB=attPaper(B);
@@ -2698,11 +3010,11 @@ document.addEventListener('click',e=>{const t=e.target.closest&&e.target.closest
 Object.assign(acts,{
   topicopen(t){
     if(!V.topicOpen)V.topicOpen=new Set();
-    const k=t.dataset.k,A=store.attempts.find(x=>x.id===V.analysisId),next=t.nextElementSibling;
+    const k=t.dataset.k,A=curAtt(),next=t.nextElementSibling;
     if(next&&next.classList.contains('tqrow')){next.remove();V.topicOpen.delete(k);const c=t.querySelector('.tcaret');if(c)c.textContent='▸';return}
     if(!A)return;
-    const parts=k.split('›'),tr=document.createElement('tr');tr.className='tqrow';
-    tr.innerHTML=`<td colspan="${t.children.length}"><div class="tqin">${topicQuestionsHtml(A,parts[0],parts[1]||'')}</div></td>`;
+    const ar=k.includes('¦')?k.split('¦')[0]:'',parts=(ar?k.slice(ar.length+1):k).split('›'),tr=document.createElement('tr');tr.className='tqrow';
+    tr.innerHTML=`<td colspan="${t.children.length}"><div class="tqin">${topicQuestionsHtml(A,parts[0],parts[1]||'',ar)}</div></td>`;
     t.after(tr);V.topicOpen.add(k);const c=t.querySelector('.tcaret');if(c)c.textContent='▾';
   },
   paperan(t){
@@ -2735,14 +3047,14 @@ function openPanel(title,sub,html){
 const GROUP_NAME={easy:'Easy',medium:'Medium',hard:'Hard',mcq:'Multiple choice',tita:'Type-in answer'};
 Object.assign(acts,{
   grp(t){
-    const A=store.attempts.find(x=>x.id===V.analysisId);if(!A)return;
+    const A=curAtt();if(!A)return;
     const k=t.dataset.gk,v=t.dataset.gv,sc=t.dataset.sc,P=attPaper(A);
     const items=A.qs.filter(x=>x[k]===v&&(!sc||x.secName===sc));
     const name=(GROUP_NAME[v]||v)+(k==='secName'?' section':' questions');
     openPanel(name+(sc?' · '+sc:''),A.title,`<div class="tq">${items.length?paperGroup('This paper · '+A.title,'',items.map(x=>({B:A,PB:P,x})),true):'<div class="sub">No questions.</div>'}</div>`);
   },
   grptopic(t){
-    const A=store.attempts.find(x=>x.id===V.analysisId);if(!A)return;
+    const A=curAtt();if(!A)return;
     openPanel(t.dataset.t,A.title,topicQuestionsHtml(A,t.dataset.t,''));
   },
   pgall(t){
@@ -2750,7 +3062,7 @@ Object.assign(acts,{
     c.querySelectorAll('details.pg[data-other]').forEach(d=>{d.open=t.dataset.o==='1'});
   },
   qopen(t){
-    const A=store.attempts.find(x=>x.id===V.analysisId);if(!A)return;
+    const A=curAtt();if(!A)return;
     const i=A.qs.findIndex(q=>q.id===t.dataset.q);if(i<0)return;
     openPanel('','','');
     const z=document.getElementById('zoomov'),nav=document.createElement('div');nav.className='qnavbar';
@@ -2759,7 +3071,7 @@ Object.assign(acts,{
   }
 });
 function qNavPaint(i){
-  const A=store.attempts.find(x=>x.id===V.analysisId),z=document.getElementById('zoomov');if(!A||!z||!A.qs[i])return;
+  const A=curAtt(),z=document.getElementById('zoomov');if(!A||!z||!A.qs[i])return;
   const x=A.qs[i],p=A.qs[i-1],n=A.qs[i+1];z.dataset.qi=i;
   z.querySelector('.zoombar b').textContent=x.secName+' Q'+x.n;
   z.querySelector('.zoombar .sub').textContent=A.title+' · '+x.topic+(x.sub?' › '+x.sub:'');
@@ -2778,7 +3090,7 @@ document.addEventListener('keydown',e=>{
 });
 document.addEventListener('change',e=>{
   const t=e.target;if(!t.closest||!t.closest('#zoomov')||!t.dataset.tag)return;
-  const A=store.attempts.find(x=>x.id===V.analysisId);if(A){A.tags=A.tags||{};if(t.value)A.tags[t.dataset.tag]=t.value;else delete A.tags[t.dataset.tag];store.save(A)}
+  const A=curAtt();if(A){A.tags=A.tags||{};if(t.value)A.tags[t.dataset.tag]=t.value;else delete A.tags[t.dataset.tag];saveAtt(A)}
 });
 </script>
 
@@ -2910,14 +3222,14 @@ function qaiPrompt(A,x,m,custom){
 }
 acts.qaidel=t=>{
   const box=t.closest('.qai');if(!box)return;
-  const A=store.attempts.find(a=>a.id===box.dataset.aid);if(!A||!A.qai)return;
+  const A=findAtt(box.dataset.aid);if(!A||!A.qai)return;
   const id=box.dataset.qid;A.qai[id]=(A.qai[id]||[]).filter(r=>String(r.at)!==t.dataset.at);
   if(!A.qai[id].length)delete A.qai[id];
-  store.save(A);box.querySelector('.qo').innerHTML=qaiOut(A.qai[id]);toast('AI result removed');
+  saveAtt(A);box.querySelector('.qo').innerHTML=qaiOut(A.qai[id]);toast('AI result removed');
 };
 acts.qai=async t=>{
   const box=t.closest('.qai');if(!box)return;
-  const A=store.attempts.find(a=>a.id===box.dataset.aid);if(!A)return;
+  const A=findAtt(box.dataset.aid);if(!A)return;
   const x=A.qs.find(q=>q.id===box.dataset.qid);if(!x)return;
   const m=t.dataset.m,inp=box.querySelector('input');let custom='';
   if(m==='ask'){custom=inp.value.trim();if(!custom){toast('Type your question first');return}}
@@ -2928,7 +3240,7 @@ acts.qai=async t=>{
     const text=await aiAsk(qaiPrompt(A,x,m,custom));
     if(!text||!String(text).trim())throw new Error('The AI returned an empty answer.');
     A.qai=A.qai||{};(A.qai[x.id]=A.qai[x.id]||[]).push({m,q:custom,text:String(text),at:Date.now(),by:DESK?(AI_LABEL[AIS.provider]||'AI')+(AIS.model?' · '+AIS.model:''):'Claude'});
-    store.save(A);if(m==='ask')inp.value='';
+    saveAtt(A);if(m==='ask')inp.value='';
     out.innerHTML=qaiOut(A.qai[x.id]);
   }catch(e){
     hold.className='msg err';hold.textContent=(e&&e.message)||String(e);
@@ -3028,6 +3340,7 @@ async function syncNow(silent){
           const t=SY_TOMB[row.id];if(t&&t>=row.upd)continue;
           if(!loc||row.upd>updOf(loc)){
             const d=Object.assign({},row.data,{upd:row.upd});
+            if(d.kind==='attempt'&&!Array.isArray(d.qs))continue;
             if(loc)list[idx]=d;else (d.kind==='paper'?store.papers:d.kind==='note'?store.notes:store.attempts).unshift(d);
             changed=true;down++;delete SY_DIRTY[row.id];
           }
