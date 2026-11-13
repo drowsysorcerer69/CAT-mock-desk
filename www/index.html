@@ -2,7 +2,7 @@
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>CAT Mock Desk</title>
 <meta name="claude:viewport-fit-sides" content="cover">
-<meta name="app-build" content="2026-11-13.08">
+<meta name="app-build" content="2026-11-13.11">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto+Flex:opsz,wght@8..144,400;8..144,500;8..144,600&family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Serif:wght@400;600&display=swap">
 <style>
 /* Layout: home/analysis are scrolling pages on a paper-blue ground; the exam is a fixed-height console (header, section bar, question pane + palette, action bar) modelled on the CAT screen. */
@@ -638,6 +638,26 @@ body:not(.exam-on) .nbside .tiles{grid-template-columns:repeat(3,minmax(0,1fr));
 .wkcards{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,420px),1fr));gap:12px}
 .wkcards .paper{margin:0!important}
 @media(max-width:980px){.catgrid,.dppgrid,.nbgrid,.wkgrid{grid-template-columns:minmax(0,1fr)}.catside,.dppside,.nbside,.wkside{position:static;max-height:none}.dppside{order:0}.slider.v{flex-direction:row;overflow-x:auto}.slider.v button{flex:1 0 140px}}
+
+/* phones: use the whole width, back button at top right */
+@media(max-width:600px){
+  body:not(.exam-on){padding-left:max(4px,env(safe-area-inset-left,0px));padding-right:max(4px,env(safe-area-inset-right,0px))}
+  body:not(.exam-on) .wrap{padding-inline:0}
+  body:not(.exam-on) .wrap>.top{display:flex;flex-wrap:nowrap;align-items:center;justify-content:space-between;gap:8px;padding:8px 8px 8px 14px;border-radius:22px}
+  body:not(.exam-on) .wrap>.top>.brand{min-width:0;flex:1 1 auto;flex-wrap:wrap}
+  body:not(.exam-on) .wrap>.top>.row:not(.homebar),body:not(.exam-on) .wrap>.top>.btn{width:auto;flex:none;margin:0;flex-wrap:nowrap}
+  body:not(.exam-on) .panel{border-radius:20px;padding:14px 10px}
+  body:not(.exam-on) .hm-hero{border-radius:24px}
+  .hm-head{padding-inline:10px}.hm-h{margin-inline:10px}
+  .hm-hero,.hm-quick,.hm-cats{margin-inline:0}
+  body:not(.exam-on) .paper,body:not(.exam-on) .pgrid .paper{border-radius:18px;padding:12px}
+  body:not(.exam-on) .subjgrid>*{border-radius:20px}
+}
+
+.hm-top{display:grid;grid-template-columns:minmax(320px,32%) minmax(0,1fr);gap:14px;align-items:start;margin-bottom:14px}
+.hm-top>.hm-hero{margin:0}
+.hm-top>.hm-add{margin:0;align-self:start}
+@media(max-width:900px){.hm-top{grid-template-columns:minmax(0,1fr)}.hm-top>.hm-hero{order:-1}}
 </style>
 <div id="app"></div>
 <script>window.addEventListener('error',function(e){var a=document.getElementById('app');if(a&&!a.children.length){a.innerHTML='<div style="padding:18px;font:14px/1.5 system-ui"><b>The app hit an error while starting.</b><pre style="white-space:pre-wrap;word-break:break-word">'+String(e.message||e).replace(/</g,'&lt;')+'\n'+String(e.filename||'').split('/').pop()+':'+(e.lineno||'')+'</pre><p>Send this text to get it fixed.</p></div>'}});</script>
@@ -832,7 +852,7 @@ function paperCat(p){
   return p.sections.length>1?'full':'sectional';
 }
 const attPaper=a=>a.vp||store.papers.find(x=>x.id===a.paperId);
-const curAtt=()=>V.analysisId==='__cx'?V.cxA:curAtt();
+const curAtt=()=>V.analysisId==='__cx'?V.cxA:store.attempts.find(a=>a.id===V.analysisId);
 const findAtt=id=>id==='__cx'?V.cxA:store.attempts.find(a=>a.id===id);
 /* saving notes/AI answers made inside the combined view writes them back to the real attempts */
 function saveAtt(A){
@@ -931,18 +951,9 @@ function renderHome(){
   const tiles=[['practice','bolt','DPP','Daily practice',''],['notebook','warn','Mistakes','Review notebook',due?`<span class="dueb">${due}</span>`:''],['weak','insights','Weak areas','Find gaps',''],['combo','layers','Combined','Many mocks','']];
   app.innerHTML=`<div class="wrap hm">
   <header class="hm-head"><div class="hm-hi"><div class="hm-hello">Hello,</div><input class="nm hm-name" id="candname" value="${esc(candName())}" placeholder="Your name" aria-label="Your name" maxlength="40"></div>
-   <details class="more"><summary class="hm-ic" aria-label="Menu">${ic('more')}</summary><div class="menu"><button class="btn sm" data-act="theme">Theme &amp; colours</button><button class="btn sm" data-act="wmopen">Exam watermark (CAT ID)</button><button class="btn sm" data-act="syopen">Cloud sync${typeof SY!=='undefined'&&SY.refresh?' · on':''}</button>${window.Capacitor?'':`<button class="btn sm" data-act="fullscreen">${document.fullscreenElement?'Exit full screen':'Full screen'}</button>`}${window.desk?'<button class="btn sm" data-act="backup">Export backup</button><button class="btn sm" data-act="restore">Import backup</button>':''}<div class="sub" style="font-size:12px;padding:6px 12px">${window.desk?'History saved on this computer':window.Capacitor?'History saved on this phone':store.cloud?'History saved to your account':'History saved in this browser'}</div></div></details></header>
-  <section class="hm-hero">${inprog?`<div class="hm-hl"><div class="hm-k">Test in progress</div><div class="hm-t">${esc(sess.title)}</div><div class="hm-s">Answers and timers were saved when you left.</div></div><div class="hm-ha"><button class="btn pri" data-act="resume">${ic('play')} Resume test</button><button class="btn" data-act="discard">Discard</button></div>`
-   :`<div class="hm-hl"><div class="hm-k">CAT Mock Desk</div><div class="hm-t">${due?`${due} mistake${due>1?'s':''} due for review`:atts.length?'Keep the streak going':'Ready for your first practice?'}</div><div class="hm-s">${nPap} paper${nPap===1?'':'s'} · ${atts.length} attempt${atts.length===1?'':'s'}${due?' · quick revision keeps them fresh':''}</div></div><div class="hm-ha">${due?`<button class="btn pri" data-act="nbstart" data-set="due">${ic('play')} Revise now</button>`:`<button class="btn pri" data-act="practice">${ic('bolt')} Start DPP</button>`}${due?'<button class="btn" data-act="practice">DPP</button>':''}</div>`}</section>
-  <section class="hm-quick">${tiles.map(([act,i,n,d,b])=>`<button class="hm-q" data-act="${act}"><span class="hm-qi">${ic(i)}</span><span class="hm-qt"><b>${n}${b}</b><small>${d}</small></span></button>`).join('')}</section>
-  <h2 class="hm-h">Your papers</h2>
-  <div class="hm-cats">${['full','sectional','topic','drill'].map(c=>{
-    const ps=store.papers.filter(p=>paperCat(p)===c),as=atts.filter(x=>attCat(x)===c),avg=as.length?Math.round(as.reduce((s,x)=>s+(x.max?x.score/x.max*100:0),0)/as.length):null;
-    const ci={full:'doc',sectional:'pie',topic:'topic',drill:'timer'}[c];
-    return `<button class="hm-c" style="--tile:var(${CATS[c].tint})" data-act="opencat" data-c="${c}"><span class="hm-ci">${ic(ci)}</span><span class="hm-cn">${CATS[c].name.replace(' mock','')}</span><span class="hm-cs">${ps.length} paper${ps.length===1?'':'s'} · ${as.length} attempt${as.length===1?'':'s'}${avg!=null?` · avg ${avg}%`:''}</span></button>`}).join('')}</div>
-  <div class="panel" style="margin-top:14px"><h2>Subject progress</h2><div class="sub" style="margin-bottom:10px;font-size:12.5px">Score as a percentage of marks available, from full syllabus and sectional mocks. ${matchMedia('(pointer:coarse)').matches?'Tap':'Click'} a graph to zoom.</div>
-   <div class="subjgrid">${AREAS.map(a=>subjectCard(a,subjectPoints(a,['full','sectional']))).join('')}</div></div>
-  <details class="panel hm-add stack" style="margin-top:14px"${V.msg?' open':''}><summary><span class="hm-ci">${ic('add')}</span><span class="hm-addt"><b>Add a practice paper</b><small>Import a PDF, JSON or pasted text</small></span></summary><div class="stack" style="gap:10px;margin-top:12px">
+   <details class="more"><summary class="hm-ic" aria-label="Menu">${ic('more')}</summary><div class="menu"><button class="btn sm" data-act="theme">Theme &amp; colours</button><button class="btn sm" data-act="wmopen">Exam watermark (CAT ID)</button><button class="btn sm" data-act="syopen">Cloud sync${typeof SY!=='undefined'&&SY.refresh?' · on':''}</button>${window.Capacitor?'':`<button class="btn sm" data-act="fullscreen">${document.fullscreenElement?'Exit full screen':'Full screen'}</button>`}${window.desk?'<button class="btn sm" data-act="backup">Export backup</button><button class="btn sm" data-act="restore">Import backup</button>':''}${window.desk&&window.desk.updateApp?'<button class="btn sm" data-act="appupdate">Update app from file</button><button class="btn sm" data-act="appreset">Use built-in version</button>':''}<div class="sub" style="font-size:12px;padding:6px 12px">Build ${esc(BUILD)}</div><div class="sub" style="font-size:12px;padding:6px 12px">${window.desk?'History saved on this computer':window.Capacitor?'History saved on this phone':store.cloud?'History saved to your account':'History saved in this browser'}</div></div></details></header>
+  <div class="hm-top">
+  <details class="panel hm-add stack"${V.msg?' open':''}><summary><span class="hm-ci">${ic('add')}</span><span class="hm-addt"><b>Add a practice paper</b><small>Import a PDF, JSON or pasted text</small></span></summary><div class="stack" style="gap:10px;margin-top:12px">
     <div class="row" style="gap:8px;align-items:center"><span class="sub" style="font-size:12px">Add it as</span><div class="seg">${[['auto','Auto'],['full','Full syllabus'],['sectional','Sectional'],['topic','Topic-wise'],['drill','Drill']].map(([k,l])=>`<button class="${(V.addCat||'auto')===k?'on':''}" data-act="addcat" data-v="${k}">${l}</button>`).join('')}</div></div>
     <div class="dropbar drop" id="drop"><span class="grow">Drop a PDF or JSON file here, or</span><button class="btn pri sm" data-act="pick">Choose file</button><button class="btn sm" data-act="importpdf">Import PDF or text…</button><button class="btn sm" data-act="combine">Combine sections…</button><button class="btn sm" data-act="sample">Try a sample paper</button><input type="file" id="file" accept=".pdf,.json,.txt,application/pdf,application/json,text/plain" multiple hidden></div>
     ${V.msg?`<div class="msg ${V.msg.t}" style="white-space:pre-wrap">${esc(V.msg.m)}</div>`:''}
@@ -952,6 +963,16 @@ function renderHome(){
       <pre class="prompt" id="aiprompt">${esc(AI_PROMPT)}</pre><button class="btn sm" data-act="copyprompt">Copy prompt</button>
       <div class="sub" style="margin-top:8px">If the paper is a PDF, ask the AI to convert it into this JSON format first. Questions that share a passage or data set repeat the same passage text.</div></details>
   </div></details>
+  <section class="hm-hero">${inprog?`<div class="hm-hl"><div class="hm-k">Test in progress</div><div class="hm-t">${esc(sess.title)}</div><div class="hm-s">Answers and timers were saved when you left.</div></div><div class="hm-ha"><button class="btn pri" data-act="resume">${ic('play')} Resume test</button><button class="btn" data-act="discard">Discard</button></div>`
+   :`<div class="hm-hl"><div class="hm-k">CAT Mock Desk</div><div class="hm-t">${due?`${due} mistake${due>1?'s':''} due for review`:atts.length?'Keep the streak going':'Ready for your first practice?'}</div><div class="hm-s">${nPap} paper${nPap===1?'':'s'} · ${atts.length} attempt${atts.length===1?'':'s'}${due?' · quick revision keeps them fresh':''}</div></div><div class="hm-ha">${due?`<button class="btn pri" data-act="nbstart" data-set="due">${ic('play')} Revise now</button>`:`<button class="btn pri" data-act="practice">${ic('bolt')} Start DPP</button>`}${due?'<button class="btn" data-act="practice">DPP</button>':''}</div>`}</section></div>
+  <section class="hm-quick">${tiles.map(([act,i,n,d,b])=>`<button class="hm-q" data-act="${act}"><span class="hm-qi">${ic(i)}</span><span class="hm-qt"><b>${n}${b}</b><small>${d}</small></span></button>`).join('')}</section>
+  <h2 class="hm-h">Your papers</h2>
+  <div class="hm-cats">${['full','sectional','topic','drill'].map(c=>{
+    const ps=store.papers.filter(p=>paperCat(p)===c),as=atts.filter(x=>attCat(x)===c),avg=as.length?Math.round(as.reduce((s,x)=>s+(x.max?x.score/x.max*100:0),0)/as.length):null;
+    const ci={full:'doc',sectional:'pie',topic:'topic',drill:'timer'}[c];
+    return `<button class="hm-c" style="--tile:var(${CATS[c].tint})" data-act="opencat" data-c="${c}"><span class="hm-ci">${ic(ci)}</span><span class="hm-cn">${CATS[c].name.replace(' mock','')}</span><span class="hm-cs">${ps.length} paper${ps.length===1?'':'s'} · ${as.length} attempt${as.length===1?'':'s'}${avg!=null?` · avg ${avg}%`:''}</span></button>`}).join('')}</div>
+  <div class="panel" style="margin-top:14px"><h2>Subject progress</h2><div class="sub" style="margin-bottom:10px;font-size:12.5px">Score as a percentage of marks available, from full syllabus and sectional mocks. ${matchMedia('(pointer:coarse)').matches?'Tap':'Click'} a graph to zoom.</div>
+   <div class="subjgrid">${AREAS.map(a=>subjectCard(a,subjectPoints(a,['full','sectional']))).join('')}</div></div>
   <details class="panel hdet" style="margin-top:14px"><summary>Attempt history (${atts.length})</summary>
     ${atts.length?`<div class="tablewrap" style="max-height:360px;overflow:auto;margin-top:8px"><table class="hist"><thead><tr><th>Paper</th><th>Date</th><th>Score</th><th>Accuracy</th><th>Attempted</th><th></th></tr></thead><tbody>${atts.map(a=>`<tr><td>${esc(a.title)}${a.imported?' <span class="chip">logged</span>':''}</td><td>${fmtDate(a.date)}</td><td class="num">${r1(a.score)}/${a.max}</td><td class="num">${a.accuracy}%</td><td class="num">${a.attempted}/${a.qs.length}</td><td><div class="row"><button class="btn sm" data-act="analysis" data-id="${a.id}">Analysis</button><button class="btn sm danger" data-act="delatt" data-id="${a.id}">Delete</button></div></td></tr>`).join('')}</tbody></table></div>`:`<p class="sub">Finished attempts appear here with their full analysis.</p>`}
   </details>${footerHtml()}</div>`;
@@ -1367,9 +1388,7 @@ function titleCell(p){
   if(V.renaming===p.id)return `<div class="row"><input class="nm" id="rn-${p.id}" value="${esc(p.title)}" aria-label="Paper name" style="min-width:240px;flex:1"><button class="btn pri sm" data-act="rnsave" data-id="${p.id}">Save</button><button class="btn sm" data-act="rncancel">Cancel</button></div>`;
   return `<div class="t">${esc(p.title)}</div>`;
 }
-function footerHtml(){
-  return `<div class="sub" style="text-align:center;font-size:12px;margin-top:26px">CAT Mock Desk · build ${esc(BUILD)}${window.desk&&window.desk.updateApp?` · <button class="btn sm" data-act="appupdate">Update app from file</button> <button class="btn sm" data-act="appreset">Use built-in version</button>`:''}</div>`;
-}
+function footerHtml(){return ''}
 </script>
 <script>
 'use strict';
