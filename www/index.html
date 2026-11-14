@@ -2,7 +2,7 @@
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>CAT Mock Desk</title>
 <meta name="claude:viewport-fit-sides" content="cover">
-<meta name="app-build" content="2026-11-13.11">
+<meta name="app-build" content="2026-11-14.08">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto+Flex:opsz,wght@8..144,400;8..144,500;8..144,600&family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Serif:wght@400;600&display=swap">
 <style>
 /* Layout: home/analysis are scrolling pages on a paper-blue ground; the exam is a fixed-height console (header, section bar, question pane + palette, action bar) modelled on the CAT screen. */
@@ -658,7 +658,52 @@ body:not(.exam-on) .nbside .tiles{grid-template-columns:repeat(3,minmax(0,1fr));
 .hm-top>.hm-hero{margin:0}
 .hm-top>.hm-add{margin:0;align-self:start}
 @media(max-width:900px){.hm-top{grid-template-columns:minmax(0,1fr)}.hm-top>.hm-hero{order:-1}}
+
+/* background: no band at the bottom of long pages */
+body:not(.exam-on){min-height:100vh;background-repeat:no-repeat!important;background-attachment:fixed!important;background-size:100% 100%!important}
+/* header alert icon (shown while the Add paper card is open) */
+.hm-tools{display:flex;align-items:center;gap:10px}
+.hm-alert{display:none;position:relative;border:0;color:var(--accent);animation:popin .3s cubic-bezier(.2,0,0,1.4)}
+body:has(.hm-add[open]:not(.closing)) .hm-alert{display:grid}
+.hm-bdg{position:absolute;top:-4px;right:-4px;min-width:20px;height:20px;padding:0 5px;border-radius:10px;background:#b3261e;color:#fff;font:700 11px/20px var(--f-ui);text-align:center}
+/* motion */
+@keyframes viewin{from{opacity:0;transform:translateY(14px) scale(.992)}to{opacity:1;transform:none}}
+@keyframes popin{from{opacity:0;transform:scale(.5);filter:blur(8px)}to{opacity:1;transform:none;filter:blur(0)}}
+@keyframes fadein{from{opacity:0}to{opacity:1}}
+@keyframes rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+body:not(.exam-on) .btn,body:not(.exam-on) .seg button,body:not(.exam-on) .slider button,body:not(.exam-on) .hm-q,body:not(.exam-on) .hm-c,body:not(.exam-on) .hm-ic,body:not(.exam-on) .paper{transition:background-color .2s,color .2s,box-shadow .2s,transform .18s cubic-bezier(.2,0,0,1),border-color .2s}
+body:not(.exam-on) .btn:active,body:not(.exam-on) .hm-q:active,body:not(.exam-on) .hm-c:active,body:not(.exam-on) .hm-ic:active{transform:scale(.96)}
+body:not(.exam-on) .more[open] .menu{animation:viewin .2s cubic-bezier(.2,0,0,1) both;transform-origin:top right}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-delay:0s!important;transition-duration:.01ms!important}}
+
+/* smooth hero collapse while Add paper is open */
+.hm-top{grid-template-columns:1fr 2.1fr;column-gap:14px;transition:grid-template-columns .42s cubic-bezier(.2,0,0,1),column-gap .42s cubic-bezier(.2,0,0,1),row-gap .42s cubic-bezier(.2,0,0,1)}
+.hm-top>.hm-add{min-width:min(320px,100%)}
+.hm-top>.hm-hero{min-width:0;overflow:hidden;transition:opacity .3s ease,filter .42s ease,padding .42s cubic-bezier(.2,0,0,1),max-height .42s cubic-bezier(.2,0,0,1),margin .42s cubic-bezier(.2,0,0,1);max-height:600px}
+body:has(.hm-add[open]:not(.closing)) .hm-top{grid-template-columns:1fr 0fr;column-gap:0}
+body:has(.hm-add[open]:not(.closing)) .hm-top>.hm-hero{opacity:0;filter:blur(14px);padding-inline:0;pointer-events:none}
+@media(max-width:900px){.hm-top{grid-template-columns:minmax(0,1fr)!important;row-gap:14px;transition:row-gap .4s}
+ body:has(.hm-add[open]:not(.closing)) .hm-top{row-gap:0}
+ body:has(.hm-add[open]:not(.closing)) .hm-top>.hm-hero{max-height:0;padding-block:0;opacity:0}}
+
+/* hero collapse: no leftover height */
+body:has(.hm-add[open]:not(.closing)) .hm-top>.hm-hero{max-height:0;padding-block:0;margin:0}
+/* themed Windows title bar */
+#dragbar,#tbprobe{display:none}
+body.has-tb #dragbar{display:flex;align-items:center;position:fixed;top:0;left:0;right:0;height:40px;padding-left:14px;z-index:2147483001;-webkit-app-region:drag;font:600 13px var(--f-ui);user-select:none;transition:background-color .3s,color .3s}
+body.has-tb #tbprobe{display:block;position:fixed;width:0;height:0;visibility:hidden;background:var(--surface2);color:var(--ink)}
+body.has-tb{padding-top:40px}
+body.has-tb .catside,body.has-tb .dppside,body.has-tb .nbside,body.has-tb .wkside{top:52px;max-height:calc(100vh - 64px)}
+body.exam-on.has-tb{background:#1d5fa6!important}
+body.notrans *{transition:none!important}
+
+.nbfilters .btn{width:100%}
+.hdet2>summary{cursor:pointer;font-weight:600;list-style:none}
+.hdet2>summary::before{content:"\25B8  "}.hdet2[open]>summary::before{content:"\25BE  "}
+.catgrid,.nbgrid,.wkgrid{grid-template-columns:minmax(280px,22%) minmax(0,1fr)}
+.nbfilters .field{flex:none!important;width:100%;min-width:0}.nbfilters .field select{width:100%}
 </style>
+<div id="dragbar" aria-hidden="true"><span>CAT Mock Desk</span></div><div id="tbprobe" aria-hidden="true"></div>
 <div id="app"></div>
 <script>window.addEventListener('error',function(e){var a=document.getElementById('app');if(a&&!a.children.length){a.innerHTML='<div style="padding:18px;font:14px/1.5 system-ui"><b>The app hit an error while starting.</b><pre style="white-space:pre-wrap;word-break:break-word">'+String(e.message||e).replace(/</g,'&lt;')+'\n'+String(e.filename||'').split('/').pop()+':'+(e.lineno||'')+'</pre><p>Send this text to get it fixed.</p></div>'}});</script>
 <script>
@@ -818,7 +863,7 @@ const paperMax=p=>p.questions.reduce((s,q)=>s+q.marks,0);
 
 /* ---------- navigation ---------- */
 const V={view:'home',msg:null,analysisId:null,tab:'overview',filter:'all',secFilter:'all'};
-function go(view,extra){NOTIME=false;if(view!=='analysis'&&view!=='cat')V.fromCat=null;Object.assign(V,{view},extra||{});document.body.classList.toggle('exam-on',view==='exam');app.classList.toggle('is-exam',view==='exam');render();if(view!=='exam'&&typeof wmSync==='function')wmSync();if(view!=='exam'){window.scrollTo(0,0);const w=app.querySelector('.wrap');if(w)w.classList.add('enter')}}
+function go(view,extra){NOTIME=false;if(view!=='analysis'&&view!=='cat')V.fromCat=null;Object.assign(V,{view},extra||{});document.body.classList.toggle('exam-on',view==='exam');app.classList.toggle('is-exam',view==='exam');const _pv=V.__shown;render();if(view!=='exam'&&_pv!==view&&app.firstElementChild&&app.firstElementChild.animate&&!matchMedia('(prefers-reduced-motion:reduce)').matches){try{app.firstElementChild.animate([{opacity:0,transform:'translateY(14px)'},{opacity:1,transform:'none'}],{duration:320,easing:'cubic-bezier(.2,0,0,1)'})}catch(e){}}V.__shown=view;if(view!=='exam'&&typeof wmSync==='function')wmSync();if(view!=='exam'){window.scrollTo(0,0);const w=app.querySelector('.wrap');if(w)w.classList.add('enter')}}
 function render(){if(store.attempts.some(x=>!x||!Array.isArray(x.qs)))store.attempts=store.attempts.filter(x=>x&&Array.isArray(x.qs));({home:renderHome,instr:renderInstr,exam:renderExam,analysis:renderAnalysis,practice:renderPractice,log:renderLog,import:renderImport,notebook:renderNotebook,weak:renderWeak,papers:renderAllPapers,cat:renderCat,combine:renderCombine,combo:renderCombo})[V.view]()}
 
 /* ---------- categories: full syllabus, sectional, topic-wise ---------- */
@@ -951,7 +996,7 @@ function renderHome(){
   const tiles=[['practice','bolt','DPP','Daily practice',''],['notebook','warn','Mistakes','Review notebook',due?`<span class="dueb">${due}</span>`:''],['weak','insights','Weak areas','Find gaps',''],['combo','layers','Combined','Many mocks','']];
   app.innerHTML=`<div class="wrap hm">
   <header class="hm-head"><div class="hm-hi"><div class="hm-hello">Hello,</div><input class="nm hm-name" id="candname" value="${esc(candName())}" placeholder="Your name" aria-label="Your name" maxlength="40"></div>
-   <details class="more"><summary class="hm-ic" aria-label="Menu">${ic('more')}</summary><div class="menu"><button class="btn sm" data-act="theme">Theme &amp; colours</button><button class="btn sm" data-act="wmopen">Exam watermark (CAT ID)</button><button class="btn sm" data-act="syopen">Cloud sync${typeof SY!=='undefined'&&SY.refresh?' · on':''}</button>${window.Capacitor?'':`<button class="btn sm" data-act="fullscreen">${document.fullscreenElement?'Exit full screen':'Full screen'}</button>`}${window.desk?'<button class="btn sm" data-act="backup">Export backup</button><button class="btn sm" data-act="restore">Import backup</button>':''}${window.desk&&window.desk.updateApp?'<button class="btn sm" data-act="appupdate">Update app from file</button><button class="btn sm" data-act="appreset">Use built-in version</button>':''}<div class="sub" style="font-size:12px;padding:6px 12px">Build ${esc(BUILD)}</div><div class="sub" style="font-size:12px;padding:6px 12px">${window.desk?'History saved on this computer':window.Capacitor?'History saved on this phone':store.cloud?'History saved to your account':'History saved in this browser'}</div></div></details></header>
+   <div class="hm-tools">${inprog?`<button class="hm-ic hm-alert" data-act="resume" aria-label="Resume test" title="Resume test">${ic('bolt')}</button>`:due?`<button class="hm-ic hm-alert" data-act="nbstart" data-set="due" aria-label="${due} mistakes due" title="${due} mistakes due - revise now">${ic('bolt')}<span class="hm-bdg">${due>99?'99+':due}</span></button>`:`<button class="hm-ic hm-alert" data-act="practice" aria-label="Start DPP" title="Start DPP">${ic('bolt')}</button>`}<details class="more"><summary class="hm-ic" aria-label="Menu">${ic('more')}</summary><div class="menu"><button class="btn sm" data-act="theme">Theme &amp; colours</button><button class="btn sm" data-act="wmopen">Exam watermark (CAT ID)</button><button class="btn sm" data-act="syopen">Cloud sync${typeof SY!=='undefined'&&SY.refresh?' · on':''}</button>${window.Capacitor?'':`<button class="btn sm" data-act="fullscreen">${document.fullscreenElement?'Exit full screen':'Full screen'}</button>`}${window.desk?'<button class="btn sm" data-act="backup">Export backup</button><button class="btn sm" data-act="restore">Import backup</button>':''}${window.desk&&window.desk.updateApp?'<button class="btn sm" data-act="appupdate">Update app from file</button><button class="btn sm" data-act="appreset">Use built-in version</button>':''}<div class="sub" style="font-size:12px;padding:6px 12px">Build ${esc(BUILD)}</div><div class="sub" style="font-size:12px;padding:6px 12px">${window.desk?'History saved on this computer':window.Capacitor?'History saved on this phone':store.cloud?'History saved to your account':'History saved in this browser'}</div></div></details></div></header>
   <div class="hm-top">
   <details class="panel hm-add stack"${V.msg?' open':''}><summary><span class="hm-ci">${ic('add')}</span><span class="hm-addt"><b>Add a practice paper</b><small>Import a PDF, JSON or pasted text</small></span></summary><div class="stack" style="gap:10px;margin-top:12px">
     <div class="row" style="gap:8px;align-items:center"><span class="sub" style="font-size:12px">Add it as</span><div class="seg">${[['auto','Auto'],['full','Full syllabus'],['sectional','Sectional'],['topic','Topic-wise'],['drill','Drill']].map(([k,l])=>`<button class="${(V.addCat||'auto')===k?'on':''}" data-act="addcat" data-v="${k}">${l}</button>`).join('')}</div></div>
@@ -2603,15 +2648,16 @@ function renderNotebook(){
   <div class="nbgrid">
   <div class="panel stack nbside">
    <div class="tiles" style="margin-top:0"><div class="tile"><b class="${due.length?'bad':''}">${due.length}</b><span>due for review now</span></div><div class="tile"><b>${open.length}</b><span>still open</span></div><div class="tile"><b class="good">${mast.length}</b><span>mastered</span></div></div>
-   <div class="sub">Every question you got wrong or left blank lands here. It is scheduled for another try ${REVIEW_DAYS} days after you last saw it, and it leaves the open list once you answer it correctly ${NEED_RIGHT} times in a row. Re-attempts are counted automatically, whether from here, a DPP or a full paper.</div>
+   <details class="hdet2"><summary>How the notebook works</summary><div class="sub" style="margin-top:6px">Every question you got wrong or left blank lands here. It is scheduled for another try ${REVIEW_DAYS} days after you last saw it, and it leaves the open list once you answer it correctly ${NEED_RIGHT} times in a row. Re-attempts are counted automatically, whether from here, a DPP or a full paper.</div></details>
    <div class="row"><button class="btn pri" data-act="nbstart" data-set="due" ${due.length?'':'disabled'}>Practise what is due (${due.length})</button><button class="btn" data-act="nbstart" data-set="open" ${open.filter(m=>m.pool).length?'':'disabled'}>Practise all open (${open.filter(m=>m.pool).length})</button></div>
+  
+   <div class="nbfilters stack" style="gap:10px"><h3>Filter</h3>${sel('sec','Section',uniq(m=>m.sec),nb.sec)}${sel('topic','Topic',uniq(m=>m.topic),nb.topic)}
+    <label class="field" style="min-width:0;width:100%"><span class="sub">Last result</span><select data-nb="reason"><option value="all">All</option><option value="wrong"${nb.reason==='wrong'?' selected':''}>Wrong</option><option value="skipped"${nb.reason==='skipped'?' selected':''}>Left blank</option><option value="correct"${nb.reason==='correct'?' selected':''}>Correct last time</option></select></label>
+    ${nb.tab==='open'?`<button class="btn" data-act="nbstart" data-set="filtered" ${ok.length?'':'disabled'}>Practise these (${ok.length})</button>`:''}</div>
+   ${list.length&&nb.tab!=='discarded'?`<div class="row" style="margin:0;gap:8px"><span class="sub" style="font-size:12.5px">For the ${list.length} shown:</span>${nb.tab==='open'?`<button class="btn sm" data-act="nbbulk" data-op="learned">Mark learned</button>`:''}<button class="btn sm danger" data-act="nbbulk" data-op="discard">Discard</button></div>`:''}
   </div>
   <div class="panel">
    <div class="seg" style="margin-bottom:12px"><button class="${nb.tab==='open'?'on':''}" data-act="nbtab" data-v="open">Open (${open.length})</button><button class="${nb.tab==='mastered'?'on':''}" data-act="nbtab" data-v="mastered">Mastered (${mast.length})</button>${dis.length?`<button class="${nb.tab==='discarded'?'on':''}" data-act="nbtab" data-v="discarded">Discarded (${dis.length})</button>`:''}</div>
-   <div class="row" style="align-items:flex-end;margin-bottom:12px">${sel('sec','Section',uniq(m=>m.sec),nb.sec)}${sel('topic','Topic',uniq(m=>m.topic),nb.topic)}
-    <label class="field" style="min-width:150px;flex:0 1 190px"><span class="sub">Last result</span><select data-nb="reason"><option value="all">All</option><option value="wrong"${nb.reason==='wrong'?' selected':''}>Wrong</option><option value="skipped"${nb.reason==='skipped'?' selected':''}>Left blank</option><option value="correct"${nb.reason==='correct'?' selected':''}>Correct last time</option></select></label>
-    ${nb.tab==='open'?`<button class="btn" data-act="nbstart" data-set="filtered" ${ok.length?'':'disabled'}>Practise these (${ok.length})</button>`:''}</div>
-   ${list.length&&nb.tab!=='discarded'?`<div class="row" style="margin:-4px 0 12px;gap:8px"><span class="sub" style="font-size:12.5px">For the ${list.length} shown:</span>${nb.tab==='open'?`<button class="btn sm" data-act="nbbulk" data-op="learned">Mark learned</button>`:''}<button class="btn sm danger" data-act="nbbulk" data-op="discard">Discard</button></div>`:''}
    ${list.length?list.map(row).join(''):`<p class="sub">${all.length||dis.length?'Nothing matches these filters.':'No mistakes recorded yet. Finish an attempt, or log a past one, and the wrong and blank questions show up here.'}</p>`}
   </div></div>${footerHtml()}</div>`;
 }
@@ -2839,6 +2885,41 @@ function wmSync(){
 function wmPanel(){const w=getWm();return `<div class="stack" style="gap:14px"><div class="sub">Your CAT ID is shown faintly across the screen while you give a paper, like the real exam.</div>
   <label class="field" style="max-width:360px"><span style="font-weight:600">CAT ID / registration number</span><input id="wmid" value="${esc(w.id)}" placeholder="e.g. CAT26 123456" maxlength="40" autocomplete="off"></label>
   <label class="row" style="gap:8px"><input type="checkbox" id="wmon" ${w.on?'checked':''}> Show watermark during tests</label></div>`}
+
+function tbSync(){
+  if(!(window.desk&&window.desk.setTitleBar))return;
+  const b=document.body;b.classList.add('has-tb');
+  const hex=c=>{const m=(c||'').match(/[\d.]+/g);if(!m||m.length<3)return '#EDF0F5';return '#'+m.slice(0,3).map(v=>Math.round(+v).toString(16).padStart(2,'0')).join('')};
+  let bg,fg;const bar=document.getElementById('dragbar');
+  if(b.classList.contains('exam-on')){const h=document.querySelector('.xhead');bg=h?getComputedStyle(h).backgroundColor:'rgb(26,94,168)';fg='rgb(255,255,255)'}
+  else{const cs=getComputedStyle(document.getElementById('tbprobe'));bg=cs.backgroundColor;fg=cs.color}
+  bar.style.background=bg;bar.style.color=fg;
+  try{window.desk.setTitleBar(hex(bg),hex(fg))}catch(e){}
+}
+{const _g=go;go=function(){const r=_g.apply(this,arguments);requestAnimationFrame(tbSync);return r};const _at=applyTheme;applyTheme=function(){_at.apply(this,arguments);requestAnimationFrame(tbSync)};
+ try{matchMedia('(prefers-color-scheme:dark)').addEventListener('change',()=>setTimeout(tbSync,50))}catch(e){}
+ setTimeout(tbSync,0);setTimeout(tbSync,600)}
+
+/* ---------- smooth expand / collapse for <details> ---------- */
+document.addEventListener('click',e=>{
+  const sm=e.target.closest&&e.target.closest('summary');
+  if(!sm||document.body.classList.contains('exam-on'))return;
+  const d=sm.parentElement;
+  if(!d||d.tagName!=='DETAILS'||d.classList.contains('more')||!d.animate)return;
+  if(matchMedia('(prefers-reduced-motion:reduce)').matches)return;
+  e.preventDefault();
+  if(d._a){try{d._a.cancel()}catch(x){}}(d._ca||[]).forEach(x=>{try{x.cancel()}catch(y){}});d._ca=[];
+  const start=d.getBoundingClientRect().height,opening=!d.open;
+  let end;
+  const B=document.body;B.classList.add('notrans');
+  if(opening){d.open=true;end=d.getBoundingClientRect().height;d.open=false;void d.offsetHeight;B.classList.remove('notrans');d.open=true}
+  else{d.open=false;end=d.getBoundingClientRect().height;d.open=true;void d.offsetHeight;B.classList.remove('notrans');d.classList.add('closing')}
+  d.style.overflow='hidden';
+  const done=()=>{(d._ca||[]).forEach(x=>{try{x.cancel()}catch(y){}});d._ca=[];d._a=null;d.style.overflow='';d.classList.remove('closing');if(!opening)d.open=false};
+  const a=d._a=d.animate([{height:start+'px'},{height:end+'px'}],{duration:420,easing:'cubic-bezier(.2,0,0,1)'});
+  a.onfinish=done;a.oncancel=()=>{d.style.overflow=''};
+  [...d.children].forEach(c=>{if(c!==sm&&c.animate)d._ca.push(c.animate(opening?[{opacity:0,transform:'translateY(-6px)',filter:'blur(12px)'},{opacity:1,transform:'none',filter:'blur(0)'}]:[{opacity:1,filter:'blur(0)'},{opacity:0,filter:'blur(12px)'}],{duration:opening?340:200,easing:'ease-out',delay:opening?170:0,fill:opening?'backwards':'forwards'}))});
+},true);
 {const _re=renderExam;renderExam=function(){_re.apply(this,arguments);wmSync()}}
 Object.assign(acts,{wmopen(){openPanel('Exam watermark','Your CAT ID',wmPanel())}});
 document.addEventListener('input',e=>{const t=e.target;if(t&&t.id==='wmid'){const w=getWm();w.id=t.value;setWm(w)}});
