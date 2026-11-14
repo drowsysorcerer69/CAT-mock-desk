@@ -2,7 +2,7 @@
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>CAT Mock Desk</title>
 <meta name="claude:viewport-fit-sides" content="cover">
-<meta name="app-build" content="2026-11-14.12">
+<meta name="app-build" content="2026-11-14.20">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto+Flex:opsz,wght@8..144,400;8..144,500;8..144,600&family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Serif:wght@400;600&display=swap">
 <style>
 /* Layout: home/analysis are scrolling pages on a paper-blue ground; the exam is a fixed-height console (header, section bar, question pane + palette, action bar) modelled on the CAT screen. */
@@ -728,6 +728,38 @@ body.has-tb .hs-panel{top:40px}
   .hs-head{padding:12px 16px 8px}.hs-body{padding:4px 8px 18px 14px}
 }
 
+
+/* smoother first expand: pre-promote layers, cheaper blur on small screens */
+body:not(.exam-on) .hm-top>.hm-hero,body:not(.exam-on) .hm-add>div{will-change:opacity,filter}
+.hm-alert{will-change:transform,opacity}
+@media(max-width:900px){body:has(.hm-add[open]:not(.closing)) .hm-top>.hm-hero{filter:none}}
+
+.hm-alert{display:grid!important;width:0;min-width:0;margin-right:-10px;opacity:0;transform:scale(.5);overflow:visible;pointer-events:none;animation:none!important;transition:width .3s cubic-bezier(.2,0,0,1),margin .3s cubic-bezier(.2,0,0,1),opacity .25s ease,transform .3s cubic-bezier(.2,0,0,1)}
+.hm-alert>*{visibility:hidden}
+body:has(.hm-add[open]:not(.closing)) .hm-alert{width:44px;margin-right:0;opacity:1;transform:none;pointer-events:auto}
+body:has(.hm-add[open]:not(.closing)) .hm-alert>*{visibility:visible}
+
+/* add-paper: separate JSON / AI-prompt toggles, upper area folds away while one is open */
+.addtop{display:grid;grid-template-rows:1fr;transition:grid-template-rows .38s cubic-bezier(.2,0,0,1),opacity .28s ease,margin .38s cubic-bezier(.2,0,0,1)}
+.addtop>.in{overflow:hidden;min-height:0;display:flex;flex-direction:column;gap:10px}
+.addchip{display:none;align-self:flex-start}.addchip .c2{display:none}
+.hm-add:has(.pj[open],.pp[open]) .addchip{display:inline-flex}
+.hm-add.showtop .addchip .c1{display:none}.hm-add.showtop .addchip .c2{display:inline}
+.hm-add:has(.pj[open],.pp[open]):not(.showtop) .addtop{grid-template-rows:0fr;opacity:0;margin-block:-5px}
+.pdet{border:1px solid var(--line);border-radius:16px;padding:0 14px;background:var(--surface2)}
+.pdet>summary{cursor:pointer;font:600 15px var(--f-ui);padding:13px 0;list-style:none;display:flex;align-items:center;gap:8px}
+.pdet>summary::-webkit-details-marker{display:none}
+.pdet>summary::before{content:"\25B8";color:var(--accent);transition:transform .25s}
+.pdet[open]>summary::before{transform:rotate(90deg)}
+.pdet[open]{padding-bottom:16px}
+.pdet .prompt{max-height:min(46vh,380px)}
+
+/* question rows: keep the Q number off the card edge everywhere (beats the generic details>summary rule) */
+body:not(.exam-on) .rev>summary{padding:12px 18px;gap:6px 12px}
+body:not(.exam-on) .revbody{padding:8px 18px 16px}
+body:not(.exam-on) .btn.addchip{padding:10px 24px;min-height:42px;font-size:14px;margin:4px 0}
+body:not(.exam-on) .pdet>summary{padding:14px 0}
+body:not(.exam-on) .pdet[open]>summary{padding-bottom:8px}
 /* themed scrollbars */
 :root{--sbc:#0B57D0}
 *::-webkit-scrollbar{width:14px;height:14px}
@@ -1034,12 +1066,16 @@ function renderHome(){
    <div class="hm-tools">${inprog?`<button class="hm-ic hm-alert" data-act="resume" aria-label="Resume test" title="Resume test">${ic('bolt')}</button>`:due?`<button class="hm-ic hm-alert" data-act="nbstart" data-set="due" aria-label="${due} mistakes due" title="${due} mistakes due - revise now">${ic('bolt')}<span class="hm-bdg">${due>99?'99+':due}</span></button>`:`<button class="hm-ic hm-alert" data-act="practice" aria-label="Start DPP" title="Start DPP">${ic('bolt')}</button>`}<button class="hm-ic" data-act="histopen" aria-label="Attempt history" title="Attempt history (${atts.length})">${ic('history')}</button><details class="more"><summary class="hm-ic" aria-label="Menu">${ic('more')}</summary><div class="menu"><button class="btn sm" data-act="theme">Theme &amp; colours</button><button class="btn sm" data-act="wmopen">Exam watermark (CAT ID)</button><button class="btn sm" data-act="syopen">Cloud sync${typeof SY!=='undefined'&&SY.refresh?' · on':''}</button>${window.Capacitor?'':`<button class="btn sm" data-act="fullscreen">${document.fullscreenElement?'Exit full screen':'Full screen'}</button>`}${window.desk?'<button class="btn sm" data-act="backup">Export backup</button><button class="btn sm" data-act="restore">Import backup</button>':''}${window.desk&&window.desk.updateApp?'<button class="btn sm" data-act="appupdate">Update app from file</button><button class="btn sm" data-act="appreset">Use built-in version</button>':''}<div class="sub" style="font-size:12px;padding:6px 12px">Build ${esc(BUILD)}</div><div class="sub" style="font-size:12px;padding:6px 12px">${window.desk?'History saved on this computer':window.Capacitor?'History saved on this phone':store.cloud?'History saved to your account':'History saved in this browser'}</div></div></details></div></header>
   <div class="hm-top">
   <details class="panel hm-add stack"${V.msg?' open':''}><summary><span class="hm-ci">${ic('add')}</span><span class="hm-addt"><b>Add a practice paper</b><small>Import a PDF, JSON or pasted text</small></span></summary><div class="stack" style="gap:10px;margin-top:12px">
+    <div class="addtop"><div class="in">
     <div class="row" style="gap:8px;align-items:center"><span class="sub" style="font-size:12px">Add it as</span><div class="seg">${[['auto','Auto'],['full','Full syllabus'],['sectional','Sectional'],['topic','Topic-wise'],['drill','Drill']].map(([k,l])=>`<button class="${(V.addCat||'auto')===k?'on':''}" data-act="addcat" data-v="${k}">${l}</button>`).join('')}</div></div>
     <div class="dropbar drop" id="drop"><span class="grow">Drop a PDF or JSON file here, or</span><button class="btn pri sm" data-act="pick">Choose file</button><button class="btn sm" data-act="importpdf">Import PDF or text…</button><button class="btn sm" data-act="combine">Combine sections…</button><button class="btn sm" data-act="sample">Try a sample paper</button><input type="file" id="file" accept=".pdf,.json,.txt,application/pdf,application/json,text/plain" multiple hidden></div>
+    </div></div>
+    <button class="btn sm addchip" data-act="addtop" type="button"><span class="c1">Show upload options</span><span class="c2">Hide upload options</span></button>
     ${V.msg?`<div class="msg ${V.msg.t}" style="white-space:pre-wrap">${esc(V.msg.m)}</div>`:''}
-    <details><summary>Paste text or JSON, and the AI prompt</summary>
-      <textarea class="paste" id="paste" placeholder="Paste the paper JSON or plain text here" aria-label="Paste paper JSON" style="min-height:110px;margin:8px 0"></textarea><div class="row"><button class="btn sm" data-act="addpaste">Add pasted paper</button></div>
-      <div class="sub" style="margin:10px 0 4px">Prompt to give your AI so the paper imports cleanly:</div>
+    <details class="pdet pj"><summary>Paste text or JSON</summary>
+      <textarea class="paste" id="paste" placeholder="Paste the paper JSON or plain text here" aria-label="Paste paper JSON" style="min-height:160px;margin:8px 0"></textarea><div class="row"><button class="btn sm" data-act="addpaste">Add pasted paper</button></div></details>
+    <details class="pdet pp"><summary>AI prompt for clean import</summary>
+      <div class="sub" style="margin:8px 0 4px">Prompt to give your AI so the paper imports cleanly:</div>
       <pre class="prompt" id="aiprompt">${esc(AI_PROMPT)}</pre><button class="btn sm" data-act="copyprompt">Copy prompt</button>
       <div class="sub" style="margin-top:8px">If the paper is a PDF, ask the AI to convert it into this JSON format first. Questions that share a passage or data set repeat the same passage text.</div></details>
   </div></details>
@@ -2529,7 +2565,8 @@ function renderCombo(){
   app.innerHTML=`<div class="wrap"><div class="top"><div class="brand">Combined analysis<small>many mocks, one picture</small></div><div class="row"><button class="btn sm" data-act="weak">Weak areas</button><button class="btn sm" data-act="home">Back</button></div></div>
   <div class="cxgrid"><aside class="panel stack cxside"><div><h2>Pick the attempts</h2><div class="sub" style="font-size:13px">Tick any mix of full, sectional, topic-wise and drill attempts. They are merged into one analysis with VA / RC, DILR and Quant as the subjects.</div></div>
    <div class="chips">${[['all','All'],...Object.keys(CATS).map(k=>[k,CATS[k].name])].map(([k,l])=>`<button class="chip ${st.cat===k?'on':''}" data-act="cxcat" data-f="${k}">${esc(l)}</button>`).join('')}</div>
-   <div class="row"><button class="btn sm" data-act="cxall">Select all shown</button><button class="btn sm" data-act="cxlatest">Latest of each paper</button><button class="btn sm" data-act="cxclear">Clear</button></div><div class="sub" id="cxcount"></div>
+   <div class="row"><button class="btn sm" data-act="cxall">Select all shown</button><button class="btn sm" data-act="cxlatest">Latest of each paper</button><button class="btn sm" data-act="cxclear">Clear</button></div>
+   <div class="stack" style="gap:6px"><div class="sub" style="font-size:12px;font-weight:600">Export every detail for AI prep</div><div class="row" id="cxlvl"><span class="sub" style="font-size:12px">Question detail</span><button class="chip ${(st.rd||'short')==='short'?'on':''}" data-act="cxlevel" data-v="short">Short</button><button class="chip ${st.rd==='full'?'on':''}" data-act="cxlevel" data-v="full">Full</button></div><div class="row"><button class="btn sm pri" data-act="cxpdf">Download PDF</button><button class="btn sm" data-act="cxtxt">Text (.md)</button><button class="btn sm" data-act="cxcopy">Copy</button></div></div><div class="sub" id="cxcount"></div>
    <div class="plist" id="cxlist">${cxListHtml()}</div></aside>
   <main class="cxmain" id="cxres"></main></div>${footerHtml()}</div>`;
   cxPaintRes();
@@ -2860,6 +2897,7 @@ function renderCat(){
 }
 Object.assign(acts,{
   addcat(t){V.addCat=t.dataset.v;render()},
+  addtop(t){const h=t.closest('.hm-add');if(h)h.classList.toggle('showtop')},
   opencat(t){V.catv=t.dataset.c;V.carea=t.dataset.c==='topic'?'VARC':'all';V.ctab='papers';V.cq='';go('cat')},
   carea(t){V.carea=t.dataset.v;renderCat()},
   ctab(t){V.ctab=t.dataset.v;renderCat()},
@@ -3616,5 +3654,152 @@ setTimeout(()=>{if(SY.refresh)syncNow(true)},2500);
     if(Date.now()-last<2000)A.exitApp();else{last=Date.now();toast('Press back again to exit')}
   });
 })();
+</script>
+
+<script>
+'use strict';
+/* ===== Export many attempts as one AI-ready report (PDF or text) ===== */
+function aiReportText(ids,level){
+  const SHORT=(level||(typeof cxState==='function'&&cxState().rd)||'short')==='short';
+  const atts=store.attempts.filter(a=>ids.has(a.id)).sort((a,b)=>a.date-b.date);
+  const L=[],clip=(x,n)=>{x=String(x==null?'':x).replace(/[ \t]+/g,' ').trim();return n&&x.length>n?x.slice(0,n)+'…':x};
+  const nb={};try{mistakeItems(true).forEach(m=>{nb[m.key]=m})}catch(e){}
+  const tm=(a,s)=>a.noTime?'n/a':fmtT0(s);
+  const row=(n,a,noT)=>`${n}: ${r1(a.score)}/${a.max} marks | acc ${a.attempted?a.acc+'%':'n/a'} | ${a.correct} correct, ${a.wrong} wrong, ${a.skipped} blank, ${a.unseen} unseen | neg ${r1(a.neg)} | avg time ${noT?'n/a':fmtT0(a.time/Math.max(1,a.n))}`;
+  const all=[];atts.forEach(a=>a.qs.forEach(x=>all.push(Object.assign({},x,{_t:a.noTime}))));
+  L.push('# CAT MOCK DESK - COMBINED PERFORMANCE REPORT');
+  L.push('Generated: '+new Date().toLocaleString()+' | Attempts included: '+atts.length+' | Questions: '+all.length);
+  L.push('');
+  L.push('## HOW TO USE THIS REPORT (instructions for the AI)');
+  L.push('This is the complete data a CAT (Common Admission Test, India) student collected across several practice mocks. Marking: +3 correct, -1 wrong MCQ, no negative for type-in (TITA) answers. Please: (1) find recurring weak topics and question types across papers, (2) separate concept gaps from calculation slips, misreads and time pressure using the time, answer-change and tag data, (3) say what to fix first and give a realistic day-by-day prep plan, (4) suggest shortcuts for the costly questions, (5) point out where accuracy or speed trends up or down over time. Be honest and specific.');
+  L.push('');
+  const T=agg(all);
+  L.push('## OVERALL (all attempts together)');
+  L.push(row('TOTAL',T,all.every(x=>x._t)));
+  ['VA / RC','DILR','Quant'].forEach(()=>{});
+  const bySec=groupBy(all,'secName');L.push('');L.push('By section:');Object.keys(bySec).forEach(k=>L.push('- '+row(k,agg(bySec[k]),bySec[k].every(x=>x._t))));
+  const byTop=groupBy(all,'topic');L.push('');L.push('By topic (weakest accuracy first):');
+  Object.keys(byTop).map(k=>[k,agg(byTop[k])]).sort((p,q)=>(p[1].attempted?p[1].acc:101)-(q[1].attempted?q[1].acc:101)).forEach(([k,a])=>{L.push('- '+row(k,a,byTop[k].every(x=>x._t)));
+    const sg=groupBy(byTop[k].filter(x=>x.sub),'sub');Object.keys(sg).forEach(u=>L.push('    - '+row(u,agg(sg[u]),sg[u].every(x=>x._t))))});
+  const byD=groupBy(all,'difficulty');L.push('');L.push('By difficulty:');Object.keys(byD).forEach(k=>L.push('- '+row(k,agg(byD[k]),byD[k].every(x=>x._t))));
+  const tagN={};atts.forEach(a=>Object.values(a.tags||{}).forEach(t=>{if(t)tagN[t]=(tagN[t]||0)+1}));
+  if(Object.keys(tagN).length){L.push('');L.push('Student\'s own mistake reasons (count): '+Object.entries(tagN).map(e=>e[0]+' x'+e[1]).join('; '))}
+  const chg=all.filter(x=>x.ch>0),chW=chg.filter(x=>x.status==='wrong').length;
+  L.push('');L.push(`Answer changes: ${chg.length} questions had the answer changed; ${chW} of them ended wrong.`);
+  L.push(`Marked for review: ${all.filter(x=>x.mk).length}. Never opened: ${T.unseen}. Opened but left blank: ${T.skipped}.`);
+  L.push('');L.push('## ATTEMPT TIMELINE (oldest first)');
+  atts.forEach((a,i)=>L.push(`${i+1}. ${new Date(a.date).toLocaleString()} | ${a.title} | ${r1(a.score)}/${a.max} | acc ${a.attempted?pct(a.correct,a.attempted)+'%':'n/a'}${a.noTime?' | no timing recorded':''}`));
+  atts.forEach((a,ai)=>{
+    const P=attPaper(a),Ta=agg(a.qs);
+    L.push('');L.push('='.repeat(100));
+    L.push(`## ATTEMPT ${ai+1}/${atts.length}: ${a.title}`);
+    L.push(`Date: ${new Date(a.date).toLocaleString()} | Mode: ${a.mode==='cat'?'CAT sectional timing':a.mode==='free'?'free':'single timer'}${a.noTime?' | per-question time NOT recorded (answers entered afterwards)':''}`);
+    try{const pc=(typeof pctAtt==='function')?pctAtt(a):null;if(pc!=null&&pc!==undefined&&pc!==''&&pc!==false)L.push('Percentile estimate: '+(typeof pc==='object'?JSON.stringify(pc):pc))}catch(e){}
+    L.push(row('TOTAL',Ta,a.noTime));
+    L.push('');L.push('Sections:');
+    (a.secs||[]).forEach((s,si)=>L.push('- '+row(s.name,agg(a.qs.filter(x=>x.sec===si)),a.noTime)+` | time used ${tm(a,s.used)} of ${r1(s.minutes)} min`));
+    const tg=groupBy(a.qs,'topic');L.push('');L.push('Topics:');Object.keys(tg).forEach(k=>L.push('- '+row(k,agg(tg[k]),a.noTime)));
+    try{const ins=buildInsights(a);if(ins.length){L.push('');L.push('Automatic observations:');ins.forEach(i=>L.push('- '+i.title+'. '+i.text))}}catch(e){}
+    if(a.ai&&a.ai.text){L.push('');L.push('Saved AI analysis of this attempt ('+(a.ai.by||'AI')+'):');L.push(SHORT?clip(a.ai.text,1500):a.ai.text)}
+    L.push('');L.push('### Every question ('+(SHORT?'short form: question stem, right option and solution are trimmed':'full text')+')');
+    a.qs.forEach(x=>{
+      const q=P&&P.questions[x.n-1]&&P.questions[x.n-1].id===x.id?P.questions[x.n-1]:null;
+      const ideal=a.secs&&a.secs[x.sec]?idealOf(a,x):0;
+      const key=(q&&q.srcKey)||(a.paperId+':'+x.id),m=nb[key];
+      L.push('');
+      L.push(`[${x.secName} Q${x.n}] ${x.status.toUpperCase()} | ${x.got>0?'+':''}${x.got} of ${x.marks} | ${x.type==='mcq'?'MCQ':'TITA'} | ${x.topic}${x.sub?' > '+x.sub:''} | ${x.difficulty}`);
+      L.push(`  Time: ${tm(a,x.time)} spent vs ${tm(a,ideal)} available | opened ${x.visits}x | answer changed ${x.ch}x${x.mk?' | marked for review':''}`);
+      const fmt=v=>v==null?'none':(x.type==='mcq'?String.fromCharCode(65+v):String(v));
+      L.push(`  First answer: ${fmt(x.first)}${x.firstOk!=null?(x.firstOk?' (was correct)':' (was wrong)'):''} | Final answer: ${fmt(x.given)}${q&&!SHORT?' | Correct: '+clip(correctText(q),200):''}`);
+      const tag=(a.tags||{})[x.id];if(tag)L.push('  Student\'s reason for miss/slow: '+tag);
+      if(m)L.push(`  Mistake notebook: wrong/blank ${m.wrongs}x overall, current streak ${m.streak}, state: ${dueLabel(m)}`);
+      if(q&&SHORT){
+        if(q.passage)L.push('  Passage (start): '+clip(q.passage,140));
+        L.push('  Q: '+clip(q.text,260));
+        if(q.type==='mcq'){const g=x.given!=null&&x.given!==q.ai?` | chose ${String.fromCharCode(65+x.given)}: ${clip(q.options[x.given],70)}`:'';L.push('  Right option: '+String.fromCharCode(65+q.ai)+'. '+clip(q.options[q.ai],90)+g)}
+        if(q.solution)L.push('  Solution (short): '+clip(q.solution,180));
+      }else if(q){
+        if(q.passage)L.push('  PASSAGE / DATA SET:\n'+q.passage);
+        L.push('  QUESTION: '+q.text);
+        if(q.type==='mcq')q.options.forEach((o,k)=>L.push(`    ${String.fromCharCode(65+k)}. ${o}${k===q.ai?'   <-- correct':''}${k===x.given&&k!==q.ai?'   <-- student chose':''}`));
+        if(q.solution)L.push('  OFFICIAL SOLUTION: '+q.solution);
+      }else L.push('  (paper deleted - question text unavailable)');
+      ((a.qai||{})[x.id]||[]).forEach(r=>{L.push(`  AI Q&A (${r.m}${r.q?': '+r.q:''}): ${SHORT?clip(r.text,300):r.text}`)});
+    });
+  });
+  L.push('');L.push('END OF REPORT');
+  return L.join('\n');
+}
+/* ---- minimal PDF writer (Courier, A4, text only) ---- */
+function pdfSafe(s){
+  const map={'→':'->','←':'<-','≤':'<=','≥':'>=','≠':'!=','≈':'~','√':'sqrt','π':'pi','✓':'(ok)','✔':'(ok)','✗':'(x)','✘':'(x)','∞':'inf','−':'-',' ':' ',' ':' ',' ':' ',' ':' ','•':'*','▸':'>','…':'...','α':'alpha','β':'beta','θ':'theta','λ':'lambda','μ':'mu','σ':'sigma','∑':'sum','Δ':'Delta','∆':'Delta','Ω':'Omega','∩':'^','∪':'U','∈':'in','₹':'Rs','⁄':'/','∕':'/'};
+  let o='';for(const ch of String(s)){const c=ch.codePointAt(0);
+    if(map[ch]!==undefined)o+=map[ch];
+    else if(c===9)o+='    ';
+    else if(c===10)o+='\n';
+    else if(c<32)o+=' ';
+    else if(c<127||(c>=160&&c<=255))o+=ch;
+    else if(c===0x2013||c===0x2014)o+='-';
+    else if(c===0x2018||c===0x2019)o+="'";
+    else if(c===0x201C||c===0x201D)o+='"';
+    else if(c>=0x2070&&c<=0x2079)o+='^'+'0123456789'[c===0x2070?0:c===0xB9?1:c-0x2070];
+    else if(c>=0x2080&&c<=0x2089)o+='_'+(c-0x2080);
+    else if(c===127)o+=' ';
+    else o+='?'}
+  return o;
+}
+function pdfBuild(text,title){
+  const W=595,H=842,M=40,FS=8,LH=10.2,CW=FS*0.6,COLS=Math.floor((W-2*M)/CW),PERPAGE=Math.floor((H-2*M-12)/LH);
+  const lines=[];
+  pdfSafe(text).split('\n').forEach(raw=>{
+    const head=/^#{1,3} /.test(raw)||/^={20,}$/.test(raw);
+    let t=raw;if(/^#{1,3} /.test(raw))t=raw.replace(/^#{1,3} /,'').toUpperCase();
+    const ind=(t.match(/^ */)[0].length);const pad=' '.repeat(Math.min(ind,8)+(ind?2:0));
+    if(!t.length){lines.push({t:'',b:0});return}
+    let rest=t,first=true;
+    while(rest.length>COLS){
+      let cut=rest.lastIndexOf(' ',COLS);if(cut<COLS*0.5)cut=COLS;
+      lines.push({t:(first?'':pad)+rest.slice(0,cut).replace(/\s+$/,''),b:head});rest=rest.slice(cut).replace(/^ +/,'');first=false}
+    lines.push({t:(first?'':pad)+rest,b:head});
+  });
+  const pages=[];for(let i=0;i<lines.length;i+=PERPAGE)pages.push(lines.slice(i,i+PERPAGE));
+  const esc2=s=>s.replace(/\\/g,'\\\\').replace(/\(/g,'\\(').replace(/\)/g,'\\)');
+  const objs=[];const add=s=>{objs.push(s);return objs.length};
+  const catalog=add('');const pagesObj=add('');const f1=add('<< /Type /Font /Subtype /Type1 /BaseFont /Courier /Encoding /WinAnsiEncoding >>');const f2=add('<< /Type /Font /Subtype /Type1 /BaseFont /Courier-Bold /Encoding /WinAnsiEncoding >>');
+  const kids=[];
+  pages.forEach((pg,pi)=>{
+    let c='BT\n';let y=H-M;
+    pg.forEach(l=>{c+=`/${l.b?'F2':'F1'} ${FS} Tf 1 0 0 1 ${M} ${y.toFixed(1)} Tm (${esc2(l.t)}) Tj\n`;y-=LH});
+    c+=`/F1 7 Tf 1 0 0 1 ${M} ${M-14} Tm (${esc2(pdfSafe(title)+'  -  page '+(pi+1)+' of '+pages.length)}) Tj\nET`;
+    const cs=add(`<< /Length ${c.length} >>\nstream\n${c}\nendstream`);
+    kids.push(add(`<< /Type /Page /Parent ${pagesObj} 0 R /MediaBox [0 0 ${W} ${H}] /Resources << /Font << /F1 ${f1} 0 R /F2 ${f2} 0 R >> >> /Contents ${cs} 0 R >>`));
+  });
+  objs[catalog-1]=`<< /Type /Catalog /Pages ${pagesObj} 0 R >>`;
+  objs[pagesObj-1]=`<< /Type /Pages /Kids [${kids.map(k=>k+' 0 R').join(' ')}] /Count ${kids.length} >>`;
+  let out='%PDF-1.4\n',off=[];
+  objs.forEach((o,i)=>{off.push(out.length);out+=`${i+1} 0 obj\n${o}\nendobj\n`});
+  const xr=out.length;out+=`xref\n0 ${objs.length+1}\n0000000000 65535 f \n`+off.map(o=>String(o).padStart(10,'0')+' 00000 n \n').join('')+`trailer\n<< /Size ${objs.length+1} /Root ${catalog} 0 R >>\nstartxref\n${xr}\n%%EOF`;
+  const u=new Uint8Array(out.length);for(let i=0;i<out.length;i++)u[i]=out.charCodeAt(i)&255;
+  return {bytes:u,pages:pages.length};
+}
+async function saveBinFile(name,bytes,mime){
+  try{
+    const file=new File([bytes],name,{type:mime});
+    if(navigator.canShare&&navigator.canShare({files:[file]})){try{await navigator.share({files:[file],title:name});return}catch(e){if(e&&e.name==='AbortError')return}}
+    const a=document.createElement('a');a.href=URL.createObjectURL(file);a.download=name;document.body.appendChild(a);a.click();
+    setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},1500);toast('Download started');
+  }catch(e){toast('Could not save the file here. Try the Copy text button.')}
+}
+function cxExportIds(){const s=cxState().sel;if(!s.size){toast('Tick at least one attempt first');return null}return s}
+Object.assign(acts,{
+  cxlevel(t){const st=cxState();st.rd=t.dataset.v;document.querySelectorAll('#cxlvl .chip').forEach(c=>c.classList.toggle('on',c.dataset.v===st.rd))},
+  async cxpdf(){const ids=cxExportIds();if(!ids)return;
+    try{const t=aiReportText(ids),r=pdfBuild(t,'CAT Mock Desk report');
+      await saveBinFile('CAT-analysis-'+ids.size+'-attempts.pdf',r.bytes,'application/pdf')}catch(e){toast('Could not build the report')}},
+  async cxtxt(){const ids=cxExportIds();if(!ids)return;
+    try{await saveTextFile('CAT-analysis-'+ids.size+'-attempts.md',aiReportText(ids),'text/markdown')}catch(e){toast('Could not build the report')}},
+  async cxcopy(){const ids=cxExportIds();if(!ids)return;
+    try{await navigator.clipboard.writeText(aiReportText(ids));toast('Report copied - paste it into any AI')}catch(e){toast('Copy blocked here. Use the text or PDF button.')}}
+});
 </script>
 </body></html>
