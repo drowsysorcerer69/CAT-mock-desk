@@ -2,7 +2,7 @@
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>CAT Mock Desk</title>
 <meta name="claude:viewport-fit-sides" content="cover">
-<meta name="app-build" content="2026-11-14.08">
+<meta name="app-build" content="2026-11-14.11">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto+Flex:opsz,wght@8..144,400;8..144,500;8..144,600&family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Serif:wght@400;600&display=swap">
 <style>
 /* Layout: home/analysis are scrolling pages on a paper-blue ground; the exam is a fixed-height console (header, section bar, question pane + palette, action bar) modelled on the CAT screen. */
@@ -702,6 +702,41 @@ body.notrans *{transition:none!important}
 .hdet2>summary::before{content:"\25B8  "}.hdet2[open]>summary::before{content:"\25BE  "}
 .catgrid,.nbgrid,.wkgrid{grid-template-columns:minmax(280px,22%) minmax(0,1fr)}
 .nbfilters .field{flex:none!important;width:100%;min-width:0}.nbfilters .field select{width:100%}
+
+@media(max-width:600px){
+  body:not(.exam-on) .wrap>.top>.brand{flex-wrap:nowrap;gap:8px;font-size:19px;line-height:1.2;align-items:center}
+  body:not(.exam-on) .wrap>.top>.brand::before{flex:none;width:28px;height:28px;border-radius:9px}
+  body:not(.exam-on) .wrap>.top>.brand small{display:none}
+  body:not(.exam-on) .wrap>.top .btn{padding-inline:14px;min-height:40px}
+}
+@media(max-width:980px){.catgrid,.dppgrid,.nbgrid,.wkgrid{grid-template-columns:minmax(0,1fr)!important}}
+
+/* attempt history sheet */
+#hist{position:fixed;inset:0;z-index:2147482000}
+.hs-bg{position:absolute;inset:0;background:rgba(10,12,20,.28);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+.hs-panel{position:absolute;top:0;right:0;bottom:0;width:min(50vw,820px);min-width:min(520px,100vw);display:flex;flex-direction:column;background:var(--surface);color:var(--ink);border-radius:32px 0 0 32px;box-shadow:-12px 0 40px rgba(0,0,0,.2);overflow:hidden}
+body.has-tb .hs-panel{top:40px}
+.hs-grab{display:none}
+.hs-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:20px 22px 10px}
+.hs-head h2{margin:0;font:600 20px var(--f-ui);display:flex;align-items:center;gap:10px}
+.hs-body{flex:1;min-height:0;overflow:auto;padding:6px 14px 22px 22px}
+.hs-body table.hist{width:100%}
+@media(max-width:700px){
+  .hs-panel{top:auto;left:0;right:0;bottom:0;width:100%;min-width:0;height:56vh;border-radius:28px 28px 0 0;box-shadow:0 -10px 40px rgba(0,0,0,.25)}
+  body.has-tb .hs-panel{top:auto}
+  .hs-grab{display:block;width:44px;height:5px;border-radius:3px;background:var(--line);margin:10px auto 0}
+  .hs-head{padding:12px 16px 8px}.hs-body{padding:4px 8px 18px 14px}
+}
+
+/* themed scrollbars */
+:root{--sbc:#0B57D0}
+*::-webkit-scrollbar{width:14px;height:14px}
+*::-webkit-scrollbar-track{background:transparent}
+*::-webkit-scrollbar-corner{background:transparent}
+*::-webkit-scrollbar-thumb{background:color-mix(in srgb,var(--sbc) 38%,transparent);border:4px solid transparent;background-clip:padding-box;border-radius:99px;min-height:44px;transition:background-color .2s}
+*::-webkit-scrollbar-thumb:hover{background:color-mix(in srgb,var(--sbc) 70%,transparent);background-clip:padding-box}
+*::-webkit-scrollbar-thumb:active{background:var(--sbc);background-clip:padding-box}
+@media(max-width:600px){*::-webkit-scrollbar{width:8px;height:8px}*::-webkit-scrollbar-thumb{border-width:2px}}
 </style>
 <div id="dragbar" aria-hidden="true"><span>CAT Mock Desk</span></div><div id="tbprobe" aria-hidden="true"></div>
 <div id="app"></div>
@@ -985,7 +1020,7 @@ function papersListHtml(q){
       <div class="row"><button class="btn pri sm" data-act="start" data-id="${p.id}">Start</button><button class="btn sm" data-act="rename" data-id="${p.id}">Rename</button><button class="btn sm" data-act="pctl" data-id="${p.id}">${p.pct&&p.pct.length?'Percentile ✓':'Percentile'}</button><button class="btn sm" data-act="expjson" data-id="${p.id}">Export JSON</button><button class="btn sm" data-act="logpast" data-id="${p.id}">Log past attempt</button><button class="btn sm danger" data-act="delpaper" data-id="${p.id}">Delete</button></div></div>`}).join(''):`<p class="sub">No papers yet. Add one on the left, or load the sample to see how the exam screen and analysis look.</p>`}
     ${sets.length?`<h3 style="margin-top:20px">DPP sets and section tests</h3>`+sets.map(p=>{const a=atts.filter(x=>x.paperId===p.id);return `<div class="paper"><div>${titleCell(p)}<div class="sub" style="font-size:12px">${p.questions.length} questions · ${p.sections[0].minutes} min${a.length?' · '+a.length+' attempt'+(a.length>1?'s':''):''}</div></div><div class="row"><button class="btn pri sm" data-act="start" data-id="${p.id}">Start</button><button class="btn sm" data-act="rename" data-id="${p.id}">Rename</button><button class="btn sm" data-act="pctl" data-id="${p.id}">${p.pct&&p.pct.length?'Percentile ✓':'Percentile'}</button><button class="btn sm" data-act="expjson" data-id="${p.id}">Export JSON</button><button class="btn sm" data-act="logpast" data-id="${p.id}">Log past attempt</button><button class="btn sm danger" data-act="delpaper" data-id="${p.id}">Delete</button></div></div>`}).join(''):''}`;
 }
-const IC={bolt:'M11 21h-1l1-7H7.5c-.58 0-.57-.32-.38-.66L13 3h1l-1 7h3.5c.49 0 .56.33.47.51C12.96 17.55 11 21 11 21z',warn:'M12 2L1 21h22L12 2zm1 14h-2v-2h2v2zm0-4h-2V8h2v4z',insights:'M21 8c-1.45 0-2.26 1.44-1.93 2.51l-3.55 3.56c-.3-.09-.74-.09-1.04 0l-2.55-2.55C12.27 10.45 11.46 9 10 9c-1.45 0-2.27 1.44-1.93 2.52l-4.56 4.55C2.44 15.74 1 16.55 1 18c0 1.1.9 2 2 2 1.45 0 2.26-1.44 1.93-2.51l4.55-4.56c.3.09.74.09 1.04 0l2.55 2.55C12.73 16.55 13.54 18 15 18c1.45 0 2.27-1.44 1.93-2.52l3.56-3.55c1.07.33 2.51-.48 2.51-1.93 0-1.1-.9-2-2-2z',layers:'M11.99 18.54l-7.37-5.73L3 14.07l9 7 9-7-1.63-1.27-7.38 5.74zM12 16l7.36-5.73L21 9l-9-7-9 7 1.63 1.27L12 16z',doc:'M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z',pie:'M11 2v20c-5.07-.5-9-4.79-9-10s3.93-9.5 9-10zm2.03 0v8.99H22c-.47-4.74-4.24-8.52-8.97-8.99zm0 11.01V22c4.74-.47 8.5-4.25 8.97-8.99h-8.97z',topic:'M12 2l-5.5 9h11L12 2zm5.5 11c-2.49 0-4.5 2.01-4.5 4.5s2.01 4.5 4.5 4.5 4.5-2.01 4.5-4.5-2.01-4.5-4.5-4.5zM3 21.5h8v-8H3v8z',timer:'M15 1H9v2h6V1zm-4 13h2V8h-2v6zm8.03-6.61l1.42-1.42c-.43-.51-.9-.99-1.41-1.41l-1.42 1.42C16.07 4.74 14.12 4 12 4c-4.97 0-9 4.03-9 9s4.02 9 9 9 9-4.03 9-9c0-2.12-.74-4.07-1.97-5.61zM12 20c-3.87 0-7-3.13-7-7s3.13-7 7-7 7 3.13 7 7-3.13 7-7 7z',more:'M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z',add:'M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z',play:'M8 5v14l11-7z'};
+const IC={bolt:'M11 21h-1l1-7H7.5c-.58 0-.57-.32-.38-.66L13 3h1l-1 7h3.5c.49 0 .56.33.47.51C12.96 17.55 11 21 11 21z',warn:'M12 2L1 21h22L12 2zm1 14h-2v-2h2v2zm0-4h-2V8h2v4z',insights:'M21 8c-1.45 0-2.26 1.44-1.93 2.51l-3.55 3.56c-.3-.09-.74-.09-1.04 0l-2.55-2.55C12.27 10.45 11.46 9 10 9c-1.45 0-2.27 1.44-1.93 2.52l-4.56 4.55C2.44 15.74 1 16.55 1 18c0 1.1.9 2 2 2 1.45 0 2.26-1.44 1.93-2.51l4.55-4.56c.3.09.74.09 1.04 0l2.55 2.55C12.73 16.55 13.54 18 15 18c1.45 0 2.27-1.44 1.93-2.52l3.56-3.55c1.07.33 2.51-.48 2.51-1.93 0-1.1-.9-2-2-2z',layers:'M11.99 18.54l-7.37-5.73L3 14.07l9 7 9-7-1.63-1.27-7.38 5.74zM12 16l7.36-5.73L21 9l-9-7-9 7 1.63 1.27L12 16z',doc:'M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z',pie:'M11 2v20c-5.07-.5-9-4.79-9-10s3.93-9.5 9-10zm2.03 0v8.99H22c-.47-4.74-4.24-8.52-8.97-8.99zm0 11.01V22c4.74-.47 8.5-4.25 8.97-8.99h-8.97z',topic:'M12 2l-5.5 9h11L12 2zm5.5 11c-2.49 0-4.5 2.01-4.5 4.5s2.01 4.5 4.5 4.5 4.5-2.01 4.5-4.5-2.01-4.5-4.5-4.5zM3 21.5h8v-8H3v8z',timer:'M15 1H9v2h6V1zm-4 13h2V8h-2v6zm8.03-6.61l1.42-1.42c-.43-.51-.9-.99-1.41-1.41l-1.42 1.42C16.07 4.74 14.12 4 12 4c-4.97 0-9 4.03-9 9s4.02 9 9 9 9-4.03 9-9c0-2.12-.74-4.07-1.97-5.61zM12 20c-3.87 0-7-3.13-7-7s3.13-7 7-7 7 3.13 7 7-3.13 7-7 7z',more:'M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z',add:'M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z',play:'M8 5v14l11-7z',history:'M13 3c-4.97 0-9 4.03-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42C8.27 19.99 10.51 21 13 21c4.97 0 9-4.03 9-9s-4.03-9-9-9zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z'};
 function ic(n){return `<svg class="ic" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="currentColor"><path d="${IC[n]||''}"/></svg>`}
 function renderHome(){
   const sess=LS.get('cmd.session');
@@ -996,7 +1031,7 @@ function renderHome(){
   const tiles=[['practice','bolt','DPP','Daily practice',''],['notebook','warn','Mistakes','Review notebook',due?`<span class="dueb">${due}</span>`:''],['weak','insights','Weak areas','Find gaps',''],['combo','layers','Combined','Many mocks','']];
   app.innerHTML=`<div class="wrap hm">
   <header class="hm-head"><div class="hm-hi"><div class="hm-hello">Hello,</div><input class="nm hm-name" id="candname" value="${esc(candName())}" placeholder="Your name" aria-label="Your name" maxlength="40"></div>
-   <div class="hm-tools">${inprog?`<button class="hm-ic hm-alert" data-act="resume" aria-label="Resume test" title="Resume test">${ic('bolt')}</button>`:due?`<button class="hm-ic hm-alert" data-act="nbstart" data-set="due" aria-label="${due} mistakes due" title="${due} mistakes due - revise now">${ic('bolt')}<span class="hm-bdg">${due>99?'99+':due}</span></button>`:`<button class="hm-ic hm-alert" data-act="practice" aria-label="Start DPP" title="Start DPP">${ic('bolt')}</button>`}<details class="more"><summary class="hm-ic" aria-label="Menu">${ic('more')}</summary><div class="menu"><button class="btn sm" data-act="theme">Theme &amp; colours</button><button class="btn sm" data-act="wmopen">Exam watermark (CAT ID)</button><button class="btn sm" data-act="syopen">Cloud sync${typeof SY!=='undefined'&&SY.refresh?' · on':''}</button>${window.Capacitor?'':`<button class="btn sm" data-act="fullscreen">${document.fullscreenElement?'Exit full screen':'Full screen'}</button>`}${window.desk?'<button class="btn sm" data-act="backup">Export backup</button><button class="btn sm" data-act="restore">Import backup</button>':''}${window.desk&&window.desk.updateApp?'<button class="btn sm" data-act="appupdate">Update app from file</button><button class="btn sm" data-act="appreset">Use built-in version</button>':''}<div class="sub" style="font-size:12px;padding:6px 12px">Build ${esc(BUILD)}</div><div class="sub" style="font-size:12px;padding:6px 12px">${window.desk?'History saved on this computer':window.Capacitor?'History saved on this phone':store.cloud?'History saved to your account':'History saved in this browser'}</div></div></details></div></header>
+   <div class="hm-tools">${inprog?`<button class="hm-ic hm-alert" data-act="resume" aria-label="Resume test" title="Resume test">${ic('bolt')}</button>`:due?`<button class="hm-ic hm-alert" data-act="nbstart" data-set="due" aria-label="${due} mistakes due" title="${due} mistakes due - revise now">${ic('bolt')}<span class="hm-bdg">${due>99?'99+':due}</span></button>`:`<button class="hm-ic hm-alert" data-act="practice" aria-label="Start DPP" title="Start DPP">${ic('bolt')}</button>`}<details class="more"><summary class="hm-ic" aria-label="Menu">${ic('more')}</summary><div class="menu"><button class="btn sm" data-act="theme">Theme &amp; colours</button><button class="btn sm" data-act="wmopen">Exam watermark (CAT ID)</button><button class="btn sm" data-act="syopen">Cloud sync${typeof SY!=='undefined'&&SY.refresh?' · on':''}</button>${window.Capacitor?'':`<button class="btn sm" data-act="fullscreen">${document.fullscreenElement?'Exit full screen':'Full screen'}</button>`}${window.desk?'<button class="btn sm" data-act="backup">Export backup</button><button class="btn sm" data-act="restore">Import backup</button>':''}${window.desk&&window.desk.updateApp?'<button class="btn sm" data-act="appupdate">Update app from file</button><button class="btn sm" data-act="appreset">Use built-in version</button>':''}<div class="sub" style="font-size:12px;padding:6px 12px">Build ${esc(BUILD)}</div><div class="sub" style="font-size:12px;padding:6px 12px">${window.desk?'History saved on this computer':window.Capacitor?'History saved on this phone':store.cloud?'History saved to your account':'History saved in this browser'}</div></div></details><button class="hm-ic" data-act="histopen" aria-label="Attempt history" title="Attempt history (${atts.length})">${ic('history')}</button></div></header>
   <div class="hm-top">
   <details class="panel hm-add stack"${V.msg?' open':''}><summary><span class="hm-ci">${ic('add')}</span><span class="hm-addt"><b>Add a practice paper</b><small>Import a PDF, JSON or pasted text</small></span></summary><div class="stack" style="gap:10px;margin-top:12px">
     <div class="row" style="gap:8px;align-items:center"><span class="sub" style="font-size:12px">Add it as</span><div class="seg">${[['auto','Auto'],['full','Full syllabus'],['sectional','Sectional'],['topic','Topic-wise'],['drill','Drill']].map(([k,l])=>`<button class="${(V.addCat||'auto')===k?'on':''}" data-act="addcat" data-v="${k}">${l}</button>`).join('')}</div></div>
@@ -1018,9 +1053,7 @@ function renderHome(){
     return `<button class="hm-c" style="--tile:var(${CATS[c].tint})" data-act="opencat" data-c="${c}"><span class="hm-ci">${ic(ci)}</span><span class="hm-cn">${CATS[c].name.replace(' mock','')}</span><span class="hm-cs">${ps.length} paper${ps.length===1?'':'s'} · ${as.length} attempt${as.length===1?'':'s'}${avg!=null?` · avg ${avg}%`:''}</span></button>`}).join('')}</div>
   <div class="panel" style="margin-top:14px"><h2>Subject progress</h2><div class="sub" style="margin-bottom:10px;font-size:12.5px">Score as a percentage of marks available, from full syllabus and sectional mocks. ${matchMedia('(pointer:coarse)').matches?'Tap':'Click'} a graph to zoom.</div>
    <div class="subjgrid">${AREAS.map(a=>subjectCard(a,subjectPoints(a,['full','sectional']))).join('')}</div></div>
-  <details class="panel hdet" style="margin-top:14px"><summary>Attempt history (${atts.length})</summary>
-    ${atts.length?`<div class="tablewrap" style="max-height:360px;overflow:auto;margin-top:8px"><table class="hist"><thead><tr><th>Paper</th><th>Date</th><th>Score</th><th>Accuracy</th><th>Attempted</th><th></th></tr></thead><tbody>${atts.map(a=>`<tr><td>${esc(a.title)}${a.imported?' <span class="chip">logged</span>':''}</td><td>${fmtDate(a.date)}</td><td class="num">${r1(a.score)}/${a.max}</td><td class="num">${a.accuracy}%</td><td class="num">${a.attempted}/${a.qs.length}</td><td><div class="row"><button class="btn sm" data-act="analysis" data-id="${a.id}">Analysis</button><button class="btn sm danger" data-act="delatt" data-id="${a.id}">Delete</button></div></td></tr>`).join('')}</tbody></table></div>`:`<p class="sub">Finished attempts appear here with their full analysis.</p>`}
-  </details>${footerHtml()}</div>`;
+${footerHtml()}</div>`;
   const drop=document.getElementById('drop');
   if(drop){['dragover','dragenter'].forEach(e=>drop.addEventListener(e,ev=>{ev.preventDefault();drop.classList.add('over')}));
    ['dragleave','drop'].forEach(e=>drop.addEventListener(e,ev=>{ev.preventDefault();drop.classList.remove('over')}));
@@ -2886,6 +2919,8 @@ function wmPanel(){const w=getWm();return `<div class="stack" style="gap:14px"><
   <label class="field" style="max-width:360px"><span style="font-weight:600">CAT ID / registration number</span><input id="wmid" value="${esc(w.id)}" placeholder="e.g. CAT26 123456" maxlength="40" autocomplete="off"></label>
   <label class="row" style="gap:8px"><input type="checkbox" id="wmon" ${w.on?'checked':''}> Show watermark during tests</label></div>`}
 
+
+function sbSync(){try{const c=getComputedStyle(document.body).getPropertyValue('--accent').trim();document.documentElement.style.setProperty('--sbc',c||'#1d5fa6')}catch(e){}}
 function tbSync(){
   if(!(window.desk&&window.desk.setTitleBar))return;
   const b=document.body;b.classList.add('has-tb');
@@ -2896,9 +2931,9 @@ function tbSync(){
   bar.style.background=bg;bar.style.color=fg;
   try{window.desk.setTitleBar(hex(bg),hex(fg))}catch(e){}
 }
-{const _g=go;go=function(){const r=_g.apply(this,arguments);requestAnimationFrame(tbSync);return r};const _at=applyTheme;applyTheme=function(){_at.apply(this,arguments);requestAnimationFrame(tbSync)};
+{const _g=go;go=function(){const r=_g.apply(this,arguments);requestAnimationFrame(tbSync);requestAnimationFrame(sbSync);if(arguments[0]!=='home')histClose(true);return r};const _at=applyTheme;applyTheme=function(){_at.apply(this,arguments);requestAnimationFrame(tbSync);requestAnimationFrame(sbSync)};
  try{matchMedia('(prefers-color-scheme:dark)').addEventListener('change',()=>setTimeout(tbSync,50))}catch(e){}
- setTimeout(tbSync,0);setTimeout(tbSync,600)}
+ setTimeout(tbSync,0);setTimeout(tbSync,600);setTimeout(sbSync,0);setTimeout(sbSync,600)}
 
 /* ---------- smooth expand / collapse for <details> ---------- */
 document.addEventListener('click',e=>{
@@ -2920,6 +2955,43 @@ document.addEventListener('click',e=>{
   a.onfinish=done;a.oncancel=()=>{d.style.overflow=''};
   [...d.children].forEach(c=>{if(c!==sm&&c.animate)d._ca.push(c.animate(opening?[{opacity:0,transform:'translateY(-6px)',filter:'blur(12px)'},{opacity:1,transform:'none',filter:'blur(0)'}]:[{opacity:1,filter:'blur(0)'},{opacity:0,filter:'blur(12px)'}],{duration:opening?340:200,easing:'ease-out',delay:opening?170:0,fill:opening?'backwards':'forwards'}))});
 },true);
+
+/* ---------- attempt history sheet ---------- */
+function histHtml(){
+  const atts=store.attempts;
+  return atts.length?`<div class="tablewrap" style="overflow:auto"><table class="hist"><thead><tr><th>Paper</th><th>Date</th><th>Score</th><th>Accuracy</th><th>Attempted</th><th></th></tr></thead><tbody>${atts.map(a=>`<tr><td>${esc(a.title)}${a.imported?' <span class="chip">logged</span>':''}</td><td>${fmtDate(a.date)}</td><td class="num">${r1(a.score)}/${a.max}</td><td class="num">${a.accuracy}%</td><td class="num">${a.attempted}/${a.qs.length}</td><td><div class="row" style="flex-wrap:nowrap"><button class="btn sm" data-act="analysis" data-id="${a.id}">Analysis</button><button class="btn sm danger" data-act="delatt" data-id="${a.id}">Delete</button></div></td></tr>`).join('')}</tbody></table></div>`:`<p class="sub">Finished attempts appear here with their full analysis.</p>`;
+}
+function histOpen(){
+  if(document.getElementById('hist'))return;
+  const el=document.createElement('div');el.id='hist';
+  el.innerHTML=`<div class="hs-bg"></div><aside class="hs-panel" role="dialog" aria-label="Attempt history"><div class="hs-grab"></div><div class="hs-head"><h2>Attempt history <span class="chip">${store.attempts.length}</span></h2><button class="btn sm" data-hs="x">Close</button></div><div class="hs-body">${histHtml()}</div></aside>`;
+  document.body.appendChild(el);
+  const bg=el.querySelector('.hs-bg'),pn=el.querySelector('.hs-panel'),bd=el.querySelector('.hs-body'),phone=matchMedia('(max-width:700px)').matches;
+  if(!el.animate)return;
+  const E='cubic-bezier(.2,0,0,1)',from=phone?'translateY(60px)':'translateX(70px)';
+  bg.animate([{opacity:0,backdropFilter:'blur(0px)'},{opacity:1,backdropFilter:'blur(10px)'}],{duration:380,easing:E,fill:'backwards'});
+  pn.animate([{opacity:0,transform:from,filter:'blur(14px)'},{opacity:1,transform:'none',filter:'blur(0)'}],{duration:440,easing:E,fill:'backwards'});
+  bd.animate([{opacity:0,filter:'blur(12px)'},{opacity:1,filter:'blur(0)'}],{duration:340,delay:150,easing:'ease-out',fill:'backwards'});
+}
+function histClose(now){
+  const el=document.getElementById('hist');if(!el||el._c)return;el._c=1;
+  if(now||!el.animate){el.remove();return}
+  const bg=el.querySelector('.hs-bg'),pn=el.querySelector('.hs-panel'),phone=matchMedia('(max-width:700px)').matches,E='cubic-bezier(.4,0,1,1)';
+  bg.animate([{opacity:1,backdropFilter:'blur(10px)'},{opacity:0,backdropFilter:'blur(0px)'}],{duration:260,easing:E,fill:'forwards'});
+  const a=pn.animate([{opacity:1,transform:'none',filter:'blur(0)'},{opacity:0,transform:phone?'translateY(60px)':'translateX(70px)',filter:'blur(14px)'}],{duration:280,easing:E,fill:'forwards'});
+  a.onfinish=()=>el.remove();
+}
+Object.assign(acts,{histopen:histOpen});
+document.addEventListener('click',e=>{
+  const el=document.getElementById('hist');if(!el||!el.contains(e.target))return;
+  if(e.target.classList.contains('hs-bg')||e.target.closest('[data-hs="x"]')){histClose();return}
+  const t=e.target.closest('[data-act]');if(!t||t.disabled)return;
+  const f=acts[t.dataset.act];if(!f)return;
+  if(t.dataset.act==='analysis'){histClose(true)}
+  f(t,e);
+  if(t.dataset.act==='delatt')setTimeout(()=>{const b=document.querySelector('#hist .hs-body');if(b){b.innerHTML=histHtml();const c=document.querySelector('#hist .chip');if(c)c.textContent=store.attempts.length}},120);
+});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')histClose()});
 {const _re=renderExam;renderExam=function(){_re.apply(this,arguments);wmSync()}}
 Object.assign(acts,{wmopen(){openPanel('Exam watermark','Your CAT ID',wmPanel())}});
 document.addEventListener('input',e=>{const t=e.target;if(t&&t.id==='wmid'){const w=getWm();w.id=t.value;setWm(w)}});
