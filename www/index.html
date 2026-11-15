@@ -2,16 +2,16 @@
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>CAT Mock Desk</title>
 <meta name="claude:viewport-fit-sides" content="cover">
-<meta name="app-build" content="2026-11-14.43">
-<script>(function(){try{var cmp=function(a,b){var f=function(x){return String(x).split(/[-.]/).map(Number)},p=f(a),q=f(b);for(var i=0;i<4;i++){if((p[i]||0)!==(q[i]||0))return(p[i]||0)>(q[i]||0)?1:-1}return 0};
-var me=document.querySelector('meta[name="app-build"]').content,o=localStorage.getItem('ovr.html');if(!o)return;
+<meta name="app-build" content="2026-11-14.44">
+<script>(function(){try{var L=function(m){try{var a=JSON.parse(localStorage.getItem('upd.log')||'[]');a.push(new Date().toTimeString().slice(0,8)+' '+m);localStorage.setItem('upd.log',JSON.stringify(a.slice(-16)))}catch(e){}};
+var cmp=function(a,b){var f=function(x){return String(x).split(/[-.]/).map(Number)},p=f(a),q=f(b);for(var i=0;i<4;i++){if((p[i]||0)!==(q[i]||0))return(p[i]||0)>(q[i]||0)?1:-1}return 0};
+var me=document.querySelector('meta[name="app-build"]').content,o=localStorage.getItem('ovr.html');
+if(window.__ovr)return;
+if(localStorage.getItem('ovr.try')){localStorage.removeItem('ovr.try');localStorage.removeItem('ovr.html');L('Previous start did not finish. Built-in version '+me+' restored.');return}
+if(!o)return;
 var mm=o.match(/name="app-build" content="([^"]+)"/),ob=mm?mm[1]:'';
 if(!ob||cmp(ob,me)<0){localStorage.removeItem('ovr.html');return}
-if(cmp(ob,me)>0&&!window.__ovr){window.__ovr=1;window.stop();setTimeout(function(){var d=new DOMParser().parseFromString(o,'text/html'),H=document.head,B=document.body||document.documentElement.appendChild(document.createElement('body'));
-document.title=d.title||document.title;Array.prototype.slice.call(H.childNodes).forEach(function(n){if(n.nodeName!=='META'||n.getAttribute('charset')==null&&n.name!=='viewport')H.removeChild(n)});B.innerHTML='';
-var add=function(par,n){if(n.nodeName==='SCRIPT'){var c=document.createElement('script');for(var i=0;i<n.attributes.length;i++)c.setAttribute(n.attributes[i].name,n.attributes[i].value);c.textContent=n.textContent;if(n.src)c.async=false;par.appendChild(c)}else par.appendChild(document.importNode(n,true))};
-Array.prototype.slice.call(d.head.childNodes).forEach(function(n){if(n.nodeName==='META'&&(n.getAttribute('charset')!=null||n.name==='viewport'))return;add(H,n)});
-Array.prototype.slice.call(d.body.childNodes).forEach(function(n){add(B,n)})},0)}}catch(e){}})()</script>
+if(cmp(ob,me)>0){L('Starting updated version '+ob);localStorage.setItem('ovr.try',ob);window.__ovr=1;document.write(o+'<plaintext style="display:none">')}}catch(e){}})()</script>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto+Flex:opsz,wght@8..144,400;8..144,500;8..144,600&family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Serif:wght@400;600&display=swap">
 <style>
 /* Layout: home/analysis are scrolling pages on a paper-blue ground; the exam is a fixed-height console (header, section bar, question pane + palette, action bar) modelled on the CAT screen. */
@@ -4218,8 +4218,9 @@ function psGo(){
 <script>
 'use strict';
 /* ===== Android: update the app from your GitHub repository without building a new APK ===== */
-const UPD={url:(()=>{try{return localStorage.getItem('upd.url')||''}catch(e){return ''}})(),found:null,msg:'',err:'',busy:false};
+const UPD={url:(()=>{try{return localStorage.getItem('upd.url')||''}catch(e){return ''}})(),found:null,msg:'',err:'',busy:false,step:'',pct:null,t0:0,tick:null};
 const updCmp=(a,b)=>{const f=x=>String(x).split(/[-.]/).map(Number),p=f(a),q=f(b);for(let i=0;i<4;i++){if((p[i]||0)!==(q[i]||0))return(p[i]||0)>(q[i]||0)?1:-1}return 0};
+function updLog(m){try{const a=JSON.parse(localStorage.getItem('upd.log')||'[]');a.push(new Date().toTimeString().slice(0,8)+' '+m);localStorage.setItem('upd.log',JSON.stringify(a.slice(-16)))}catch(e){}}
 function updUrls(u){
   u=(u||'').trim();if(!u)return [];
   let m=u.match(/^https?:\/\/github\.com\/([^\/]+)\/([^\/#?]+?)(?:\.git)?\/blob\/([^\/]+)\/(.+?)(?:[?#].*)?$/i);
@@ -4228,13 +4229,32 @@ function updUrls(u){
   if(m)return ['main','master'].map(b=>'https://raw.githubusercontent.com/'+m[1]+'/'+m[2]+'/'+b+'/www/index.html');
   return [u];
 }
-async function updFetch(){
-  let last='';
-  for(const base of updUrls(UPD.url)){
+/* progress bar: pct null = moving stripe (working, size unknown) */
+function updBar(step,pct){UPD.step=step;UPD.pct=pct;const b=document.getElementById('updbar');if(!b)return;
+  b.hidden=!step;const t=b.querySelector('.ut'),f=b.querySelector('.uf');if(t)t.textContent=step+(UPD.t0?' · '+Math.round((Date.now()-UPD.t0)/1000)+' s':'');
+  if(f){if(pct==null){f.classList.add('ind');f.style.width=''}else{f.classList.remove('ind');f.style.width=Math.max(3,Math.min(100,pct))+'%'}}}
+function updStart(step){UPD.t0=Date.now();clearInterval(UPD.tick);UPD.tick=setInterval(()=>{if(UPD.step)updBar(UPD.step,UPD.pct)},500);updBar(step,null)}
+function updStop(){clearInterval(UPD.tick);UPD.tick=null;UPD.t0=0}
+async function updRead(r){
+  try{const len=+(r.headers&&r.headers.get&&r.headers.get('content-length'))||0;
+    if(r.body&&r.body.getReader){const rd=r.body.getReader(),dec=new TextDecoder();let got=0,txt='';
+      for(;;){const x=await rd.read();if(x.done)break;got+=x.value.length;txt+=dec.decode(x.value,{stream:true});updBar('Downloading '+Math.round(got/1024)+' KB'+(len?' of '+Math.round(len/1024)+' KB':''),len?got/len*100:null)}
+      return txt+dec.decode()}}catch(e){}
+  return await r.text();
+}
+async function updFetch(quiet){
+  let last='';const urls=updUrls(UPD.url);
+  for(let k=0;k<urls.length;k++){
+    const base=urls[k];
     try{
-      const r=await syHttp(base+(base.includes('?')?'&':'?')+'t='+Date.now());
+      if(!quiet)updBar('Connecting to GitHub…',null);
+      const ctl=window.AbortController?new AbortController():null,to=setTimeout(()=>{try{ctl&&ctl.abort()}catch(e){}},30000);
+      let r;try{r=await Promise.race([syHttp(base+(base.includes('?')?'&':'?')+'t='+Date.now(),ctl?{signal:ctl.signal}:{}),new Promise((_,rej)=>setTimeout(()=>rej(new Error('GitHub did not answer in 30 seconds. Check the internet and try again.')),30500))])}finally{clearTimeout(to)}
       if(r.status>=400){last='Could not open the link ('+r.status+').';continue}
-      const t=await r.text();const m=String(t).match(/name="app-build" content="([^"]+)"/);
+      if(!quiet)updBar('Downloading update…',null);
+      const t=await updRead(r);
+      if(!quiet)updBar('Checking the file…',null);
+      const m=String(t).match(/name="app-build" content="([^"]+)"/);
       if(!m||!/CAT Mock Desk/.test(t)){last='That link does not look like the app file.';continue}
       return {html:String(t),build:m[1]};
     }catch(e){last=(e&&e.message)||'Could not reach the link.'}
@@ -4242,35 +4262,42 @@ async function updFetch(){
   throw new Error(last||'Paste your GitHub repository link first.');
 }
 function updHtml(){
-  const f=UPD.found;
+  const f=UPD.found;let log='';try{log=JSON.parse(localStorage.getItem('upd.log')||'[]').join('\n')}catch(e){}
   return `<div class="stack" style="gap:12px;max-width:520px">
    <div class="sub" style="margin:0">Paste your GitHub repository link once. After you replace <b>www/index.html</b> in that repository, press <b>Check for update</b> here and the app updates itself. No new APK needed.</div>
    <label class="field"><span class="sub">Repository link</span><input class="cbin" id="updurl" value="${esc(UPD.url)}" placeholder="https://github.com/your-name/your-repo" autocapitalize="off" autocomplete="off"></label>
    <div class="sub" style="font-size:12.5px;margin:0">This version: <b>${esc(BUILD)}</b></div>
+   <div id="updbar" class="updbar" ${UPD.step?'':'hidden'}><div class="ut">${esc(UPD.step)}</div><div class="ub"><div class="uf ${UPD.pct==null?'ind':''}" ${UPD.pct==null?'':`style="width:${UPD.pct}%"`}></div></div></div>
    ${UPD.err?`<div class="msg err">${esc(UPD.err)}</div>`:''}${UPD.msg?`<div class="msg ok">${esc(UPD.msg)}</div>`:''}
    ${f?`<div class="msg info">New version <b>${esc(f.build)}</b> is ready.</div>`:''}
-   <div class="row"><button class="btn pri" data-act="updcheck" ${UPD.busy?'disabled':''}>${UPD.busy?'Checking…':'Check for update'}</button>${f?'<button class="btn pri" data-act="updinstall">Install and restart</button>':''}<button class="btn" data-act="updreset">Use built-in version</button></div>
-   <div class="sub" style="font-size:12px;margin:0">Your papers and history stay as they are. If a new APK is installed later, the newer of the two versions is used.</div></div>`;
+   <div class="row"><button class="btn pri" data-act="updcheck" ${UPD.busy?'disabled':''}>${UPD.busy?'Working…':'Check for update'}</button>${f&&!UPD.busy?'<button class="btn pri" data-act="updinstall">Install and restart</button>':''}<button class="btn" data-act="updreset" ${UPD.busy?'disabled':''}>Use built-in version</button></div>
+   <div class="sub" style="font-size:12px;margin:0">Your papers and history stay as they are. If a new APK is installed later, the newer of the two versions is used. If an update ever hangs, close the app and open it again: it returns to the built-in version by itself.</div>
+   ${log?`<details><summary class="sub">Update log</summary><pre style="font:11.5px var(--f-mono);white-space:pre-wrap;margin:6px 0 0">${esc(log)}</pre></details>`:''}</div>`;
 }
-function updPaint(){const b=document.querySelector('#zoomov .zoombody,#zoomov .zbody');const o=document.getElementById('zoomov');if(!o)return;openPanel('App update','From your GitHub repository',updHtml())}
+function updPaint(){const o=document.getElementById('zoomov');if(!o)return;openPanel('App update','From your GitHub repository',updHtml())}
+const updWait=ms=>new Promise(r=>setTimeout(r,ms));
 Object.assign(acts,{
-  updopen(){UPD.err='';UPD.msg='';UPD.found=null;openPanel('App update','From your GitHub repository',updHtml())},
+  updopen(){UPD.err='';UPD.msg='';UPD.found=null;UPD.step='';openPanel('App update','From your GitHub repository',updHtml())},
   async updcheck(){
+    if(UPD.busy)return;
     const i=document.getElementById('updurl');if(i)UPD.url=i.value.trim();try{localStorage.setItem('upd.url',UPD.url)}catch(e){}
-    UPD.busy=true;UPD.err='';UPD.msg='';UPD.found=null;updPaint();
-    try{const r=await updFetch();const c=updCmp(r.build,BUILD);
+    UPD.busy=true;UPD.err='';UPD.msg='';UPD.found=null;updPaint();updStart('Connecting to GitHub…');updLog('Check started');
+    try{const r=await updFetch();const c=updCmp(r.build,BUILD);updLog('Repository has '+r.build+', this app '+BUILD);
       if(c>0)UPD.found=r;else UPD.msg=c===0?'You already have the latest version ('+BUILD+').':'The repository has an older version ('+r.build+') than this app ('+BUILD+').'}
-    catch(e){UPD.err=(e&&e.message)||String(e)}
-    UPD.busy=false;updPaint()},
-  updinstall(){
-    const f=UPD.found;if(!f)return;
-    try{localStorage.setItem('ovr.html',f.html)}catch(e){UPD.err='Not enough storage on this phone to keep the update.';updPaint();return}
-    toast('Updated. Restarting…');setTimeout(()=>location.reload(),600)},
-  updreset(){try{localStorage.removeItem('ovr.html')}catch(e){}toast('Back to the built-in version. Restarting…');setTimeout(()=>location.reload(),600)}
+    catch(e){UPD.err=(e&&e.message)||String(e);updLog('Check failed: '+UPD.err)}
+    updStop();UPD.busy=false;UPD.step='';updPaint()},
+  async updinstall(){
+    const f=UPD.found;if(!f||UPD.busy)return;UPD.busy=true;UPD.err='';updPaint();updStart('Saving the update on this phone…');updLog('Saving '+f.build+' ('+Math.round(f.html.length/1024)+' KB)');
+    await updWait(350);
+    try{localStorage.setItem('ovr.html',f.html)}catch(e){updStop();UPD.busy=false;UPD.step='';UPD.err='Not enough storage on this phone to keep the update.';updLog('Save failed');updPaint();return}
+    updLog('Saved. Restarting');updBar('Saved. Restarting the app…',100);await updWait(900);location.reload()},
+  updreset(){if(UPD.busy)return;try{localStorage.removeItem('ovr.html');localStorage.removeItem('ovr.try')}catch(e){}updLog('Back to built-in version');updBar('Going back to the built-in version…',null);setTimeout(()=>location.reload(),700)}
 });
 document.addEventListener('click',e=>{const t=e.target.closest&&e.target.closest('#zoomov [data-act^="upd"]');if(t&&acts[t.dataset.act]&&!t.disabled)acts[t.dataset.act](t)});
+/* the app started fine: clear the safety flag, so the update stays */
+setTimeout(()=>{try{if(localStorage.getItem('ovr.try')){localStorage.removeItem('ovr.try');updLog('Running '+BUILD+' fine')}}catch(e){}},2500);
 /* quiet check a few seconds after the app opens */
-if(window.Capacitor&&!window.desk&&UPD.url)setTimeout(async()=>{try{const r=await updFetch();if(updCmp(r.build,BUILD)>0)toast('App update '+r.build+' is available. Menu, then App update.')}catch(e){}},5000);
+if(window.Capacitor&&!window.desk&&UPD.url)setTimeout(async()=>{try{const r=await updFetch(true);if(updCmp(r.build,BUILD)>0)toast('App update '+r.build+' is available. Menu, then App update.')}catch(e){}},6000);
 </script>
 <script>
 'use strict';
@@ -4291,5 +4318,13 @@ body.ps-on #app .prow,body.ps-on #app .paper{cursor:pointer}
 .psbar{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);z-index:70;display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:center;max-width:calc(100vw - 24px);padding:10px 14px;border-radius:999px;background:var(--surface);border:1px solid var(--line);box-shadow:0 10px 30px rgba(0,0,0,.25)}
 .psbar .psn{font:600 14px var(--f-ui);color:var(--ink)}.psbar small{color:var(--muted);font-weight:400}
 .psbar .btn[disabled]{opacity:.5;pointer-events:none}
+
+.updbar{display:flex;flex-direction:column;gap:6px}.updbar[hidden]{display:none}
+.updbar .ut{font:600 13px var(--f-ui);color:var(--ink)}
+.updbar .ub{height:10px;border-radius:99px;background:var(--surface2);border:1px solid var(--line);overflow:hidden}
+.updbar .uf{height:100%;width:0;border-radius:99px;background:var(--accent);transition:width .25s ease}
+.updbar .uf.ind{width:38%;animation:updslide 1.1s ease-in-out infinite}
+@keyframes updslide{0%{margin-left:-38%}100%{margin-left:100%}}
 </style>
 </body></html>
+
