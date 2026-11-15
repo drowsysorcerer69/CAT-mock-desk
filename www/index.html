@@ -2,7 +2,7 @@
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>CAT Mock Desk</title>
 <meta name="claude:viewport-fit-sides" content="cover">
-<meta name="app-build" content="2026-11-14.48">
+<meta name="app-build" content="2026-11-14.49">
 <script>(function(){try{var L=function(m){try{var a=JSON.parse(localStorage.getItem('upd.log')||'[]');a.push(new Date().toTimeString().slice(0,8)+' '+m);localStorage.setItem('upd.log',JSON.stringify(a.slice(-16)))}catch(e){}};
 var cmp=function(a,b){var f=function(x){return String(x).split(/[-.]/).map(Number)},p=f(a),q=f(b);for(var i=0;i<4;i++){if((p[i]||0)!==(q[i]||0))return(p[i]||0)>(q[i]||0)?1:-1}return 0};
 var me=document.querySelector('meta[name="app-build"]').content,o=localStorage.getItem('ovr.html');
@@ -11,7 +11,7 @@ if(localStorage.getItem('ovr.try')){localStorage.removeItem('ovr.try');localStor
 if(!o)return;
 var mm=o.match(/name="app-build" content="([^"]+)"/),ob=mm?mm[1]:'';
 if(!ob||cmp(ob,me)<0){localStorage.removeItem('ovr.html');return}
-if(cmp(ob,me)>0){L('Starting updated version '+ob);localStorage.setItem('ovr.try',ob);window.__ovr=1;document.write(o+'<plaintext style="display:none">')}}catch(e){}})()</script>
+if(cmp(ob,me)>0){L('Starting updated version '+ob);localStorage.setItem('ovr.try',ob);window.__ovr=1;var mt=document.querySelector('meta[name="app-build"]');if(mt&&mt.parentNode)mt.parentNode.removeChild(mt);document.write(o+'<plaintext style="display:none">')}}catch(e){}})()</script>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto+Flex:opsz,wght@8..144,400;8..144,500;8..144,600&family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Serif:wght@400;600&display=swap">
 <style>
 /* Layout: home/analysis are scrolling pages on a paper-blue ground; the exam is a fixed-height console (header, section bar, question pane + palette, action bar) modelled on the CAT screen. */
@@ -1549,7 +1549,7 @@ function revList(A,P,list){
 
 <script>
 'use strict';
-const BUILD=(document.querySelector('meta[name="app-build"]')||{content:'dev'}).content;
+const BUILD=([...document.querySelectorAll('meta[name="app-build"]')].pop()||{content:'dev'}).content;
 const candName=()=>LS.get('cmd.name')||'';
 function titleCell(p){
   if(V.renaming===p.id)return `<div class="row"><input class="nm" id="rn-${p.id}" value="${esc(p.title)}" aria-label="Paper name" style="min-width:240px;flex:1"><button class="btn pri sm" data-act="rnsave" data-id="${p.id}">Save</button><button class="btn sm" data-act="rncancel">Cancel</button></div>`;
