@@ -2,7 +2,7 @@
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>CAT Mock Desk</title>
 <meta name="claude:viewport-fit-sides" content="cover">
-<meta name="app-build" content="2026-11-14.49">
+<meta name="app-build" content="2026-11-14.50">
 <script>(function(){try{var L=function(m){try{var a=JSON.parse(localStorage.getItem('upd.log')||'[]');a.push(new Date().toTimeString().slice(0,8)+' '+m);localStorage.setItem('upd.log',JSON.stringify(a.slice(-16)))}catch(e){}};
 var cmp=function(a,b){var f=function(x){return String(x).split(/[-.]/).map(Number)},p=f(a),q=f(b);for(var i=0;i<4;i++){if((p[i]||0)!==(q[i]||0))return(p[i]||0)>(q[i]||0)?1:-1}return 0};
 var me=document.querySelector('meta[name="app-build"]').content,o=localStorage.getItem('ovr.html');
@@ -646,7 +646,8 @@ body:not(.exam-on) .nbside .tiles{grid-template-columns:repeat(3,minmax(0,1fr));
 .nbside .row .btn{flex:1 1 100%}
 .wkcards{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,420px),1fr));gap:12px}
 .wkcards .paper{margin:0!important}
-@media(max-width:980px){.catgrid,.dppgrid,.nbgrid,.wkgrid{grid-template-columns:minmax(0,1fr)}.catside,.dppside,.nbside,.wkside{position:static;max-height:none}.dppside{order:0}.slider.v{display:grid;grid-template-columns:repeat(auto-fit,minmax(132px,1fr));overflow:visible;gap:8px}.slider.v button{flex:none;width:100%;min-width:0}}
+@media(max-width:980px){.catgrid,.dppgrid,.nbgrid,.wkgrid{grid-template-columns:minmax(0,1fr)}.catside,.dppside,.nbside,.wkside{position:static;max-height:none}.dppside{order:0}.slider.v{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);overflow:visible;gap:6px}.slider.v button{flex:none;width:100%;min-width:0}}
+@media(max-width:640px){body:not(.exam-on) .slider.v button{flex-direction:column;justify-content:center;align-items:center;gap:1px;padding:8px 4px;border-radius:14px;font-size:13px;line-height:1.2;white-space:normal;text-align:center}body:not(.exam-on) .slider.v button small{margin:0;font-size:11px}}
 
 /* phones: use the whole width, back button at top right */
 @media(max-width:600px){
