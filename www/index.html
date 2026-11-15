@@ -2,7 +2,7 @@
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>CAT Mock Desk</title>
 <meta name="claude:viewport-fit-sides" content="cover">
-<meta name="app-build" content="2026-11-14.42">
+<meta name="app-build" content="2026-11-14.43">
 <script>(function(){try{var cmp=function(a,b){var f=function(x){return String(x).split(/[-.]/).map(Number)},p=f(a),q=f(b);for(var i=0;i<4;i++){if((p[i]||0)!==(q[i]||0))return(p[i]||0)>(q[i]||0)?1:-1}return 0};
 var me=document.querySelector('meta[name="app-build"]').content,o=localStorage.getItem('ovr.html');if(!o)return;
 var mm=o.match(/name="app-build" content="([^"]+)"/),ob=mm?mm[1]:'';
@@ -448,10 +448,10 @@ body:not(.exam-on) .dlg{border:0;border-radius:28px;padding:24px;box-shadow:var(
 body:not(.exam-on) .toast{border-radius:14px}
 body:not(.exam-on) details{border-radius:16px}
 body:not(.exam-on) details>summary{padding:6px 2px}
-body:not(.exam-on) .wrap.enter>*{animation:m3rise .4s cubic-bezier(.2,.8,.2,1) both}
-body:not(.exam-on) .wrap.enter>*:nth-child(2){animation-delay:.04s}
-body:not(.exam-on) .wrap.enter>*:nth-child(3){animation-delay:.08s}
-body:not(.exam-on) .wrap.enter>*:nth-child(n+4){animation-delay:.12s}
+body:not(.exam-on) .wrap.enter>*{animation:m3rise .28s cubic-bezier(.2,.8,.2,1) both}
+body:not(.exam-on) .wrap.enter>*:nth-child(2){animation-delay:.02s}
+body:not(.exam-on) .wrap.enter>*:nth-child(3){animation-delay:.04s}
+body:not(.exam-on) .wrap.enter>*:nth-child(n+4){animation-delay:.06s}
 @keyframes m3rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
 @media (prefers-reduced-motion:reduce){body:not(.exam-on) .wrap.enter>*{animation:none}body:not(.exam-on) .btn,body:not(.exam-on) .paper{transition:none}}
 /* import review */
@@ -982,7 +982,7 @@ const paperMax=p=>p.questions.reduce((s,q)=>s+q.marks,0);
 
 /* ---------- navigation ---------- */
 const V={view:'home',msg:null,analysisId:null,tab:'overview',filter:'all',secFilter:'all'};
-function go(view,extra){NOTIME=false;if(view!=='analysis'&&view!=='cat')V.fromCat=null;Object.assign(V,{view},extra||{});document.body.classList.toggle('exam-on',view==='exam');app.classList.toggle('is-exam',view==='exam');const _pv=V.__shown;render();if(view!=='exam'&&_pv!==view&&app.firstElementChild&&app.firstElementChild.animate&&!matchMedia('(prefers-reduced-motion:reduce)').matches){try{app.firstElementChild.animate([{opacity:0,transform:'translateY(14px)',filter:'blur(16px)'},{opacity:1,transform:'none',filter:'blur(0)'}],{duration:380,easing:'cubic-bezier(.2,0,0,1)'})}catch(e){}}V.__shown=view;if(view!=='exam'&&typeof wmSync==='function')wmSync();if(view!=='exam'){window.scrollTo(0,0);const w=app.querySelector('.wrap');if(w)w.classList.add('enter')}}
+function go(view,extra){NOTIME=false;if(view!=='analysis'&&view!=='cat')V.fromCat=null;Object.assign(V,{view},extra||{});document.body.classList.toggle('exam-on',view==='exam');app.classList.toggle('is-exam',view==='exam');const _pv=V.__shown;render();if(view!=='exam'&&_pv!==view&&app.firstElementChild&&app.firstElementChild.animate&&!matchMedia('(prefers-reduced-motion:reduce)').matches){try{app.firstElementChild.animate([{opacity:0,transform:'translateY(14px)',filter:'blur(16px)'},{opacity:1,transform:'none',filter:'blur(0)'}],{duration:270,easing:'cubic-bezier(.2,0,0,1)'})}catch(e){}}V.__shown=view;if(view!=='exam'&&typeof wmSync==='function')wmSync();if(view!=='exam'){window.scrollTo(0,0);const w=app.querySelector('.wrap');if(w)w.classList.add('enter')}}
 function render(){if(store.attempts.some(x=>!x||!Array.isArray(x.qs)))store.attempts=store.attempts.filter(x=>x&&Array.isArray(x.qs));({home:renderHome,instr:renderInstr,exam:renderExam,analysis:renderAnalysis,practice:renderPractice,log:renderLog,import:renderImport,notebook:renderNotebook,weak:renderWeak,papers:renderAllPapers,cat:renderCat,combine:renderCombine,combo:renderCombo})[V.view]()}
 
 /* ---------- categories: full syllabus, sectional, topic-wise ---------- */
@@ -2773,7 +2773,9 @@ function renderNotebook(){
   };
   const shown=nb.sort==='topic'?[...list].sort((x,y)=>String(x.topic).localeCompare(String(y.topic))||x.dueAt-y.dueAt):list;
   let body='',lastT=null;
-  shown.forEach(m=>{if(nb.sort==='topic'&&m.topic!==lastT){lastT=m.topic;body+=`<h3 class="nbgh">${esc(m.topic)} <span>${shown.filter(z=>z.topic===m.topic).length}</span></h3>`}body+=row(m)});
+  const lim=nb.lim||40;
+  shown.slice(0,lim).forEach(m=>{if(nb.sort==='topic'&&m.topic!==lastT){lastT=m.topic;body+=`<h3 class="nbgh">${esc(m.topic)} <span>${shown.filter(z=>z.topic===m.topic).length}</span></h3>`}body+=row(m)});
+  if(shown.length>lim)body+=`<div class="row" style="justify-content:center;margin:10px 0"><button class="btn" data-act="nbmore">Show ${Math.min(60,shown.length-lim)} more <small>(${shown.length-lim} left)</small></button></div>`;
   const total=open.length+mast.length;
   app.innerHTML=`<div class="wrap"><div class="top"><div class="brand">Mistake notebook<small>revise until it sticks</small></div><div class="row"><button class="btn sm nbphx" data-act="revision">Revision sheet</button><button class="btn sm nbphx" data-act="weak">Weak areas</button><button class="btn sm" data-act="home">Back</button></div></div>
   <div class="nbgrid">
@@ -2861,8 +2863,9 @@ function buildWeak(topics,count,perq,title,secName){
 Object.assign(acts,{
   notebook(){V.nb=null;go('notebook')},
   weak(){V.wk=null;go('weak')},
-  nbreset(){V.nb.sec='all';V.nb.topics=[];V.nb.reason='all';renderNotebook()},
-  nbtab(t){V.nb.tab=t.dataset.v;V.nb.sec='all';V.nb.topics=[];V.nb.reason='all';renderNotebook()},
+  nbmore(){const y=window.scrollY;V.nb.lim=(V.nb.lim||40)+60;renderNotebook();window.scrollTo(0,y)},
+  nbreset(){V.nb.lim=40;V.nb.sec='all';V.nb.topics=[];V.nb.reason='all';renderNotebook()},
+  nbtab(t){V.nb.lim=40;V.nb.tab=t.dataset.v;V.nb.sec='all';V.nb.topics=[];V.nb.reason='all';renderNotebook()},
   nbstart(t){
     const w=t.dataset.set,all=mistakeItems().filter(m=>m.pool&&!m.mastered);
     const src=w==='due'?all.filter(m=>m.due):(w==='filtered'?nbFiltered().filter(m=>m.pool):all);
@@ -3907,7 +3910,7 @@ Object.assign(acts,{
   const E='cubic-bezier(.2,0,0,1)';
   function playIn(){
     if(!ok())return;
-    flat().forEach(el=>{if(!el.animate)return;try{el.animate([{opacity:0,transform:'translateY(12px) scale(.992)',filter:'blur(14px)'},{opacity:1,transform:'none',filter:'blur(0)'}],{duration:420,easing:E})}catch(e){}});
+    flat().forEach(el=>{if(!el.animate)return;try{el.animate([{opacity:0,transform:'translateY(12px) scale(.992)',filter:'blur(14px)'},{opacity:1,transform:'none',filter:'blur(0)'}],{duration:300,easing:E})}catch(e){}});
   }
   let lock=false,pend=false;
   /* bubble phase, registered after the app's own handler: the new DOM is animated in the same task, so no unblurred frame is ever painted */
@@ -3922,7 +3925,7 @@ Object.assign(acts,{
     e.stopImmediatePropagation();e.preventDefault();
     if(lock)return;lock=true;
     let n=t.length;const fin=()=>{if(--n>0)return;lock=false;b.__go=1;b.click()};
-    t.forEach(el=>{try{const an=el.animate([{opacity:1,filter:'blur(0)'},{opacity:0,filter:'blur(12px)'}],{duration:170,easing:'ease-in',fill:'forwards'});an.onfinish=fin;an.oncancel=fin}catch(x){fin()}});
+    t.forEach(el=>{try{const an=el.animate([{opacity:1,filter:'blur(0)'},{opacity:0,filter:'blur(12px)'}],{duration:110,easing:'ease-in',fill:'forwards'});an.onfinish=fin;an.oncancel=fin}catch(x){fin()}});
   },true);
   app.addEventListener('change',e=>{if(e.target.matches&&e.target.matches('select')&&ok())pend=true},true);
 
@@ -3937,7 +3940,7 @@ Object.assign(acts,{
     e.stopImmediatePropagation();e.preventDefault();
     if(hl)return;hl=true;
     const fin=()=>{hl=false;b.__hgo=1;b.click()};
-    try{const an=w.animate([{opacity:1,filter:'blur(0)',transform:'none'},{opacity:0,filter:'blur(12px)',transform:'scale(.985)'}],{duration:170,easing:'ease-in',fill:'forwards'});an.onfinish=fin;an.oncancel=fin}catch(x){fin()}
+    try{const an=w.animate([{opacity:1,filter:'blur(0)',transform:'none'},{opacity:0,filter:'blur(12px)',transform:'scale(.985)'}],{duration:110,easing:'ease-in',fill:'forwards'});an.onfinish=fin;an.oncancel=fin}catch(x){fin()}
   },true);
 })();
 </script>
@@ -4269,6 +4272,16 @@ document.addEventListener('click',e=>{const t=e.target.closest&&e.target.closest
 /* quiet check a few seconds after the app opens */
 if(window.Capacitor&&!window.desk&&UPD.url)setTimeout(async()=>{try{const r=await updFetch();if(updCmp(r.build,BUILD)>0)toast('App update '+r.build+' is available. Menu, then App update.')}catch(e){}},5000);
 </script>
+<script>
+'use strict';
+/* mistakeItems is called many times per screen; cache it until something is saved */
+{let V0=0,mc={};const _s=store.save,_r=store.remove;
+ store.save=function(){V0++;return _s.apply(this,arguments)};store.remove=function(){V0++;return _r.apply(this,arguments)};
+ const _mi=mistakeItems;
+ mistakeItems=function(w){const k=(w?1:0)+'|'+V0+'|'+store.attempts.length+'|'+store.papers.length+'|'+store.notes.length+'|'+Math.floor(Date.now()/60000);
+  if(!mc[k]){mc={};mc[k]=_mi(w)}return mc[k].slice()}}
+</script>
+
 
 <style>
 #app .prow,#app .paper{-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}
