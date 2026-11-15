@@ -2,7 +2,7 @@
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>CAT Mock Desk</title>
 <meta name="claude:viewport-fit-sides" content="cover">
-<meta name="app-build" content="2026-11-14.44">
+<meta name="app-build" content="2026-11-14.46">
 <script>(function(){try{var L=function(m){try{var a=JSON.parse(localStorage.getItem('upd.log')||'[]');a.push(new Date().toTimeString().slice(0,8)+' '+m);localStorage.setItem('upd.log',JSON.stringify(a.slice(-16)))}catch(e){}};
 var cmp=function(a,b){var f=function(x){return String(x).split(/[-.]/).map(Number)},p=f(a),q=f(b);for(var i=0;i<4;i++){if((p[i]||0)!==(q[i]||0))return(p[i]||0)>(q[i]||0)?1:-1}return 0};
 var me=document.querySelector('meta[name="app-build"]').content,o=localStorage.getItem('ovr.html');
@@ -652,9 +652,10 @@ body:not(.exam-on) .nbside .tiles{grid-template-columns:repeat(3,minmax(0,1fr));
 @media(max-width:600px){
   body:not(.exam-on){padding-left:max(4px,env(safe-area-inset-left,0px));padding-right:max(4px,env(safe-area-inset-right,0px))}
   body:not(.exam-on) .wrap{padding-inline:0}
-  body:not(.exam-on) .wrap>.top{display:flex;flex-wrap:nowrap;align-items:center;justify-content:space-between;gap:8px;padding:8px 8px 8px 14px;border-radius:22px}
+  body:not(.exam-on) .wrap>.top{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px;padding:8px 8px 8px 14px;border-radius:22px}
   body:not(.exam-on) .wrap>.top>.brand{min-width:0;flex:1 1 auto;flex-wrap:wrap}
-  body:not(.exam-on) .wrap>.top>.row:not(.homebar),body:not(.exam-on) .wrap>.top>.btn{width:auto;flex:none;margin:0;flex-wrap:nowrap}
+  body:not(.exam-on) .wrap>.top>.row:not(.homebar),body:not(.exam-on) .wrap>.top>.btn{width:auto;flex:none;margin:0;flex-wrap:wrap;max-width:100%}
+  body:not(.exam-on) .wrap>.top>.row:not(.homebar){justify-content:flex-start}
   body:not(.exam-on) .panel{border-radius:20px;padding:14px 10px}
   body:not(.exam-on) .hm-hero{border-radius:24px}
   .hm-head{padding-inline:10px}.hm-h{margin-inline:10px}
@@ -1458,7 +1459,7 @@ function renderAnalysis(){
   if(V.analysisId==='__cx')return renderCombo();
   const A=curAtt();if(!A){go('home');return}
   const P=attPaper(A),{tabs,body}=analysisParts(A,P);
-  app.innerHTML=`<div class="wrap"><div class="top"><div class="brand">Test analysis<small>${esc(A.mode==='cat'?'sectional timing':'free navigation')}</small></div><div class="row"><button class="btn" data-act="retry" data-id="${A.id}" ${P&&A.qs.some(x=>x.status!=='correct')?'':'disabled'}>Retry mistakes (${A.qs.filter(x=>x.status!=='correct').length})</button><button class="btn" data-act="retake" data-id="${A.paperId}" ${P?'':'disabled'}>Retake paper</button>${V.fromCat?'<button class="btn" data-act="backcat">Back to list</button>':''}<button class="btn pri" data-act="home">Home</button></div></div>
+  app.innerHTML=`<div class="wrap"><div class="top"><div class="brand">Test analysis<small>${esc(A.mode==='cat'?'sectional timing':'free navigation')}</small></div><div class="row"><button class="btn" data-act="anpdf">PDF</button><button class="btn" data-act="retry" data-id="${A.id}" ${P&&A.qs.some(x=>x.status!=='correct')?'':'disabled'}>Retry mistakes (${A.qs.filter(x=>x.status!=='correct').length})</button><button class="btn" data-act="retake" data-id="${A.paperId}" ${P?'':'disabled'}>Retake paper</button>${V.fromCat?'<button class="btn" data-act="backcat">Back to list</button>':''}<button class="btn pri" data-act="home">Home</button></div></div>
    <div class="tabs">${tabs.map(([k,l])=>`<button class="${V.tab===k?'on':''}" data-act="tab" data-t="${k}">${l}</button>`).join('')}</div>${body}</div>`;
 }
 function givenText(q,x,pq){
@@ -2614,7 +2615,7 @@ function renderCombo(){
   const valid=new Set(store.attempts.map(a=>a.id));[...st.sel].forEach(id=>{if(!valid.has(id))st.sel.delete(id)});
   V.analysisId='__cx';
   if(document.getElementById('cxres')&&document.querySelector('.cxgrid')){cxPaintRes();return}
-  app.innerHTML=`<div class="wrap"><div class="top"><div class="brand">Combined analysis<small>many mocks, one picture</small></div><div class="row"><button class="btn sm" data-act="weak">Weak areas</button><button class="btn sm" data-act="home">Back</button></div></div>
+  app.innerHTML=`<div class="wrap"><div class="top"><div class="brand">Combined analysis<small>many mocks, one picture</small></div><div class="row"><button class="btn sm" data-act="anpdf">Colour PDF</button><button class="btn sm" data-act="weak">Weak areas</button><button class="btn sm" data-act="home">Back</button></div></div>
   <div class="cxgrid"><aside class="panel stack cxside"><div><h2>Pick the attempts</h2><div class="sub" style="font-size:13px">Tick any mix of full, sectional, topic-wise and drill attempts. They are merged into one analysis with VA / RC, DILR and Quant as the subjects.</div></div>
    <div class="chips">${[['all','All'],...Object.keys(CATS).map(k=>[k,CATS[k].name])].map(([k,l])=>`<button class="chip ${st.cat===k?'on':''}" data-act="cxcat" data-f="${k}">${esc(l)}</button>`).join('')}</div>
    <div class="row"><button class="btn sm" data-act="cxall">Select all shown</button><button class="btn sm" data-act="cxlatest">Latest of each paper</button><button class="btn sm" data-act="cxclear">Clear</button></div>
@@ -4229,11 +4230,21 @@ function updUrls(u){
   if(m)return ['main','master'].map(b=>'https://raw.githubusercontent.com/'+m[1]+'/'+m[2]+'/'+b+'/www/index.html');
   return [u];
 }
-/* progress bar: pct null = moving stripe (working, size unknown) */
-function updBar(step,pct){UPD.step=step;UPD.pct=pct;const b=document.getElementById('updbar');if(!b)return;
-  b.hidden=!step;const t=b.querySelector('.ut'),f=b.querySelector('.uf');if(t)t.textContent=step+(UPD.t0?' · '+Math.round((Date.now()-UPD.t0)/1000)+' s':'');
-  if(f){if(pct==null){f.classList.add('ind');f.style.width=''}else{f.classList.remove('ind');f.style.width=Math.max(3,Math.min(100,pct))+'%'}}}
-function updStart(step){UPD.t0=Date.now();clearInterval(UPD.tick);UPD.tick=setInterval(()=>{if(UPD.step)updBar(UPD.step,UPD.pct)},500);updBar(step,null)}
+/* cloud + ring progress: real percent when the size is known, otherwise it creeps toward the cap of the current step */
+const UPD_C=2*Math.PI*52;
+const updCap=t=>/Restart|Saved|Going back/.test(t)?100:/Saving/.test(t)?99:/Check/.test(t)?96:/Download/.test(t)?85:30;
+function updRing(){const b=document.getElementById('updbar');if(!b)return;
+  b.hidden=!UPD.step;const p=Math.max(0,Math.min(100,Math.round(UPD.shown||0)));
+  const r=b.querySelector('.ur'),n=b.querySelector('.un'),t=b.querySelector('.ut');
+  if(r)r.style.strokeDashoffset=UPD_C*(1-p/100);if(n)n.textContent=p+'%';
+  if(t)t.textContent=UPD.step+(UPD.t0?' · '+Math.round((Date.now()-UPD.t0)/1000)+' s':'');
+  b.classList.toggle('done',p>=100)}
+function updBar(step,pct){UPD.step=step;UPD.real=pct;if(!step)UPD.shown=0;
+  if(pct!=null)UPD.shown=Math.max(UPD.shown||0,pct);updRing()}
+function updStart(step){UPD.t0=Date.now();UPD.shown=0;clearInterval(UPD.tick);
+  UPD.tick=setInterval(()=>{if(!UPD.step)return;const cap=updCap(UPD.step);
+    if(UPD.real==null)UPD.shown=Math.min(cap,(UPD.shown||0)+Math.max(.15,(cap-(UPD.shown||0))*.05));
+    updRing()},140);updBar(step,null)}
 function updStop(){clearInterval(UPD.tick);UPD.tick=null;UPD.t0=0}
 async function updRead(r){
   try{const len=+(r.headers&&r.headers.get&&r.headers.get('content-length'))||0;
@@ -4267,7 +4278,7 @@ function updHtml(){
    <div class="sub" style="margin:0">Paste your GitHub repository link once. After you replace <b>www/index.html</b> in that repository, press <b>Check for update</b> here and the app updates itself. No new APK needed.</div>
    <label class="field"><span class="sub">Repository link</span><input class="cbin" id="updurl" value="${esc(UPD.url)}" placeholder="https://github.com/your-name/your-repo" autocapitalize="off" autocomplete="off"></label>
    <div class="sub" style="font-size:12.5px;margin:0">This version: <b>${esc(BUILD)}</b></div>
-   <div id="updbar" class="updbar" ${UPD.step?'':'hidden'}><div class="ut">${esc(UPD.step)}</div><div class="ub"><div class="uf ${UPD.pct==null?'ind':''}" ${UPD.pct==null?'':`style="width:${UPD.pct}%"`}></div></div></div>
+   <div id="updbar" class="updbar" ${UPD.step?'':'hidden'}><svg class="ucl" viewBox="0 0 120 120" role="img" aria-label="Update progress"><circle class="urt" cx="60" cy="60" r="52"/><circle class="ur" cx="60" cy="60" r="52" style="stroke-dasharray:${UPD_C};stroke-dashoffset:${UPD_C*(1-(UPD.shown||0)/100)}"/><g class="ucg"><path class="ucp" d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z" transform="translate(31 27) scale(2.4)"/><g class="uar" transform="translate(31 27) scale(2.4)"><path d="M12 11.5v5.5M9.6 14.8 12 17.2l2.4-2.4"/></g></g></svg><div class="un">${Math.round(UPD.shown||0)}%</div><div class="ut">${esc(UPD.step)}</div></div>
    ${UPD.err?`<div class="msg err">${esc(UPD.err)}</div>`:''}${UPD.msg?`<div class="msg ok">${esc(UPD.msg)}</div>`:''}
    ${f?`<div class="msg info">New version <b>${esc(f.build)}</b> is ready.</div>`:''}
    <div class="row"><button class="btn pri" data-act="updcheck" ${UPD.busy?'disabled':''}>${UPD.busy?'Working…':'Check for update'}</button>${f&&!UPD.busy?'<button class="btn pri" data-act="updinstall">Install and restart</button>':''}<button class="btn" data-act="updreset" ${UPD.busy?'disabled':''}>Use built-in version</button></div>
@@ -4308,6 +4319,177 @@ if(window.Capacitor&&!window.desk&&UPD.url)setTimeout(async()=>{try{const r=awai
  mistakeItems=function(w){const k=(w?1:0)+'|'+V0+'|'+store.attempts.length+'|'+store.papers.length+'|'+store.notes.length+'|'+Math.floor(Date.now()/60000);
   if(!mc[k]){mc={};mc[k]=_mi(w)}return mc[k].slice()}}
 </script>
+<script>
+'use strict';
+/* ===== coloured PDF of the analysis screen (scores, charts, every question with answers and solutions) ===== */
+const PDFW={
+ H:[278,278,355,556,556,889,667,191,333,333,389,584,278,333,278,278,556,556,556,556,556,556,556,556,556,556,278,278,584,584,584,556,1015,667,667,722,722,667,611,778,722,278,500,667,556,833,722,778,667,778,722,667,611,722,667,944,667,667,611,278,278,278,469,556,333,556,556,500,556,556,278,556,556,222,222,500,222,833,556,556,556,556,333,500,278,556,500,722,500,500,500,334,260,334,584],
+ B:[278,333,474,556,556,889,722,238,333,333,389,584,278,333,278,278,556,556,556,556,556,556,556,556,556,556,333,333,584,584,584,611,975,722,722,722,722,667,611,778,722,278,556,722,611,833,722,778,667,778,722,667,611,722,667,944,667,667,611,333,278,333,584,556,333,556,611,556,611,556,333,611,611,278,278,556,278,889,611,611,611,611,389,556,333,611,556,778,556,556,500,389,280,389,584]};
+function pdfW(s,size,bold){const t=bold?PDFW.B:PDFW.H;let w=0;for(let i=0;i<s.length;i++){const c=s.charCodeAt(i);w+=(c>=32&&c<=126?t[c-32]:556)}return w*size/1000}
+function cssRgb(v,fb){try{const e=document.createElement('span');e.style.color=String(v).trim();document.body.appendChild(e);const c=getComputedStyle(e).color;e.remove();const m=c.match(/\d+(\.\d+)?/g);if(m&&m.length>=3)return [+m[0],+m[1],+m[2]]}catch(x){}return fb}
+function pdfDoc(title){
+  const W=595,H=842,M=34,CW=W-2*M,FOOT=26;
+  const pages=[];let c=null,y=M;
+  const f=n=>(Math.round(n*100)/100).toString();
+  const col=a=>a.map(n=>f(n/255)).join(' ');
+  const esc2=s=>s.replace(/\\/g,'\\\\').replace(/\(/g,'\\(').replace(/\)/g,'\\)');
+  const D={W,H,M,CW,get y(){return y},set y(v){y=v}};
+  D.np=()=>{c=[];pages.push(c);y=M};
+  D.need=h=>{if(y+h>H-FOOT-M+8)D.np()};
+  D.rect=(x,yy,w,h,rgb,r)=>{if(w<=0||h<=0)return;const X=x,Y=H-yy-h,k=.5523;c.push(col(rgb)+' rg');
+    if(!r){c.push(`${f(X)} ${f(Y)} ${f(w)} ${f(h)} re f`);return}
+    const q=Math.min(r,w/2,h/2),z=k*q;
+    c.push(`${f(X+q)} ${f(Y)} m ${f(X+w-q)} ${f(Y)} l ${f(X+w-q+z)} ${f(Y)} ${f(X+w)} ${f(Y+q-z)} ${f(X+w)} ${f(Y+q)} c ${f(X+w)} ${f(Y+h-q)} l ${f(X+w)} ${f(Y+h-q+z)} ${f(X+w-q+z)} ${f(Y+h)} ${f(X+w-q)} ${f(Y+h)} c ${f(X+q)} ${f(Y+h)} l ${f(X+q-z)} ${f(Y+h)} ${f(X)} ${f(Y+h-q+z)} ${f(X)} ${f(Y+h-q)} c ${f(X)} ${f(Y+q)} l ${f(X)} ${f(Y+q-z)} ${f(X+q-z)} ${f(Y)} ${f(X+q)} ${f(Y)} c f`)};
+  D.line=(x1,y1,x2,y2,rgb,wd)=>{c.push(`${col(rgb)} RG ${f(wd||.6)} w ${f(x1)} ${f(H-y1)} m ${f(x2)} ${f(H-y2)} l S`)};
+  D.txt=(s,x,yb,size,bold,rgb,ital)=>{if(!s)return;c.push(`BT /${bold?'F2':ital?'F3':'F1'} ${f(size)} Tf ${col(rgb)} rg ${f(x)} ${f(H-yb)} Td (${esc2(s)}) Tj ET`)};
+  D.wrap=(s,w,size,bold)=>{const out=[];String(s).split('\n').forEach(raw=>{
+    if(!raw.trim()){out.push('');return}
+    const words=raw.replace(/\t/g,'  ').split(/(\s+)/);let cur='';
+    words.forEach(wd=>{if(!wd)return;
+      if(pdfW(cur+wd,size,bold)<=w||!cur.trim()){
+        if(pdfW(wd,size,bold)>w&&!/^\s+$/.test(wd)){ // very long word: break it
+          let part=cur;for(const ch of wd){if(pdfW(part+ch,size,bold)>w){out.push(part);part=''}part+=ch}cur=part}
+        else cur+=wd}
+      else{out.push(cur.replace(/\s+$/,''));cur=/^\s+$/.test(wd)?'':wd}});
+    out.push(cur.replace(/\s+$/,''))});return out};
+  /* flowing paragraph; bg draws a tinted strip behind each line, bar draws a coloured edge */
+  D.para=(s,o)=>{o=o||{};const x=o.x==null?M:o.x,w=o.w==null?CW:o.w,size=o.size||9,lh=o.lh||size*1.38,pad=o.pad||0;
+    D.wrap(s,w-2*pad,size,o.bold).forEach(l=>{D.need(lh);
+      if(o.bg)D.rect(x,y,w,lh,o.bg);if(o.bar)D.rect(x,y,2.5,lh,o.bar);
+      D.txt(l,x+pad,y+size*1.02+(lh-size*1.38)/2,size,o.bold,o.col||[20,33,58],o.ital);y+=lh});
+    if(o.gap)y+=o.gap};
+  D.finish=()=>{const N=pages.length;pages.forEach((pg,i)=>{c=pg;D.line(M,H-FOOT-4,W-M,H-FOOT-4,[211,218,229],.5);
+      D.txt(pdfSafe(title).slice(0,90),M,H-FOOT+8,7,false,[120,130,150]);
+      const t='Page '+(i+1)+' of '+N;D.txt(t,W-M-pdfW(t,7),H-FOOT+8,7,false,[120,130,150])});
+    const objs=[];const add=s=>{objs.push(s);return objs.length};
+    const cat=add(''),pgs=add(''),f1=add('<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>'),f2=add('<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>'),f3=add('<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Oblique /Encoding /WinAnsiEncoding >>');
+    const kids=[];pages.forEach(pg=>{const s=pg.join('\n');const cs=add(`<< /Length ${s.length} >>\nstream\n${s}\nendstream`);
+      kids.push(add(`<< /Type /Page /Parent ${pgs} 0 R /MediaBox [0 0 ${W} ${H}] /Resources << /Font << /F1 ${f1} 0 R /F2 ${f2} 0 R /F3 ${f3} 0 R >> >> /Contents ${cs} 0 R >>`))});
+    objs[cat-1]=`<< /Type /Catalog /Pages ${pgs} 0 R >>`;objs[pgs-1]=`<< /Type /Pages /Kids [${kids.map(k=>k+' 0 R').join(' ')}] /Count ${kids.length} >>`;
+    let out='%PDF-1.4\n',off=[];objs.forEach((o,i)=>{off.push(out.length);out+=`${i+1} 0 obj\n${o}\nendobj\n`});
+    const xr=out.length;out+=`xref\n0 ${objs.length+1}\n0000000000 65535 f \n`+off.map(o=>String(o).padStart(10,'0')+' 00000 n \n').join('')+`trailer\n<< /Size ${objs.length+1} /Root ${cat} 0 R >>\nstartxref\n${xr}\n%%EOF`;
+    const u=new Uint8Array(out.length);for(let i=0;i<out.length;i++)u[i]=out.charCodeAt(i)&255;return {bytes:u,pages:N}};
+  D.np();return D;
+}
+function analysisPdf(A,P){
+  const D=pdfDoc('CAT Mock Desk · '+A.title),M=D.M,CW=D.CW;
+  const rs=document.documentElement;const cs=getComputedStyle(rs);
+  const ACC=cssRgb(cs.getPropertyValue('--accent'),[29,95,166]),ACS=cssRgb(cs.getPropertyValue('--accent-soft'),[224,236,248]);
+  const K={ink:[20,33,58],mute:[90,104,128],line:[211,218,229],ok:[30,138,76],bad:[194,59,59],warn:[169,106,11],none:[138,148,166],okS:[221,241,229],badS:[248,225,225],warnS:[251,235,207],noneS:[236,239,244],soft:[245,247,250],white:[255,255,255]};
+  const ST={correct:[K.ok,K.okS,'CORRECT'],wrong:[K.bad,K.badS,'WRONG'],skipped:[K.warn,K.warnS,'BLANK'],unseen:[K.none,K.noneS,'NOT SEEN']};
+  const T=s=>pdfSafe(texClean(String(s==null?'':s)).replace(/\*\*/g,'').replace(/`/g,'').replace(/^#{1,4}\s*/gm,'')).replace(/[ \t]+\n/g,'\n').trim();
+  const tm=s=>A.noTime?'n/a':fmtT0(s);
+  const tot=agg(A.qs);
+  const section=(t)=>{D.need(40);D.y+=8;D.rect(M,D.y,4,15,ACC,2);D.txt(t.toUpperCase(),M+10,D.y+11.5,10.5,true,K.ink);D.y+=24};
+  const bar=(x,y,w,h,a)=>{D.rect(x,y,w,h,K.noneS,h/2);const n=a.n||1;let cx=x;
+    [['correct',K.ok],['wrong',K.bad],['skipped',K.warn],['unseen',K.none]].forEach(([k,cl])=>{const v=k==='unseen'?a.unseen:a[k];if(!v)return;const ww=w*v/n;D.rect(cx,y,ww,h,cl);cx+=ww});
+    D.rect(x,y,h/2,h,cx>x?(a.correct?K.ok:a.wrong?K.bad:a.skipped?K.warn:K.none):K.noneS)};
+  /* header */
+  D.rect(M,D.y,CW,74,ACC,14);
+  const tl=D.wrap(T(A.title),CW-40,17,true).slice(0,2);let ty=D.y+27;tl.forEach(l=>{D.txt(l,M+18,ty,17,true,K.white);ty+=20});
+  D.txt(T(new Date(A.date).toLocaleString()+'  |  '+(A.mode==='cat'?'sectional timing':A.mode==='free'?'free navigation':'single timer')+(A.noTime?'  |  logged, no per-question time':'')),M+18,D.y+66,8,false,[235,240,250]);
+  D.y+=88;
+  /* score */
+  D.txt(String(r1(tot.score)),M,D.y+34,40,true,K.ink);const sw=pdfW(String(r1(tot.score)),40,true);D.txt('/ '+tot.max,M+sw+8,D.y+34,17,false,K.mute);
+  let pc=null;try{pc=pctAtt(A)}catch(e){}
+  if(pc&&pc.txt){const t='Estimated percentile '+T(pc.txt);D.rect(M+CW-pdfW(t,9,true)-22,D.y+8,pdfW(t,9,true)+22,22,ACS,11);D.txt(t,M+CW-pdfW(t,9,true)-11,D.y+23,9,true,ACC)}
+  D.y+=48;
+  const used=A.secs.reduce((a,s)=>a+s.used,0),allot=A.secs.reduce((a,s)=>a+s.minutes*60,0);
+  const tiles=[[tot.attempted?tot.acc+'%':'-','Accuracy ('+tot.correct+'/'+tot.attempted+')',ACC],[tot.attempted+'/'+tot.n,'Attempted',K.ink],[String(tot.correct),'Correct',K.ok],[String(tot.wrong),'Wrong (-'+r1(tot.neg)+' marks)',K.bad],[String(tot.n-tot.attempted),'Not attempted',K.warn],[A.noTime?'n/a':fmtT0(used),A.noTime?'Time':'Time of '+fmtT0(allot),K.ink]];
+  const tw=(CW-5*8)/6;tiles.forEach(([v,l,cl],i)=>{const x=M+i*(tw+8);D.rect(x,D.y,tw,46,K.soft,9);D.rect(x,D.y,tw,3,cl);D.txt(v,x+8,D.y+23,14,true,cl);D.txt(T(l).slice(0,22),x+8,D.y+38,6.8,false,K.mute)});
+  D.y+=58;
+  bar(M,D.y,CW,12,tot);D.y+=16;
+  [['Correct',K.ok,tot.correct],['Wrong',K.bad,tot.wrong],['Blank',K.warn,tot.skipped],['Not seen',K.none,tot.unseen]].forEach((r,i)=>{const x=M+i*96;D.rect(x,D.y,8,8,r[1],2);D.txt(r[0]+' '+r[2],x+12,D.y+7.5,8,false,K.mute)});
+  D.y+=18;
+  /* section summary */
+  section('Section summary');
+  {const cols=[['Section',120],['Score',62],['Attempted',66],['Accuracy',56],['Outcome',150],['Time used',69]];let x=M;
+   D.rect(M,D.y,CW,20,ACS,6);cols.forEach(([h,w])=>{D.txt(h,x+8,D.y+13.5,8,true,ACC);x+=w});D.y+=22;
+   A.secs.forEach((s,i)=>{D.need(26);const a=agg(A.qs.filter(q=>q.sec===i));let x=M;
+     D.txt(T(s.name).slice(0,22),x+8,D.y+15,9,true,K.ink);x+=cols[0][1];
+     D.txt(r1(a.score)+'/'+a.max,x+8,D.y+15,9,false,K.ink);x+=cols[1][1];
+     D.txt(a.attempted+'/'+a.n,x+8,D.y+15,9,false,K.ink);x+=cols[2][1];
+     D.txt(a.attempted?a.acc+'%':'-',x+8,D.y+15,9,true,a.acc>=70?K.ok:a.acc>=45?K.warn:K.bad);x+=cols[3][1];
+     bar(x+8,D.y+8,cols[4][1]-18,9,a);x+=cols[4][1];
+     D.txt(A.noTime?'n/a':fmtT0(s.used)+' / '+r1(s.minutes)+'m',x+8,D.y+15,8.5,false,K.ink);
+     D.line(M,D.y+25,M+CW,D.y+25,K.line,.4);D.y+=26})}
+  /* insights */
+  let ins=[];try{ins=buildInsights(A)}catch(e){}
+  if(ins.length){section('What the data says');
+    ins.forEach(i=>{const cl=i.cls==='good'?K.ok:i.cls==='bad'?K.bad:K.warn,sf=i.cls==='good'?K.okS:i.cls==='bad'?K.badS:K.warnS;
+      D.need(36);D.para(T(i.title),{bold:true,size:9,bg:sf,bar:cl,pad:9,col:cl===K.warn?[120,75,5]:K.ink});
+      D.para(T(i.text),{size:8.5,bg:sf,bar:cl,pad:9,col:K.ink,gap:6})})}
+  /* topics */
+  section('Topics, biggest marks lost first');
+  {const cols=[['Topic',160],['Qs',28],['Acc.',40],['Outcome',120],['Marks',56],['Lost',44],['Avg time',75]];
+   const hdr=()=>{let x=M;D.rect(M,D.y,CW,20,ACS,6);cols.forEach(([h,w])=>{D.txt(h,x+8,D.y+13.5,8,true,ACC);x+=w});D.y+=22};hdr();
+   const g=groupBy(A.qs,'topic'),keys=Object.keys(g).sort((a,b)=>{const x=agg(g[a]),y=agg(g[b]);return (y.max-y.score)-(x.max-x.score)});
+   const row=(name,l,sub)=>{const a=agg(l);if(D.y+24>D.H-60){D.np();hdr()}let x=M+(sub?12:0);
+     D.txt(T(name).slice(0,sub?30:34),x+8,D.y+15,sub?8:9,!sub,sub?K.mute:K.ink);x=M+cols[0][1];
+     D.txt(String(a.n),x+8,D.y+15,8.5,false,K.ink);x+=cols[1][1];
+     D.txt(a.attempted?a.acc+'%':'-',x+8,D.y+15,8.5,true,a.attempted?(a.acc>=70?K.ok:a.acc>=45?K.warn:K.bad):K.none);x+=cols[2][1];
+     bar(x+8,D.y+8,cols[3][1]-18,8,a);x+=cols[3][1];
+     D.txt(r1(a.score)+'/'+a.max,x+8,D.y+15,8.5,false,K.ink);x+=cols[4][1];
+     D.txt('-'+r1(a.max-a.score),x+8,D.y+15,8.5,true,(a.max-a.score)>0?K.bad:K.mute);x+=cols[5][1];
+     const tt=l.filter(q=>q.status!=='unseen');D.txt(A.noTime||!tt.length?'n/a':fmtT0(tt.reduce((s,q)=>s+q.time,0)/tt.length),x+8,D.y+15,8.5,false,K.ink);
+     D.line(M,D.y+23,M+CW,D.y+23,K.line,.3);D.y+=24};
+   keys.forEach(k=>{row(k,g[k],false);const sg=groupBy(g[k].filter(q=>q.sub),'sub'),sk=Object.keys(sg);if(sk.length>1||(sk.length===1&&sg[sk[0]].length<g[k].length))sk.forEach(u=>row(u,sg[u],true))})}
+  /* time */
+  if(!A.noTime){section('Time');
+    {const cols=[['Section',120],['Available/q',80],['Correct',80],['Wrong',80],['Blank',80],['Total',83]];let x=M;D.rect(M,D.y,CW,20,ACS,6);cols.forEach(([h,w])=>{D.txt(h,x+8,D.y+13.5,8,true,ACC);x+=w});D.y+=22;
+     const av=l=>l.length?fmtT0(l.reduce((s,q)=>s+q.time,0)/l.length):'-';
+     A.secs.forEach((s,i)=>{D.need(24);const l=A.qs.filter(q=>q.sec===i),a=agg(l);let x=M;
+       const vals=[T(s.name).slice(0,20),l.length?fmtT0(idealOf(A,l[0])):'-',av(l.filter(q=>q.status==='correct')),av(l.filter(q=>q.status==='wrong')),av(l.filter(q=>q.status==='skipped'||q.status==='unseen')),fmtT0(a.time)];
+       const cl=[K.ink,K.ink,K.ok,K.bad,K.warn,K.ink];vals.forEach((v,j)=>{D.txt(v,x+8,D.y+15,8.5,j===0,cl[j]);x+=cols[j][1]});D.line(M,D.y+23,M+CW,D.y+23,K.line,.3);D.y+=24})}
+    const wasted=A.qs.filter(q=>q.status!=='correct').reduce((t,q)=>t+q.time,0);
+    D.y+=4;D.para(fmtMin(wasted)+' of your '+fmtMin(tot.time)+' went on questions that did not earn marks.',{size:8.5,col:K.mute,gap:6});
+    const lg=[...A.qs].sort((a,b)=>b.time-a.time).slice(0,8);D.need(40);D.txt('LONGEST QUESTIONS',M,D.y+9,8,true,K.mute);D.y+=16;
+    lg.forEach(q=>{D.need(16);const s=ST[q.status]||ST.unseen;D.rect(M,D.y,40,12,s[1],6);D.txt(s[2].slice(0,7),M+5,D.y+8.6,6.5,true,s[0]);
+      D.txt('Q'+q.n+'  '+T(q.secName)+'  |  '+T(q.topic).slice(0,40),M+48,D.y+9,8.5,false,K.ink);const t=fmtT0(q.time);D.txt(t,M+CW-pdfW(t,8.5,true),D.y+9,8.5,true,K.ink);D.y+=16})}
+  /* reasons */
+  const tc={};Object.values(A.tags||{}).forEach(t=>{if(t)tc[t]=(tc[t]||0)+1});
+  if(Object.keys(tc).length){section('Your mistake reasons');let x=M;D.need(24);Object.keys(tc).forEach(k=>{const t=T(k)+'  x'+tc[k],w=pdfW(t,8.5,true)+18;if(x+w>M+CW){x=M;D.y+=24;D.need(24)}D.rect(x,D.y,w,18,ACS,9);D.txt(t,x+9,D.y+12.3,8.5,true,ACC);x+=w+8});D.y+=28}
+  /* every question */
+  D.np();section('Question review - every question');
+  let lastP=null;
+  A.qs.forEach(x=>{
+    const q=P&&P.questions[x.n-1]&&P.questions[x.n-1].id===x.id?P.questions[x.n-1]:null;
+    const s=ST[x.status]||ST.unseen;
+    D.need(70);D.y+=4;
+    D.rect(M,D.y,CW,24,s[1],7);D.rect(M,D.y,4,24,s[0]);
+    const head='Q'+x.n+'   '+T(x.secName)+'  |  '+T(x.topic)+(x.sub?' > '+T(x.sub):'')+'  |  '+(x.difficulty||'');
+    D.txt(D.wrap(head,CW-130,9,true)[0],M+12,D.y+15.5,9,true,K.ink);
+    const chip=s[2]+'   '+(x.got>0?'+':'')+r1(x.got||0)+' / '+x.marks;D.txt(chip,M+CW-pdfW(chip,8.5,true)-10,D.y+15.5,8.5,true,s[0]);D.y+=28;
+    const meta=[A.noTime?null:'Time '+fmtT0(x.time)+' of '+fmtT0(A.secs[x.sec]?idealOf(A,x):0),x.visits?'opened '+x.visits+'x':null,x.ch?'answer changed '+x.ch+'x':null,x.mk?'marked for review':null,(A.tags||{})[x.id]?'reason: '+T(A.tags[x.id]):null].filter(Boolean).join('   |   ');
+    if(meta)D.para(meta,{size:7.8,col:K.mute,gap:3});
+    if(q){
+      if(q.passage&&q.passage!==lastP){lastP=q.passage;D.para('PASSAGE / DATA SET',{size:7.5,bold:true,col:K.mute,gap:1});D.para(T(q.passage),{size:8.3,bg:K.soft,bar:K.none,pad:8,col:[50,62,84],gap:5})}
+      else if(!q.passage)lastP=null;
+      D.para(T(q.text),{size:9.6,bold:false,gap:5});
+      if(q.type==='mcq'){q.options.forEach((o,k)=>{const isC=k===q.ai,isG=k===x.given;
+        const tag=isC&&isG?'   [your answer - correct]':isC?'   [correct answer]':isG?'   [your answer]':'';
+        const bg=isC?K.okS:isG?K.badS:null,cl=isC?K.ok:isG?K.bad:K.ink;
+        D.para(String.fromCharCode(65+k)+'.  '+T(o)+tag,{size:9,bg,bar:isC?K.ok:isG?K.bad:null,pad:9,col:isC||isG?cl:K.ink,bold:isC||isG,lh:12.8})});
+        if(x.given==null)D.para('You did not answer this question.',{size:8.5,col:K.warn,ital:true,gap:2});D.y+=3}
+      else{D.para('Your answer: '+(x.given==null?'(none)':T(x.given)),{size:9,bold:true,col:x.status==='correct'?K.ok:K.bad,bg:x.status==='correct'?K.okS:K.badS,bar:x.status==='correct'?K.ok:K.bad,pad:9});
+        let ca='';try{ca=correctText(q)}catch(e){}D.para('Correct answer: '+T(ca),{size:9,bold:true,col:K.ok,bg:K.okS,bar:K.ok,pad:9,gap:4})}
+      if(q.solution){D.para('SOLUTION',{size:7.5,bold:true,col:ACC,gap:1});D.para(T(q.solution),{size:8.5,bg:K.soft,bar:ACC,pad:8,col:K.ink,gap:5})}
+    }else D.para('(Paper deleted - question text unavailable.) Your answer: '+(x.given==null?'none':x.type==='mcq'?String.fromCharCode(65+x.given):T(x.given)),{size:8.5,ital:true,col:K.mute});
+    ((A.qai||{})[x.id]||[]).forEach(r=>{D.para('AI - '+T(r.m==='ask'?'your question: '+(r.q||''):r.m==='explain'?'step by step':r.m==='trick'?'shortcut / trick':'why I went wrong'),{size:7.8,bold:true,col:ACC,gap:1});D.para(T(r.text),{size:8.3,bg:ACS,pad:8,col:K.ink,gap:4})});
+    D.y+=6;D.line(M,D.y,M+CW,D.y,K.line,.4);D.y+=4;
+  });
+  return D.finish();
+}
+Object.assign(acts,{
+  async anpdf(){
+    const A=curAtt();if(!A){toast('Open an analysis first');return}
+    toast('Building the PDF…');await new Promise(r=>setTimeout(r,60));
+    try{const r=analysisPdf(A,attPaper(A));await saveBinFile(safeName(A.title)+' - analysis.pdf',r.bytes,'application/pdf')}
+    catch(e){toast('Could not build the PDF: '+((e&&e.message)||e))}
+  }
+});
+</script>
+
 
 
 <style>
@@ -4319,11 +4501,19 @@ body.ps-on #app .prow,body.ps-on #app .paper{cursor:pointer}
 .psbar .psn{font:600 14px var(--f-ui);color:var(--ink)}.psbar small{color:var(--muted);font-weight:400}
 .psbar .btn[disabled]{opacity:.5;pointer-events:none}
 
-.updbar{display:flex;flex-direction:column;gap:6px}.updbar[hidden]{display:none}
-.updbar .ut{font:600 13px var(--f-ui);color:var(--ink)}
-.updbar .ub{height:10px;border-radius:99px;background:var(--surface2);border:1px solid var(--line);overflow:hidden}
-.updbar .uf{height:100%;width:0;border-radius:99px;background:var(--accent);transition:width .25s ease}
-.updbar .uf.ind{width:38%;animation:updslide 1.1s ease-in-out infinite}
-@keyframes updslide{0%{margin-left:-38%}100%{margin-left:100%}}
+.updbar{display:flex;flex-direction:column;align-items:center;gap:6px;padding:6px 0}.updbar[hidden]{display:none}
+.updbar .ucl{width:132px;height:132px;overflow:visible}
+.updbar .urt{fill:none;stroke:var(--line);stroke-width:7}
+.updbar .ur{fill:none;stroke:var(--accent);stroke-width:7;stroke-linecap:round;transform:rotate(-90deg);transform-origin:60px 60px;transition:stroke-dashoffset .2s linear;filter:drop-shadow(0 0 5px var(--accent-soft))}
+.updbar .ucp{fill:var(--accent-soft);stroke:var(--accent);stroke-width:.9;stroke-linejoin:round}
+.updbar .uar path{fill:none;stroke:var(--accent);stroke-width:1.2;stroke-linecap:round;stroke-linejoin:round}
+.updbar .ucg{animation:updfloat 2.6s ease-in-out infinite;transform-origin:60px 60px}
+.updbar .uar{animation:updarrow 1.2s ease-in-out infinite}
+.updbar.done .uar{animation:none}.updbar.done .ucp{fill:var(--accent)}.updbar.done .uar path{stroke:var(--accent-ink)}
+.updbar .un{font:700 22px var(--f-ui);color:var(--ink);margin-top:-2px}
+.updbar .ut{font:600 13px var(--f-ui);color:var(--ink2);text-align:center}
+@keyframes updfloat{0%,100%{transform:translateY(-2.5px)}50%{transform:translateY(2.5px)}}
+@keyframes updarrow{0%{transform:translate(31px,27px) scale(2.4) translateY(-1.2px);opacity:.25}50%{opacity:1}100%{transform:translate(31px,27px) scale(2.4) translateY(1.6px);opacity:.25}}
+@media (prefers-reduced-motion:reduce){.updbar .ucg,.updbar .uar{animation:none}}}
 </style>
 </body></html>
