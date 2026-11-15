@@ -2,7 +2,7 @@
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>CAT Mock Desk</title>
 <meta name="claude:viewport-fit-sides" content="cover">
-<meta name="app-build" content="2026-11-14.20">
+<meta name="app-build" content="2026-11-14.39">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto+Flex:opsz,wght@8..144,400;8..144,500;8..144,600&family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Serif:wght@400;600&display=swap">
 <style>
 /* Layout: home/analysis are scrolling pages on a paper-blue ground; the exam is a fixed-height console (header, section bar, question pane + palette, action bar) modelled on the CAT screen. */
@@ -760,6 +760,49 @@ body:not(.exam-on) .revbody{padding:8px 18px 16px}
 body:not(.exam-on) .btn.addchip{padding:10px 24px;min-height:42px;font-size:14px;margin:4px 0}
 body:not(.exam-on) .pdet>summary{padding:14px 0}
 body:not(.exam-on) .pdet[open]>summary{padding-bottom:8px}
+
+.rvgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(560px,100%),1fr));gap:16px;align-items:start}
+.rvnote .rvmd{font-size:14px;line-height:1.55}.rvnote .rvmd h2,.rvnote .rvmd h3{font-size:15px;margin:12px 0 4px}
+.rvp textarea{width:100%;min-height:70px}
+.rvmore{display:inline}.rvmore>summary{display:inline;cursor:pointer;color:var(--accent);font-weight:600}.rvmore[open]{display:block;margin:4px 0}
+.rvsel{margin-bottom:16px}
+
+/* mistake notebook: calmer layout */
+.nbhero{display:flex;align-items:center;gap:14px}
+.nbbig{font:700 44px/1 var(--f-ui);letter-spacing:-.02em}.nbbig.bad{color:var(--bad)}
+.nbbar{display:flex;flex-wrap:wrap;gap:10px 14px;align-items:center;justify-content:space-between;margin-bottom:12px}
+.nbbar .seg small{opacity:.65;font-weight:600;margin-left:3px}
+.nbphrow{display:none;gap:8px}.nbphrow .btn{flex:1}
+@media(max-width:600px){.nbphx{display:none}.nbphrow{display:flex}}
+.nbtools{display:flex;flex-wrap:wrap;gap:8px}
+.nbsel{width:auto;min-width:0;max-width:200px;padding:8px 12px;font-size:13px;border-radius:99px}
+.nbact{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:8px 12px;margin-bottom:10px;border-radius:14px;background:var(--accent-soft)}
+.nbgh{display:flex;gap:8px;align-items:center;margin:16px 4px 8px;font-size:13px;letter-spacing:.04em;text-transform:uppercase;color:var(--ink2)}
+.nbgh span{background:var(--surface2);border-radius:99px;padding:1px 8px;font-size:11.5px}
+.nbr{border-radius:16px;margin-bottom:8px;border:1px solid var(--line);background:var(--surface);transition:box-shadow .2s,border-color .2s}
+.nbr:hover{border-color:var(--accent)}.nbr[open]{box-shadow:0 6px 22px -12px rgba(0,0,0,.3)}
+body:not(.exam-on) .nbr>summary{display:flex;flex-wrap:nowrap;gap:12px;align-items:center;padding:12px 14px}
+.nbdot{flex:none;width:10px;height:10px;border-radius:50%;background:var(--bad)}.nbdot.skipped{background:var(--warn)}.nbdot.correct{background:var(--good)}
+.nbmain{flex:1 1 auto;min-width:0;display:flex;flex-direction:column;gap:2px}
+.nbq{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--ink)}
+.nbm{font-size:12px;color:var(--ink2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.nbend{flex:none;display:flex;flex-direction:column;align-items:flex-end;gap:3px}
+.nbpips{font-size:9px;letter-spacing:2px;color:var(--accent)}
+.nbdue{font-size:11.5px;font-weight:600;color:var(--ink2)}.nbdue.now{color:var(--bad)}
+.nbchips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+@media(max-width:600px){.nbtools{width:100%}.nbsel{flex:1 1 40%;max-width:none}.nbend{display:none}}
+
+.msel{position:relative;display:inline-block}
+.panel:has(.msel[open]),.rvsel:has(.msel[open]){position:relative;z-index:60}
+.msel>summary{list-style:none;cursor:pointer;display:inline-flex;align-items:center;gap:6px;max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.msel>summary::-webkit-details-marker{display:none}
+.msel>summary::after{content:"\25BE";font-size:11px;opacity:.7}
+.msel>summary.on{border-color:var(--accent);background:var(--accent-soft)}
+.mspop{position:absolute;z-index:50;top:calc(100% + 6px);left:0;width:min(320px,86vw);background:var(--surface);border:1px solid var(--line);border-radius:18px;box-shadow:0 18px 40px -14px rgba(0,0,0,.35);padding:10px}
+.msbar{display:flex;align-items:center;gap:10px;padding:2px 4px 8px}
+.mslist{max-height:min(46vh,340px);overflow:auto}
+.msopt{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:10px;cursor:pointer;font-size:14px}
+.msopt:hover{background:var(--surface2)}.msopt input{width:18px;height:18px;flex:none;accent-color:var(--accent)}
 /* themed scrollbars */
 :root{--sbc:#0B57D0}
 *::-webkit-scrollbar{width:14px;height:14px}
@@ -930,7 +973,7 @@ const paperMax=p=>p.questions.reduce((s,q)=>s+q.marks,0);
 
 /* ---------- navigation ---------- */
 const V={view:'home',msg:null,analysisId:null,tab:'overview',filter:'all',secFilter:'all'};
-function go(view,extra){NOTIME=false;if(view!=='analysis'&&view!=='cat')V.fromCat=null;Object.assign(V,{view},extra||{});document.body.classList.toggle('exam-on',view==='exam');app.classList.toggle('is-exam',view==='exam');const _pv=V.__shown;render();if(view!=='exam'&&_pv!==view&&app.firstElementChild&&app.firstElementChild.animate&&!matchMedia('(prefers-reduced-motion:reduce)').matches){try{app.firstElementChild.animate([{opacity:0,transform:'translateY(14px)'},{opacity:1,transform:'none'}],{duration:320,easing:'cubic-bezier(.2,0,0,1)'})}catch(e){}}V.__shown=view;if(view!=='exam'&&typeof wmSync==='function')wmSync();if(view!=='exam'){window.scrollTo(0,0);const w=app.querySelector('.wrap');if(w)w.classList.add('enter')}}
+function go(view,extra){NOTIME=false;if(view!=='analysis'&&view!=='cat')V.fromCat=null;Object.assign(V,{view},extra||{});document.body.classList.toggle('exam-on',view==='exam');app.classList.toggle('is-exam',view==='exam');const _pv=V.__shown;render();if(view!=='exam'&&_pv!==view&&app.firstElementChild&&app.firstElementChild.animate&&!matchMedia('(prefers-reduced-motion:reduce)').matches){try{app.firstElementChild.animate([{opacity:0,transform:'translateY(14px)',filter:'blur(16px)'},{opacity:1,transform:'none',filter:'blur(0)'}],{duration:380,easing:'cubic-bezier(.2,0,0,1)'})}catch(e){}}V.__shown=view;if(view!=='exam'&&typeof wmSync==='function')wmSync();if(view!=='exam'){window.scrollTo(0,0);const w=app.querySelector('.wrap');if(w)w.classList.add('enter')}}
 function render(){if(store.attempts.some(x=>!x||!Array.isArray(x.qs)))store.attempts=store.attempts.filter(x=>x&&Array.isArray(x.qs));({home:renderHome,instr:renderInstr,exam:renderExam,analysis:renderAnalysis,practice:renderPractice,log:renderLog,import:renderImport,notebook:renderNotebook,weak:renderWeak,papers:renderAllPapers,cat:renderCat,combine:renderCombine,combo:renderCombo})[V.view]()}
 
 /* ---------- categories: full syllabus, sectional, topic-wise ---------- */
@@ -968,7 +1011,7 @@ const curAtt=()=>V.analysisId==='__cx'?V.cxA:store.attempts.find(a=>a.id===V.ana
 const findAtt=id=>id==='__cx'?V.cxA:store.attempts.find(a=>a.id===id);
 /* saving notes/AI answers made inside the combined view writes them back to the real attempts */
 function saveAtt(A){
-  if(!A||!A.virtual){saveAtt(A);return}
+  if(!A||!A.virtual){if(A)store.save(A);return}
   const by={};A.qs.forEach(x=>{(by[x.aid]=by[x.aid]||[]).push(x)});
   Object.keys(by).forEach(aid=>{const o=store.attempts.find(a=>a.id===aid);if(!o)return;let ch=false;
     by[aid].forEach(x=>{
@@ -1049,8 +1092,8 @@ function papersListHtml(q){
   return `${papers.length?papers.map(p=>{const a=atts.filter(x=>x.paperId===p.id);const last=a[0];return `<div class="paper"><div>${titleCell(p)}
       <div class="chips" style="margin-top:4px">${p.sections.map(s=>`<span class="chip">${esc(s.name)} · ${s.count}Q · ${s.minutes}m</span>`).join('')}<span class="chip">${paperMax(p)} marks</span></div>
       <div class="sub" style="font-size:12px;margin-top:4px">${a.length?a.length+' attempt'+(a.length>1?'s':'')+' · last '+r1(last.score)+'/'+last.max:'Not attempted yet'}</div></div>
-      <div class="row"><button class="btn pri sm" data-act="start" data-id="${p.id}">Start</button><button class="btn sm" data-act="rename" data-id="${p.id}">Rename</button><button class="btn sm" data-act="pctl" data-id="${p.id}">${p.pct&&p.pct.length?'Percentile ✓':'Percentile'}</button><button class="btn sm" data-act="expjson" data-id="${p.id}">Export JSON</button><button class="btn sm" data-act="logpast" data-id="${p.id}">Log past attempt</button><button class="btn sm danger" data-act="delpaper" data-id="${p.id}">Delete</button></div></div>`}).join(''):`<p class="sub">No papers yet. Add one on the left, or load the sample to see how the exam screen and analysis look.</p>`}
-    ${sets.length?`<h3 style="margin-top:20px">DPP sets and section tests</h3>`+sets.map(p=>{const a=atts.filter(x=>x.paperId===p.id);return `<div class="paper"><div>${titleCell(p)}<div class="sub" style="font-size:12px">${p.questions.length} questions · ${p.sections[0].minutes} min${a.length?' · '+a.length+' attempt'+(a.length>1?'s':''):''}</div></div><div class="row"><button class="btn pri sm" data-act="start" data-id="${p.id}">Start</button><button class="btn sm" data-act="rename" data-id="${p.id}">Rename</button><button class="btn sm" data-act="pctl" data-id="${p.id}">${p.pct&&p.pct.length?'Percentile ✓':'Percentile'}</button><button class="btn sm" data-act="expjson" data-id="${p.id}">Export JSON</button><button class="btn sm" data-act="logpast" data-id="${p.id}">Log past attempt</button><button class="btn sm danger" data-act="delpaper" data-id="${p.id}">Delete</button></div></div>`}).join(''):''}`;
+      <div class="row"><button class="btn pri sm" data-act="start" data-id="${p.id}">Start</button><button class="btn sm" data-act="rename" data-id="${p.id}">Rename</button><button class="btn sm" data-act="pctl" data-id="${p.id}">${p.pct&&p.pct.length?'Percentile ✓':'Percentile'}</button><button class="btn sm" data-act="expjson" data-id="${p.id}">Export JSON</button><button class="btn sm" data-act="exppa" data-id="${p.id}">Analysis PDF</button><button class="btn sm" data-act="logpast" data-id="${p.id}">Log past attempt</button><button class="btn sm danger" data-act="delpaper" data-id="${p.id}">Delete</button></div></div>`}).join(''):`<p class="sub">No papers yet. Add one on the left, or load the sample to see how the exam screen and analysis look.</p>`}
+    ${sets.length?`<h3 style="margin-top:20px">DPP sets and section tests</h3>`+sets.map(p=>{const a=atts.filter(x=>x.paperId===p.id);return `<div class="paper"><div>${titleCell(p)}<div class="sub" style="font-size:12px">${p.questions.length} questions · ${p.sections[0].minutes} min${a.length?' · '+a.length+' attempt'+(a.length>1?'s':''):''}</div></div><div class="row"><button class="btn pri sm" data-act="start" data-id="${p.id}">Start</button><button class="btn sm" data-act="rename" data-id="${p.id}">Rename</button><button class="btn sm" data-act="pctl" data-id="${p.id}">${p.pct&&p.pct.length?'Percentile ✓':'Percentile'}</button><button class="btn sm" data-act="expjson" data-id="${p.id}">Export JSON</button><button class="btn sm" data-act="exppa" data-id="${p.id}">Analysis PDF</button><button class="btn sm" data-act="logpast" data-id="${p.id}">Log past attempt</button><button class="btn sm danger" data-act="delpaper" data-id="${p.id}">Delete</button></div></div>`}).join(''):''}`;
 }
 const IC={bolt:'M11 21h-1l1-7H7.5c-.58 0-.57-.32-.38-.66L13 3h1l-1 7h3.5c.49 0 .56.33.47.51C12.96 17.55 11 21 11 21z',warn:'M12 2L1 21h22L12 2zm1 14h-2v-2h2v2zm0-4h-2V8h2v4z',insights:'M21 8c-1.45 0-2.26 1.44-1.93 2.51l-3.55 3.56c-.3-.09-.74-.09-1.04 0l-2.55-2.55C12.27 10.45 11.46 9 10 9c-1.45 0-2.27 1.44-1.93 2.52l-4.56 4.55C2.44 15.74 1 16.55 1 18c0 1.1.9 2 2 2 1.45 0 2.26-1.44 1.93-2.51l4.55-4.56c.3.09.74.09 1.04 0l2.55 2.55C12.73 16.55 13.54 18 15 18c1.45 0 2.27-1.44 1.93-2.52l3.56-3.55c1.07.33 2.51-.48 2.51-1.93 0-1.1-.9-2-2-2z',layers:'M11.99 18.54l-7.37-5.73L3 14.07l9 7 9-7-1.63-1.27-7.38 5.74zM12 16l7.36-5.73L21 9l-9-7-9 7 1.63 1.27L12 16z',doc:'M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z',pie:'M11 2v20c-5.07-.5-9-4.79-9-10s3.93-9.5 9-10zm2.03 0v8.99H22c-.47-4.74-4.24-8.52-8.97-8.99zm0 11.01V22c4.74-.47 8.5-4.25 8.97-8.99h-8.97z',topic:'M12 2l-5.5 9h11L12 2zm5.5 11c-2.49 0-4.5 2.01-4.5 4.5s2.01 4.5 4.5 4.5 4.5-2.01 4.5-4.5-2.01-4.5-4.5-4.5zM3 21.5h8v-8H3v8z',timer:'M15 1H9v2h6V1zm-4 13h2V8h-2v6zm8.03-6.61l1.42-1.42c-.43-.51-.9-.99-1.41-1.41l-1.42 1.42C16.07 4.74 14.12 4 12 4c-4.97 0-9 4.03-9 9s4.02 9 9 9 9-4.03 9-9c0-2.12-.74-4.07-1.97-5.61zM12 20c-3.87 0-7-3.13-7-7s3.13-7 7-7 7 3.13 7 7-3.13 7-7 7z',more:'M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z',add:'M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z',play:'M8 5v14l11-7z',history:'M13 3c-4.97 0-9 4.03-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42C8.27 19.99 10.51 21 13 21c4.97 0 9-4.03 9-9s-4.03-9-9-9zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z'};
 function ic(n){return `<svg class="ic" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="currentColor"><path d="${IC[n]||''}"/></svg>`}
@@ -2692,43 +2735,52 @@ const nbDoc=()=>store.notes.find(n=>n.id==='nbstate');
 const nbMap=()=>(nbDoc()||{}).map||{};
 function nbSet(keys,state){let d=nbDoc();if(!d)d={id:'nbstate',kind:'note',type:'nbstate',created:Date.now(),map:{}};
   keys.forEach(k=>{if(state)d.map[k]={s:state,at:Date.now()};else delete d.map[k]});store.save(d)}
+const nbArea=m=>areaOfName(m.sec)||topicArea(m.topic)||m.sec||'Other';
 function nbFiltered(){
   const nb=V.nb,all=nb.tab==='discarded'?mistakeItems(true).filter(m=>m.disc):mistakeItems();
-  return all.filter(m=>(nb.tab==='discarded'||(nb.tab==='mastered')===m.mastered)&&(nb.sec==='all'||m.sec===nb.sec)&&(nb.topic==='all'||m.topic===nb.topic)&&(nb.reason==='all'||m.last.st===nb.reason));
+  return all.filter(m=>(nb.tab==='discarded'||(nb.tab==='mastered')===m.mastered)&&(nb.sec==='all'||nbArea(m)===nb.sec)&&(!nb.topics||!nb.topics.length||nb.topics.includes(m.topic))&&(nb.reason==='all'||m.last.st===nb.reason));
 }
 function renderNotebook(){
-  if(!V.nb)V.nb={tab:'open',sec:'all',topic:'all',reason:'all'};
+  if(!V.nb)V.nb={tab:'open',sec:'all',topics:[],reason:'all'};if(!V.nb.topics)V.nb.topics=[];
   const nb=V.nb,all=mistakeItems(),open=all.filter(m=>!m.mastered),mast=all.filter(m=>m.mastered),dis=mistakeItems(true).filter(m=>m.disc);
   const due=open.filter(m=>m.due&&m.pool),list=nbFiltered(),ok=list.filter(m=>m.pool);
-  const uniq=f=>[...new Set((nb.tab==='discarded'?dis:all.filter(m=>(nb.tab==='mastered')===m.mastered)).map(f))].filter(Boolean).sort();
-  const sel=(id,label,vals,cur)=>`<label class="field" style="min-width:150px;flex:0 1 190px"><span class="sub">${label}</span><select data-nb="${id}"><option value="all">All</option>${vals.map(v=>`<option value="${esc(v)}"${v===cur?' selected':''}>${esc(v)}</option>`).join('')}</select></label>`;
+  const uniq=(f,sec)=>[...new Set((nb.tab==='discarded'?dis:all.filter(m=>(nb.tab==='mastered')===m.mastered)).filter(m=>!sec||sec==='all'||nbArea(m)===sec).map(f))].filter(Boolean).sort();
+  const sel=(id,all,vals,cur)=>`<select class="nbsel" data-nb="${id}" aria-label="${esc(all)}"><option value="all">${esc(all)}</option>${vals.map(v=>`<option value="${esc(v)}"${v===cur?' selected':''}>${esc(v)}</option>`).join('')}</select>`;
+  const filtered=nb.sec!=='all'||nb.topics.length>0||nb.reason!=='all';
+  const dueShort=m=>m.disc?'Discarded':m.mastered?(m.forced?'Learned':'Mastered'):m.due?'Due now':(d=>'in '+Math.max(1,Math.ceil(d/DAY))+'d')(m.dueAt-Date.now());
   const row=m=>{
     const it=m.pool,q=it&&it.q,first=q?String(q.text||'').replace(/^Directions:.*?\n\n/s,'').replace(/\s+/g,' '):'(paper deleted, question text unavailable)';
-    const pill=m.last.st==='correct'?`<span class="pill correct">Correct last time</span>`:`<span class="pill ${m.last.st}">${m.last.st==='wrong'?'Wrong':'Left blank'} last time</span>`;
-    return `<details class="rev"><summary><span class="qn">${it?esc(it.sec)+' '+(it.i+1):'—'}</span><span class="qt">${stepHtml(first.slice(0,140))}</span>${pill}<span class="pill ${m.due?'wrong':'unseen'}">${esc(dueLabel(m))}</span></summary>
-     <div class="revbody"><div class="sub">${esc(m.topic)}${m.sub?' › '+esc(m.sub):''} · ${it?esc(it.p.title):esc(m.title)} · missed ${m.wrongs} time${m.wrongs>1?'s':''} · ${m.streak} correct in a row (need ${NEED_RIGHT}) · last tried ${fmtDate(m.last.d)}</div>
-     ${q?`${q.passage?`<details><summary>Show passage</summary><div class="sol" style="max-height:240px;overflow:auto;font-family:var(--f-serif)">${richText(q.passage)}</div></details>`:''}
+    const pips='●'.repeat(Math.min(m.streak,NEED_RIGHT))+'○'.repeat(Math.max(0,NEED_RIGHT-m.streak));
+    return `<details class="rev nbr"><summary><span class="nbdot ${m.last.st}" title="${m.last.st==='wrong'?'Wrong':m.last.st==='skipped'?'Left blank':'Correct'} last time"></span>
+      <span class="nbmain"><span class="nbq">${stepHtml(first.slice(0,150))}</span><span class="nbm">${it?esc(nbArea(m))+' '+(it.i+1)+' · ':''}${esc(m.topic)}${m.sub?' › '+esc(m.sub):''} · missed ${m.wrongs}×</span></span>
+      <span class="nbend"><span class="nbpips" title="${m.streak} correct in a row, ${NEED_RIGHT} needed">${pips}</span><span class="nbdue ${m.due?'now':''}">${esc(dueShort(m))}</span></span></summary>
+     <div class="revbody"><div class="nbchips"><span class="chip">${it?esc(it.p.title):esc(m.title)}</span><span class="chip">${m.last.st==='wrong'?'Wrong':m.last.st==='skipped'?'Left blank':'Correct'} last time</span><span class="chip">last tried ${fmtDate(m.last.d)}</span><span class="chip">${esc(dueLabel(m))}</span></div>
+     ${q?`${q.passage?`<details class="pdet"><summary>Show passage</summary><div class="sol" style="max-height:360px;overflow:auto;font-family:var(--f-serif)">${richText(q.passage)}</div></details>`:''}
       <div style="white-space:pre-wrap;font-family:var(--f-serif)">${richText(q.text)}</div>
       ${q.type==='mcq'?`<div class="opts">${q.options.map((o,k)=>`<div class="${k===q.ai?'c':''}">${String.fromCharCode(65+k)}. ${stepHtml(o)}</div>`).join('')}</div>`:`<div><b>Answer:</b> ${esc(correctText(q))}</div>`}
       ${q.solution?solBlock(q.solution):''}`:''}
      <div class="row" style="margin-top:10px;gap:8px">${m.disc?`<button class="btn sm pri" data-act="nbone" data-op="restore" data-k="${esc(m.key)}">Restore to notebook</button>`
       :`${m.mastered&&!m.forced?'':`<button class="btn sm pri" data-act="nbone" data-op="learned" data-k="${esc(m.key)}">${m.mastered?'Already learned':'Mark as learned'}</button>`}${m.forced?`<button class="btn sm" data-act="nbone" data-op="reopen" data-k="${esc(m.key)}">Back to open</button>`:''}<button class="btn sm danger" data-act="nbone" data-op="discard" data-k="${esc(m.key)}">Discard</button>`}</div></div></details>`;
   };
-  app.innerHTML=`<div class="wrap"><div class="top"><div class="brand">Mistake notebook<small>revise until it sticks</small></div><div class="row"><button class="btn sm" data-act="weak">Weak areas</button><button class="btn sm" data-act="home">Back</button></div></div>
+  const shown=nb.sort==='topic'?[...list].sort((x,y)=>String(x.topic).localeCompare(String(y.topic))||x.dueAt-y.dueAt):list;
+  let body='',lastT=null;
+  shown.forEach(m=>{if(nb.sort==='topic'&&m.topic!==lastT){lastT=m.topic;body+=`<h3 class="nbgh">${esc(m.topic)} <span>${shown.filter(z=>z.topic===m.topic).length}</span></h3>`}body+=row(m)});
+  const total=open.length+mast.length;
+  app.innerHTML=`<div class="wrap"><div class="top"><div class="brand">Mistake notebook<small>revise until it sticks</small></div><div class="row"><button class="btn sm nbphx" data-act="revision">Revision sheet</button><button class="btn sm nbphx" data-act="weak">Weak areas</button><button class="btn sm" data-act="home">Back</button></div></div>
   <div class="nbgrid">
   <div class="panel stack nbside">
-   <div class="tiles" style="margin-top:0"><div class="tile"><b class="${due.length?'bad':''}">${due.length}</b><span>due for review now</span></div><div class="tile"><b>${open.length}</b><span>still open</span></div><div class="tile"><b class="good">${mast.length}</b><span>mastered</span></div></div>
-   <details class="hdet2"><summary>How the notebook works</summary><div class="sub" style="margin-top:6px">Every question you got wrong or left blank lands here. It is scheduled for another try ${REVIEW_DAYS} days after you last saw it, and it leaves the open list once you answer it correctly ${NEED_RIGHT} times in a row. Re-attempts are counted automatically, whether from here, a DPP or a full paper.</div></details>
-   <div class="row"><button class="btn pri" data-act="nbstart" data-set="due" ${due.length?'':'disabled'}>Practise what is due (${due.length})</button><button class="btn" data-act="nbstart" data-set="open" ${open.filter(m=>m.pool).length?'':'disabled'}>Practise all open (${open.filter(m=>m.pool).length})</button></div>
-  
-   <div class="nbfilters stack" style="gap:10px"><h3>Filter</h3>${sel('sec','Section',uniq(m=>m.sec),nb.sec)}${sel('topic','Topic',uniq(m=>m.topic),nb.topic)}
-    <label class="field" style="min-width:0;width:100%"><span class="sub">Last result</span><select data-nb="reason"><option value="all">All</option><option value="wrong"${nb.reason==='wrong'?' selected':''}>Wrong</option><option value="skipped"${nb.reason==='skipped'?' selected':''}>Left blank</option><option value="correct"${nb.reason==='correct'?' selected':''}>Correct last time</option></select></label>
-    ${nb.tab==='open'?`<button class="btn" data-act="nbstart" data-set="filtered" ${ok.length?'':'disabled'}>Practise these (${ok.length})</button>`:''}</div>
-   ${list.length&&nb.tab!=='discarded'?`<div class="row" style="margin:0;gap:8px"><span class="sub" style="font-size:12.5px">For the ${list.length} shown:</span>${nb.tab==='open'?`<button class="btn sm" data-act="nbbulk" data-op="learned">Mark learned</button>`:''}<button class="btn sm danger" data-act="nbbulk" data-op="discard">Discard</button></div>`:''}
+   <div class="nbhero"><div class="nbbig ${due.length?'bad':''}">${due.length}</div><div><b>due for review</b><div class="sub">${open.length} open · ${mast.length} mastered</div></div></div>
+   <div class="bar" title="${mast.length} of ${total} mastered"><i style="width:${total?Math.round(mast.length/total*100):0}%;background:var(--good)"></i></div>
+   <div class="stack" style="gap:8px"><button class="btn pri" data-act="nbstart" data-set="due" ${due.length?'':'disabled'}>Practise what is due (${due.length})</button><button class="btn" data-act="nbstart" data-set="open" ${open.filter(m=>m.pool).length?'':'disabled'}>Practise all open (${open.filter(m=>m.pool).length})</button></div>
+   <div class="nbphrow"><button class="btn sm" data-act="revision">Revision sheet</button><button class="btn sm" data-act="weak">Weak areas</button></div>
+   <details class="hdet2"><summary>How it works</summary><div class="sub" style="margin-top:6px">Every question you got wrong or left blank lands here. It comes back for another try ${REVIEW_DAYS} days after you last saw it, and leaves the open list once you answer it correctly ${NEED_RIGHT} times in a row (the dots). Re-attempts from a DPP or a full paper count automatically.</div></details>
   </div>
-  <div class="panel">
-   <div class="seg" style="margin-bottom:12px"><button class="${nb.tab==='open'?'on':''}" data-act="nbtab" data-v="open">Open (${open.length})</button><button class="${nb.tab==='mastered'?'on':''}" data-act="nbtab" data-v="mastered">Mastered (${mast.length})</button>${dis.length?`<button class="${nb.tab==='discarded'?'on':''}" data-act="nbtab" data-v="discarded">Discarded (${dis.length})</button>`:''}</div>
-   ${list.length?list.map(row).join(''):`<p class="sub">${all.length||dis.length?'Nothing matches these filters.':'No mistakes recorded yet. Finish an attempt, or log a past one, and the wrong and blank questions show up here.'}</p>`}
+  <div class="panel nbmainp">
+   <div class="nbbar"><div class="seg"><button class="${nb.tab==='open'?'on':''}" data-act="nbtab" data-v="open">Open <small>${open.length}</small></button><button class="${nb.tab==='mastered'?'on':''}" data-act="nbtab" data-v="mastered">Mastered <small>${mast.length}</small></button>${dis.length?`<button class="${nb.tab==='discarded'?'on':''}" data-act="nbtab" data-v="discarded">Discarded <small>${dis.length}</small></button>`:''}</div>
+    <div class="nbtools">${sel('sec','All sections',uniq(m=>nbArea(m)),nb.sec)}${msel('nb','topics',uniq(m=>m.topic,nb.sec),nb.topics)}<select class="nbsel" data-nb="reason" aria-label="Last result"><option value="all">Any result</option><option value="wrong"${nb.reason==='wrong'?' selected':''}>Wrong</option><option value="skipped"${nb.reason==='skipped'?' selected':''}>Left blank</option><option value="correct"${nb.reason==='correct'?' selected':''}>Correct last time</option></select>
+     <select class="nbsel" data-nb="sort" aria-label="Sort"><option value="due">Sort: due first</option><option value="topic"${nb.sort==='topic'?' selected':''}>Sort: by topic</option></select></div></div>
+   ${filtered&&list.length?`<div class="nbact"><span class="sub">${list.length} shown</span>${nb.tab==='open'?`<button class="btn sm pri" data-act="nbstart" data-set="filtered" ${ok.length?'':'disabled'}>Practise these (${ok.length})</button><button class="btn sm" data-act="nbbulk" data-op="learned">Mark learned</button>`:''}${nb.tab!=='discarded'?`<button class="btn sm danger" data-act="nbbulk" data-op="discard">Discard</button>`:''}${nb.tab!=='discarded'?'<button class="btn sm pri" data-act="nbnotes">Generate revision notes</button>':''}<button class="btn sm" data-act="nbreset">Clear filters</button></div>`:''}
+   ${list.length?body:`<p class="sub">${all.length||dis.length?'Nothing matches these filters.':'No mistakes recorded yet. Finish an attempt, or log a past one, and the wrong and blank questions show up here.'}</p>${filtered?'<button class="btn sm" data-act="nbreset">Clear filters</button>':''}`}
   </div></div>${footerHtml()}</div>`;
 }
 /* ---- weak areas ---- */
@@ -2800,7 +2852,8 @@ function buildWeak(topics,count,perq,title,secName){
 Object.assign(acts,{
   notebook(){V.nb=null;go('notebook')},
   weak(){V.wk=null;go('weak')},
-  nbtab(t){V.nb.tab=t.dataset.v;V.nb.sec='all';V.nb.topic='all';V.nb.reason='all';renderNotebook()},
+  nbreset(){V.nb.sec='all';V.nb.topics=[];V.nb.reason='all';renderNotebook()},
+  nbtab(t){V.nb.tab=t.dataset.v;V.nb.sec='all';V.nb.topics=[];V.nb.reason='all';renderNotebook()},
   nbstart(t){
     const w=t.dataset.set,all=mistakeItems().filter(m=>m.pool&&!m.mastered);
     const src=w==='due'?all.filter(m=>m.due):(w==='filtered'?nbFiltered().filter(m=>m.pool):all);
@@ -2811,7 +2864,7 @@ Object.assign(acts,{
 });
 app.addEventListener('change',e=>{
   const t=e.target;
-  if(V.view==='notebook'&&V.nb&&t.dataset.nb){V.nb[t.dataset.nb]=t.value;renderNotebook();return}
+  if(V.view==='notebook'&&V.nb&&t.dataset.nb){V.nb[t.dataset.nb]=t.value;if(t.dataset.nb==='sec')V.nb.topics=[];renderNotebook();return}
   if(V.view==='weak'&&V.wk){
     if(t.dataset.wk!=null){t.checked?V.wk.sel.add(t.dataset.wk):V.wk.sel.delete(t.dataset.wk);renderWeak()}
     else if(t.id==='wkcount'){V.wk.count=Math.max(3,Math.min(100,parseInt(t.value)||15));renderWeak()}
@@ -2847,7 +2900,7 @@ function catRow(p){
   return `<div class="prow"><div class="pmain" style="min-width:0">${titleCell(p)}
    <div class="sub" style="font-size:12px;margin-top:2px">${meta} · ${a.length?a.length+' attempt'+(a.length>1?'s':'')+' · last '+r1(last.score)+'/'+last.max:'not attempted'}</div></div>
    <div class="pbtn"><button class="btn pri sm" data-act="start" data-id="${p.id}">Start</button>${a.length?`<button class="btn sm" data-act="paperan" data-id="${p.id}">Analysis</button>`:''}
-    <details class="more"><summary class="btn sm" aria-label="More actions">⋯</summary><div class="menu"><button class="btn sm" data-act="rename" data-id="${p.id}">Rename</button><button class="btn sm" data-act="pctl" data-id="${p.id}">${p.pct&&p.pct.length?'Percentile ✓':'Percentile'}</button><button class="btn sm" data-act="expjson" data-id="${p.id}">Export JSON</button>${p.derived?'':`${p.sections.length>1?`<button class="btn sm" data-act="mksec" data-id="${p.id}">Make sectional mocks</button>`:''}<button class="btn sm" data-act="mkmicro" data-id="${p.id}">Make micro mocks</button>`}<button class="btn sm" data-act="logpast" data-id="${p.id}">Log past attempt</button><button class="btn sm danger" data-act="delpaper" data-id="${p.id}">Delete</button></div></details></div>
+    <details class="more"><summary class="btn sm" aria-label="More actions">⋯</summary><div class="menu"><button class="btn sm" data-act="rename" data-id="${p.id}">Rename</button><button class="btn sm" data-act="pctl" data-id="${p.id}">${p.pct&&p.pct.length?'Percentile ✓':'Percentile'}</button><button class="btn sm" data-act="expjson" data-id="${p.id}">Export JSON</button><button class="btn sm" data-act="exppa" data-id="${p.id}">Analysis PDF</button>${p.derived?'':`${p.sections.length>1?`<button class="btn sm" data-act="mksec" data-id="${p.id}">Make sectional mocks</button>`:''}<button class="btn sm" data-act="mkmicro" data-id="${p.id}">Make micro mocks</button>`}<button class="btn sm" data-act="logpast" data-id="${p.id}">Log past attempt</button><button class="btn sm danger" data-act="delpaper" data-id="${p.id}">Delete</button></div></details></div>
    <div class="pctl"><label class="sub" style="display:flex;gap:6px;align-items:center;font-size:12px">Category <select class="tag" data-mvc="${p.id}">${opt('full','Full syllabus',c)}${opt('sectional','Sectional',c)}${opt('topic','Topic-wise',c)}${opt('drill','Drill',c)}</select></label>
    ${c!=='full'?`<label class="sub" style="display:flex;gap:6px;align-items:center;font-size:12px">Area <select class="tag" data-mva="${p.id}">${opt('','Auto ('+(AREA_LABEL[paperArea(Object.assign({},p,{area:''}))]||'unsorted')+')',ar)}${AREAS.map(x=>opt(x,AREA_LABEL[x],ar)).join('')}</select></label>`:''}</div></div>`;
 }
@@ -2978,7 +3031,7 @@ document.addEventListener('click',e=>{
   const sm=e.target.closest&&e.target.closest('summary');
   if(!sm||document.body.classList.contains('exam-on'))return;
   const d=sm.parentElement;
-  if(!d||d.tagName!=='DETAILS'||d.classList.contains('more')||!d.animate)return;
+  if(!d||d.tagName!=='DETAILS'||d.classList.contains('more')||d.classList.contains('msel')||!d.animate)return;
   if(matchMedia('(prefers-reduced-motion:reduce)').matches)return;
   e.preventDefault();
   if(d._a){try{d._a.cancel()}catch(x){}}(d._ca||[]).forEach(x=>{try{x.cancel()}catch(y){}});d._ca=[];
@@ -2989,9 +3042,9 @@ document.addEventListener('click',e=>{
   else{d.open=false;end=d.getBoundingClientRect().height;d.open=true;void d.offsetHeight;B.classList.remove('notrans');d.classList.add('closing')}
   d.style.overflow='hidden';
   const done=()=>{(d._ca||[]).forEach(x=>{try{x.cancel()}catch(y){}});d._ca=[];d._a=null;d.style.overflow='';d.classList.remove('closing');if(!opening)d.open=false};
-  const a=d._a=d.animate([{height:start+'px'},{height:end+'px'}],{duration:420,easing:'cubic-bezier(.2,0,0,1)'});
+  const a=d._a=d.animate([{height:start+'px'},{height:end+'px'}],{duration:300,easing:'cubic-bezier(.2,0,0,1)'});
   a.onfinish=done;a.oncancel=()=>{d.style.overflow=''};
-  [...d.children].forEach(c=>{if(c!==sm&&c.animate)d._ca.push(c.animate(opening?[{opacity:0,transform:'translateY(-6px)',filter:'blur(12px)'},{opacity:1,transform:'none',filter:'blur(0)'}]:[{opacity:1,filter:'blur(0)'},{opacity:0,filter:'blur(12px)'}],{duration:opening?340:200,easing:'ease-out',delay:opening?170:0,fill:opening?'backwards':'forwards'}))});
+  [...d.children].forEach(c=>{if(c!==sm&&c.animate)d._ca.push(c.animate(opening?[{opacity:0,transform:'translateY(-6px)',filter:'blur(12px)'},{opacity:1,transform:'none',filter:'blur(0)'}]:[{opacity:1,filter:'blur(0)'},{opacity:0,filter:'blur(12px)'}],{duration:opening?260:160,easing:'ease-out',delay:opening?100:0,fill:opening?'backwards':'forwards'}))});
 },true);
 
 /* ---------- attempt history sheet ---------- */
@@ -3792,6 +3845,13 @@ async function saveBinFile(name,bytes,mime){
 }
 function cxExportIds(){const s=cxState().sel;if(!s.size){toast('Tick at least one attempt first');return null}return s}
 Object.assign(acts,{
+  async exppa(t){
+    const ids=new Set(store.attempts.filter(a=>a.paperId===t.dataset.id).map(a=>a.id));
+    if(!ids.size){toast('No attempts of this paper yet');return}
+    const pp=store.papers.find(x=>x.id===t.dataset.id);
+    try{const r=pdfBuild(aiReportText(ids,(cxState().rd)||'short'),'CAT Mock Desk report');
+      await saveBinFile(safeName(pp?pp.title:'paper')+' - analysis.pdf',r.bytes,'application/pdf')}catch(e){toast('Could not build the report')}
+  },
   cxlevel(t){const st=cxState();st.rd=t.dataset.v;document.querySelectorAll('#cxlvl .chip').forEach(c=>c.classList.toggle('on',c.dataset.v===st.rd))},
   async cxpdf(){const ids=cxExportIds();if(!ids)return;
     try{const t=aiReportText(ids),r=pdfBuild(t,'CAT Mock Desk report');
@@ -3801,5 +3861,281 @@ Object.assign(acts,{
   async cxcopy(){const ids=cxExportIds();if(!ids)return;
     try{await navigator.clipboard.writeText(aiReportText(ids));toast('Report copied - paste it into any AI')}catch(e){toast('Copy blocked here. Use the text or PDF button.')}}
 });
+</script>
+
+<script>
+'use strict';
+/* ---------- in-screen content transitions: tabs, filters and switches inside a section ---------- */
+(function(){
+  const SW=new Set(['tab','filter','secfilter','ctab','carea','cxcat','cxarea','nbtab','mode','scope','addcat','grp','group','grptopic','tsec','subsec','subtest','pbsrc','cbcat','nbone','wkone']);
+  let busy=0;
+  function targets(){
+    const w=app.firstElementChild;if(!w)return [];
+    const out=[];
+    const cx=document.getElementById('cxres');if(cx)return [cx];
+    [...w.children].forEach(c=>{
+      if(c.matches('.top,.tabs,header,.hm-head'))return;
+      if(/grid/.test(c.className)){[...c.children].forEach(k=>{if(!/side/.test(k.className))out.push(k)})}
+      else out.push(c);
+    });
+    return out;
+  }
+  function flat(){const o=[];targets().forEach(el=>{const f=el.firstElementChild;if(f&&f.matches('.seg,.tabs')){[...el.children].forEach(k=>{if(!k.matches('.seg,.tabs'))o.push(k)})}else o.push(el)});return o}
+  const ok=()=>!document.body.classList.contains('exam-on')&&!matchMedia('(prefers-reduced-motion:reduce)').matches;
+  const E='cubic-bezier(.2,0,0,1)';
+  function playIn(){
+    if(!ok())return;
+    flat().forEach(el=>{if(!el.animate)return;try{el.animate([{opacity:0,transform:'translateY(12px) scale(.992)',filter:'blur(14px)'},{opacity:1,transform:'none',filter:'blur(0)'}],{duration:420,easing:E})}catch(e){}});
+  }
+  let lock=false,pend=false;
+  /* bubble phase, registered after the app's own handler: the new DOM is animated in the same task, so no unblurred frame is ever painted */
+  app.addEventListener('click',()=>{if(pend){pend=false;playIn()}});
+  app.addEventListener('change',()=>{if(pend){pend=false;playIn()}});
+  app.addEventListener('click',e=>{
+    const b=e.target.closest&&e.target.closest('[data-act]');
+    if(!b||!SW.has(b.dataset.act)||b.dataset.act==='nbone'||b.dataset.act==='wkone')return;
+    if(b.__go){b.__go=0;pend=true;return}
+    if(!ok())return;
+    const t=flat().filter(el=>el.animate);if(!t.length)return;
+    e.stopImmediatePropagation();e.preventDefault();
+    if(lock)return;lock=true;
+    let n=t.length;const fin=()=>{if(--n>0)return;lock=false;b.__go=1;b.click()};
+    t.forEach(el=>{try{const an=el.animate([{opacity:1,filter:'blur(0)'},{opacity:0,filter:'blur(12px)'}],{duration:170,easing:'ease-in',fill:'forwards'});an.onfinish=fin;an.oncancel=fin}catch(x){fin()}});
+  },true);
+  app.addEventListener('change',e=>{if(e.target.matches&&e.target.matches('select')&&ok())pend=true},true);
+
+  /* home buttons: blur the home screen out, then open the screen (which blurs in via go()) */
+  let hl=false;
+  app.addEventListener('click',e=>{
+    if(V.view!=='home'||!ok())return;
+    const b=e.target.closest&&e.target.closest('.hm-quick [data-act],.hm-cats [data-act],.hm-hero [data-act],.hm-alert');
+    if(!b)return;
+    if(b.__hgo){b.__hgo=0;return}
+    const w=app.querySelector('.wrap');if(!w||!w.animate)return;
+    e.stopImmediatePropagation();e.preventDefault();
+    if(hl)return;hl=true;
+    const fin=()=>{hl=false;b.__hgo=1;b.click()};
+    try{const an=w.animate([{opacity:1,filter:'blur(0)',transform:'none'},{opacity:0,filter:'blur(12px)',transform:'scale(.985)'}],{duration:170,easing:'ease-in',fill:'forwards'});an.onfinish=fin;an.oncancel=fin}catch(x){fin()}
+  },true);
+})();
+</script>
+
+<script>
+'use strict';
+/* ===== Revision sheet: wrong / skipped questions grouped by topic, with AI concept notes ===== */
+const RV={show:'open',sec:'all',topics:[],reason:'all',busy:{}};
+const rvFiltered=()=>RV.sec!=='all'||RV.topics.length>0||RV.reason!=='all';
+const rvBase=()=>mistakeItems().filter(m=>RV.show==='all'||!m.mastered);
+const rvPass=m=>(RV.sec==='all'||nbArea(m)===RV.sec)&&(!RV.topics.length||RV.topics.includes(m.topic))&&(RV.reason==='all'||m.last.st===RV.reason);
+const rvId=t=>'rev:'+String(t).toLowerCase().replace(/[^a-z0-9]+/g,'-');
+const rvDoc=t=>store.notes.find(n=>n.id===rvId(t));
+function rvSave(t,patch){let d=rvDoc(t);if(!d)d={id:rvId(t),kind:'note',type:'revnote',topic:t,created:Date.now()};Object.assign(d,patch);store.save(d);return d}
+function rvStem(q){return q?String(q.text||'').replace(/^Directions:.*?\n\n/s,'').replace(/\s+/g,' ').trim():''}
+function rvTags(){const m={};[...store.attempts].sort((a,b)=>a.date-b.date).forEach(a=>{const P=store.papers.find(x=>x.id===a.paperId);a.qs.forEach(x=>{const t=(a.tags||{})[x.id];if(!t)return;const q=P&&P.questions[x.n-1];m[(q&&q.srcKey)||(a.paperId+':'+x.id)]=t})});return m}
+function rvGroups(){
+  const tags=rvTags(),g={};
+  rvBase().filter(rvPass).forEach(m=>{
+    const G=g[m.topic]||(g[m.topic]={topic:m.topic,items:[],wrong:0,blank:0,open:0,subs:{},tags:{},secs:new Set(),tm:0,tn:0});
+    G.items.push(m);if(!m.mastered)G.open++;
+    if(m.last.st==='wrong')G.wrong++;else if(m.last.st==='skipped')G.blank++;
+    if(m.sub)G.subs[m.sub]=(G.subs[m.sub]||0)+1;
+    const t=tags[m.key];if(t)G.tags[t]=(G.tags[t]||0)+1;
+    if(nbArea(m))G.secs.add(nbArea(m));
+    const tt=m.ev.filter(e=>e.time!=null).map(e=>e.time);if(tt.length){G.tm+=tt.reduce((a,b)=>a+b,0)/tt.length;G.tn++}
+  });
+  return Object.values(g).map(G=>{G.items.sort((a,b)=>(b.wrongs-a.wrongs)||(a.mastered-b.mastered));return G}).sort((a,b)=>(b.open-a.open)||(b.items.length-a.items.length));
+}
+const rvList=o=>Object.entries(o).sort((a,b)=>b[1]-a[1]).map(e=>e[0]+' ('+e[1]+')').join(', ');
+function rvPrompt(G){
+  const pick=G.items.slice(0,G.cap||12),clip=(x,n)=>{x=String(x||'').replace(/\s+/g,' ').trim();return x.length>n?x.slice(0,n)+'…':x};
+  const qs=pick.map((m,i)=>{const q=m.pool&&m.pool.q;
+    return `Q${i+1} [${nbArea(m)||''}${m.sub?' > '+m.sub:''}] missed ${m.wrongs}x, last time ${m.last.st}${m.ev.length&&m.ev[m.ev.length-1].time?' in '+Math.round(m.ev[m.ev.length-1].time)+'s':''}\n`+(q?`${q.passage?'Passage (start): '+clip(q.passage,300)+'\n':''}Question: ${clip(q.text,500)}\n`+(q.type==='mcq'?q.options.map((o,k)=>String.fromCharCode(65+k)+'. '+clip(o,120)).join('\n')+'\nCorrect: '+String.fromCharCode(65+q.ai)+'\n':'Correct answer: '+correctText(q)+'\n')+(q.solution?'Official solution: '+clip(q.solution,400)+'\n':''):'(question text not available)\n')}).join('\n');
+  return `You are a CAT (India) coach. A student keeps getting questions wrong or skipping them in ${G.multi?'this set of topics':'the topic'} "${G.topic}"${G.secs.size?' ('+[...G.secs].join(' / ')+')':''}. Marking: +3 correct, -1 wrong MCQ, no negative on type-in answers.
+Write a thorough but scannable revision sheet the student will reread before the next mock. Cover the whole topic as CAT tests it (not just the questions below), and use the missed questions to decide what to stress. Plain text with markdown headings and bullet lists, no preamble, about 700 words. Use these headings (for a verbal topic such as RC or para jumbles, adapt them to strategy, elimination rules and trap-option types instead of formulas):
+## Formula sheet by situation
+(at least 8 formulas, grouped by situation, each as "When ... use ...", including the common variants)
+## Shortcuts and tricks
+(at least 5 named shortcuts. For each: when it applies, the method, and one tiny worked example with numbers)
+## If the question says... then do...
+(6 to 8 quick situation-to-method rules)
+## Question patterns to recognise
+## Where I am going wrong (base this on the questions below${Object.keys(G.tags).length?'; the student tagged their own reasons as: '+rvList(G.tags):''})
+## Sanity checks and option elimination
+## Quick self-test (4 short practice prompts, no answers)
+${G.multi?'This note covers several topics: organise every section by topic, with a short topic subheading inside each section, and give each topic its own formulas and shortcuts. ':""}Write every formula in LaTeX between single dollar signs, for example $D = S \times T$ or $\frac{a}{b}$. Keep each formula simple and on its own line or bullet. Stats: ${G.items.length} questions in this topic need work (${G.wrong} wrong, ${G.blank} left blank last time).${Object.keys(G.subs).length?' Sub-topics: '+rvList(G.subs)+'.':''}
+
+THE STUDENT'S MISSED QUESTIONS
+${qs}`;
+}
+function rvSubs(g){
+  const e=Object.entries(g.subs).sort((a,b)=>b[1]-a[1]);if(!e.length)return '';
+  const top=e.slice(0,3).map(x=>esc(x[0])+' ('+x[1]+')').join(', ');
+  return 'Mostly: '+top+(e.length>3?` <details class="rvmore"><summary>+${e.length-3} more sub-topics</summary>${esc(e.slice(3).map(x=>x[0]+' ('+x[1]+')').join(', '))}</details>`:'')+'<br>';
+}
+function rvNoteHtml(G){
+  const d=rvDoc(G.topic);
+  return d&&d.ai?`<div class="rvmd">${md(d.ai)}</div><div class="sub" style="font-size:12px">AI note saved ${fmtDate(d.aiAt||d.created)}${d.n?' from '+d.n+' questions':''}</div>`:`<div class="sub">No AI note yet. Generate one to get formulas, patterns and traps for this topic.</div>`;
+}
+function renderRevision(){
+  if(RV.auto){RV.auto=false;setTimeout(()=>{if(V.view==='revision')rvGenSel()},450)}
+  const G=rvGroups(),tot=G.reduce((s,x)=>s+x.items.length,0),open=G.reduce((s,x)=>s+x.open,0);
+  const row=m=>{const it=m.pool,q=it&&it.q,st=rvStem(q).slice(0,150);
+    const pill=m.last.st==='correct'?'<span class="pill correct">Correct last time</span>':`<span class="pill ${m.last.st}">${m.last.st==='wrong'?'Wrong':'Left blank'} last time</span>`;
+    return `<details class="rev"><summary><span class="qn">${it?esc(it.sec)+' '+(it.i+1):'—'}</span><span class="qt">${q?stepHtml(st):esc(m.title)}</span>${pill}</summary><div class="revbody">
+      <div class="sub">${esc(m.sub||m.topic)} · ${it?esc(it.p.title):esc(m.title)} · missed ${m.wrongs}x · ${esc(dueLabel(m))}</div>
+      ${q?`${q.passage?`<details><summary>Show passage</summary><div class="sol" style="max-height:360px;overflow:auto;font-family:var(--f-serif)">${richText(q.passage)}</div></details>`:''}<div style="white-space:pre-wrap;font-family:var(--f-serif)">${richText(q.text)}</div>${q.type==='mcq'?`<div class="opts">${q.options.map((o,k)=>`<div class="${k===q.ai?'c':''}">${String.fromCharCode(65+k)}. ${stepHtml(o)}</div>`).join('')}</div>`:`<div><b>Answer:</b> ${esc(correctText(q))}</div>`}${q.solution?solBlock(q.solution):''}`:'<div class="sub">The paper was deleted, so the question text is not available.</div>'}</div></details>`};
+  const panel=g=>{const d=rvDoc(g.topic);return `<section class="panel stack rvp" data-topic="${esc(g.topic)}">
+    <div class="row" style="gap:8px;align-items:center;flex-wrap:wrap"><h2 style="margin:0">${esc(g.topic)}</h2><span class="chip">${g.open} open</span><span class="chip">${g.wrong} wrong</span><span class="chip">${g.blank} blank</span></div>
+    <div class="sub" style="font-size:13px">${rvSubs(g)}${Object.keys(g.tags).length?'Your reasons: '+esc(rvList(g.tags))+'<br>':''}${g.tn?'Avg time on these: '+fmtT0(g.tm/g.tn)+' per question':''}</div>
+    <div class="rvnote">${rvNoteHtml(g)}</div>
+    <div class="row" style="gap:8px;align-items:center"><button class="btn sm pri" data-act="rvai" data-t="${esc(g.topic)}">${d&&d.ai?'Regenerate AI note':'Generate AI concept note'}</button><span class="sub rvst" style="font-size:12px"></span></div>
+    <label class="field"><span class="sub">My note (saved automatically)</span><textarea data-rvmine="${esc(g.topic)}" rows="3" placeholder="Write the trick or formula you want to remember">${esc((d&&d.mine)||'')}</textarea></label>
+    <details class="pdet"><summary>Questions (${g.items.length})</summary><div class="stack" style="gap:8px;margin-top:6px">${g.items.map(row).join('')}</div></details></section>`};
+  app.innerHTML=`<div class="wrap"><div class="top"><div class="brand">Revision sheet<small>${tot} question${tot===1?'':'s'} across ${G.length} topic${G.length===1?'':'s'} · ${open} still open</small></div><div class="row"><button class="btn sm" data-act="notebook">Notebook</button><button class="btn sm" data-act="home">Back</button></div></div>
+   <div class="panel stack">${rvFilterBar()}<div class="row" style="gap:8px;align-items:center;flex-wrap:wrap"><span class="sub" style="font-size:12px">Show</span><button class="chip ${RV.show==='open'?'on':''}" data-act="rvshow" data-v="open">Still open</button><button class="chip ${RV.show==='all'?'on':''}" data-act="rvshow" data-v="all">Including mastered</button></div>
+    <div class="row" style="gap:8px;flex-wrap:wrap"><button class="btn sm pri" data-act="rvall" ${G.length?'':'disabled'}>${rvFiltered()?'Generate a note for each topic shown':'Generate AI notes for all topics'}</button><button class="btn sm" data-act="rvpdf" ${G.length?'':'disabled'}>Download PDF</button><button class="btn sm" data-act="rvtxt" ${G.length?'':'disabled'}>Text (.md)</button><button class="btn sm" data-act="rvcopy" ${G.length?'':'disabled'}>Copy</button></div>
+    <div class="sub" style="font-size:12px">AI notes are written once per topic from your missed questions, saved here, and included in the exports. ${DESK?'Uses the AI provider and key set in the Analysis AI tab.':'Uses the built-in Claude analysis when available; otherwise copy the text export into any AI.'}</div></div>
+   ${rvSelPanel(G)}
+   ${G.length?`<div class="rvgrid">${G.map(panel).join('')}</div>`:'<div class="panel"><p class="sub">Nothing to revise yet. Questions you get wrong or leave blank in a test will collect here, grouped by topic.</p></div>'}</div>`;
+}
+function revisionText(){
+  const G=rvGroups(),L=[];
+  L.push('# CAT MOCK DESK - REVISION SHEET');
+  L.push('Generated: '+new Date().toLocaleString()+' | Topics: '+G.length+' | Questions: '+G.reduce((s,x)=>s+x.items.length,0));
+  L.push('Questions the student got wrong or left blank, grouped by topic, with revision notes. Use it to revise, and ask for more practice on the weakest topics.');
+  G.forEach(g=>{const d=rvDoc(g.topic);L.push('');L.push('='.repeat(100));L.push('## '+g.topic+'  ('+g.open+' open, '+g.wrong+' wrong, '+g.blank+' blank)');
+    if(Object.keys(g.subs).length)L.push('Sub-topics: '+rvList(g.subs));if(Object.keys(g.tags).length)L.push('Own reasons: '+rvList(g.tags));
+    if(d&&d.ai){L.push('');L.push('AI concept note:');L.push(d.ai)}
+    if(d&&d.mine){L.push('');L.push('My note: '+d.mine)}
+    L.push('');L.push('### Questions');
+    g.items.forEach(m=>{const q=m.pool&&m.pool.q;L.push('');L.push(`[${nbArea(m)||''} ${m.pool?m.pool.i+1:''}] ${m.last.st.toUpperCase()} last time | missed ${m.wrongs}x | ${m.sub||''} | ${m.pool?m.pool.p.title:m.title}`);
+      if(q){if(q.passage)L.push('  Passage (start): '+String(q.passage).replace(/\s+/g,' ').slice(0,200));L.push('  Q: '+rvStem(q).slice(0,320));
+        L.push('  Correct: '+correctText(q).replace(/\s+/g,' ').slice(0,160));if(q.solution)L.push('  Solution: '+String(q.solution).replace(/\s+/g,' ').slice(0,260))}});
+  });
+  return L.join('\n');
+}
+async function rvGen(t,box){
+  const g=rvGroups().find(x=>x.topic===t)||(()=>{const prev=RV.show;RV.show='all';const r=rvGroups().find(x=>x.topic===t);RV.show=prev;return r})();
+  if(!g)return false;
+  const p=document.querySelector(`.rvp[data-topic="${CSS.escape(t)}"]`),st=p&&p.querySelector('.rvst'),btn=p&&p.querySelector('[data-act=rvai]');
+  if(st)st.textContent='Writing the note…';if(btn)btn.disabled=true;RV.busy[t]=1;
+  try{
+    if(DESK&&typeof aiLoad==='function'&&!AIS.loaded)await aiLoad();
+    const txt=String(await aiAsk(rvPrompt(g))||'').trim();
+    if(!txt)throw new Error('The AI returned an empty answer.');
+    rvSave(t,{ai:txt,aiAt:Date.now(),n:Math.min(12,g.items.length)});
+    const nb=p&&p.querySelector('.rvnote');if(nb){nb.innerHTML=rvNoteHtml(g);if(nb.animate)nb.animate([{opacity:0,filter:'blur(10px)'},{opacity:1,filter:'blur(0)'}],{duration:420,easing:'cubic-bezier(.2,0,0,1)'})}
+    if(btn)btn.textContent='Regenerate AI note';if(st)st.textContent='Saved';return true;
+  }catch(e){if(st)st.textContent=String((e&&e.message)||e).slice(0,160);return false}
+  finally{if(btn)btn.disabled=false;delete RV.busy[t]}
+}
+Object.assign(acts,{
+  revision(){go('revision')},
+  rvshow(t){RV.show=t.dataset.v;renderRevision()},
+  async rvai(t){await rvGen(t.dataset.t)},
+  async rvall(t){const gs=rvGroups();let ok=0,i=0;t.disabled=true;
+    for(const g of gs){i++;toast(`Writing note ${i} of ${gs.length}: ${g.topic}`);if(await rvGen(g.topic))ok++;else break}
+    t.disabled=false;toast(ok===gs.length?'All topic notes are ready':`${ok} of ${gs.length} notes written. Check the message on the topic that stopped.`)},
+  async rvpdf(){try{const r=pdfBuild(revisionText(),'CAT Mock Desk revision sheet');await saveBinFile('CAT-revision-sheet.pdf',r.bytes,'application/pdf')}catch(e){toast('Could not build the sheet')}},
+  async rvtxt(){try{await saveTextFile('CAT-revision-sheet.md',revisionText(),'text/markdown')}catch(e){toast('Could not build the sheet')}},
+  async rvcopy(){try{await navigator.clipboard.writeText(revisionText());toast('Revision sheet copied')}catch(e){toast('Copy blocked here. Use the text or PDF button.')}}
+});
+app.addEventListener('change',e=>{const ta=e.target.closest&&e.target.closest('textarea[data-rvmine]');if(ta)rvSave(ta.dataset.rvmine,{mine:ta.value})});
+{const _r=render;render=function(){if(V.view==='revision')return renderRevision();return _r.apply(this,arguments)}}
+</script>
+
+<script>
+'use strict';
+/* ===== AI answers often contain LaTeX; turn it into readable plain text ===== */
+function texClean(t){
+  const SUP={0:'⁰',1:'¹',2:'²',3:'³',4:'⁴',5:'⁵',6:'⁶',7:'⁷',8:'⁸',9:'⁹','+':'⁺','-':'⁻','n':'ⁿ'},SUB={0:'₀',1:'₁',2:'₂',3:'₃',4:'₄',5:'₅',6:'₆',7:'₇',8:'₈',9:'₉'};
+  const conv=(x,M,pre)=>{x=String(x).trim();return x&&[...x].every(c=>M[c])?[...x].map(c=>M[c]).join(''):pre+'('+x+')'};
+  const subOnly=(x)=>{x=String(x).trim();return x&&[...x].every(c=>SUB[c])?[...x].map(c=>SUB[c]).join(''):'_'+x};
+  let s=String(t==null?'':t);
+  if(!/[\\$^_*]/.test(s))return s;
+  s=s.replace(/\$\$([\s\S]+?)\$\$/g,'$1').replace(/\\\(([\s\S]+?)\\\)/g,'$1').replace(/\\\[([\s\S]+?)\\\]/g,'$1').replace(/\$([^$\n]{1,200}?)\$/g,'$1');
+  for(let i=0;i<3;i++)s=s.replace(/\\(?:text|mathrm|textbf|mathbf|operatorname)\{([^{}]*)\}/g,'$1').replace(/\\frac\{([^{}]+)\}\{([^{}]+)\}/g,'($1)/($2)').replace(/\\sqrt\{([^{}]+)\}/g,'√($1)');
+  const MAP={times:'×',div:'÷',cdot:'·',Delta:'Δ',delta:'δ',le:'≤',leq:'≤',ge:'≥',geq:'≥',neq:'≠',ne:'≠',approx:'≈',pm:'±',rightarrow:'→',to:'→',Rightarrow:'⇒',pi:'π',infty:'∞',theta:'θ',alpha:'α',beta:'β',sum:'Σ',degree:'°',circ:'°',left:'',right:'',quad:' ',qquad:'  ',ldots:'…',dots:'…',cap:'∩',cup:'∪',in:'∈'};
+  s=s.replace(/\\([a-zA-Z]+)/g,(m,c)=>c in MAP?MAP[c]:c).replace(/\\([%&_#{}])/g,'$1').replace(/\\[,;:! ]/g,' ');
+  s=s.replace(/\^\{([^{}]+)\}/g,(m,x)=>conv(x,SUP,'^')).replace(/\^([0-9n])(?![0-9a-zA-Z])/g,(m,x)=>SUP[x]).replace(/_\{([^{}]+)\}/g,(m,x)=>subOnly(x)).replace(/([A-Za-z])_([0-9])/g,(m,a,d)=>a+SUB[d]);
+  s=s.replace(/(^|[\s(])\*([^*\s][^*\n]*?[^*\s]|[^*\s])\*(?=[\s).,;:!?]|$)/gm,'$1$2').replace(/\*\*\*/g,'**');
+  return s;
+}
+/* ---- multi-select topic picker (notebook + revision sheet) ---- */
+const MS={open:{},scroll:{}};
+function msel(scope,key,vals,sel){
+  const n=sel.length,lab=n===0?'All topics':n===1?sel[0]:n+' topics';
+  return `<details class="msel" data-ms-scope="${scope}"${MS.open[scope]?' open':''}><summary class="nbsel${n?' on':''}">${esc(lab)}</summary><div class="mspop"><div class="msbar"><button class="btn sm" type="button" data-ms-clear="${scope}"${n?'':' disabled'}>Clear</button><span class="sub" style="font-size:12px">${n?n+' selected':'Tick one or more topics'}</span></div><div class="mslist">${vals.length?vals.map(v=>`<label class="msopt"><input type="checkbox" data-ms="${scope}" value="${esc(v)}"${sel.includes(v)?' checked':''}><span>${esc(v)}</span></label>`).join(''):'<div class="sub" style="padding:8px">No topics here.</div>'}</div></div></details>`;
+}
+function msRender(scope){const l=document.querySelector(`.msel[data-ms-scope="${scope}"] .mslist`);MS.scroll[scope]=l?l.scrollTop:0;if(scope==='nb')renderNotebook();else renderRevision();const n=document.querySelector(`.msel[data-ms-scope="${scope}"] .mslist`);if(n)n.scrollTop=MS.scroll[scope]||0}
+app.addEventListener('change',e=>{const c=e.target.closest&&e.target.closest('input[data-ms]');if(!c)return;const sc=c.dataset.ms,arr=sc==='nb'?V.nb.topics:RV.topics,i=arr.indexOf(c.value);if(c.checked&&i<0)arr.push(c.value);if(!c.checked&&i>=0)arr.splice(i,1);MS.open[sc]=true;msRender(sc)});
+app.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('[data-ms-clear]');if(!b)return;const sc=b.dataset.msClear;(sc==='nb'?V.nb.topics:RV.topics).length=0;MS.open[sc]=true;msRender(sc)});
+app.addEventListener('toggle',e=>{const d=e.target;if(d&&d.classList&&d.classList.contains('msel'))MS.open[d.dataset.msScope]=d.open},true);
+document.addEventListener('click',e=>{document.querySelectorAll('details.msel[open]').forEach(d=>{if(!d.contains(e.target))d.open=false})});
+Object.assign(acts,{
+  nbnotes(){const nb=V.nb;RV.sec=nb.sec;RV.topics=[...nb.topics];RV.reason=nb.reason;RV.show=nb.tab==='mastered'?'all':'open';RV.auto=true;MS.open.rv=false;go('revision')}
+});
+/* ---- revision sheet filters + one combined note for a filtered selection ---- */
+function rvFilterBar(){
+  const base=rvBase(),areas=[...new Set(base.map(nbArea))].sort(),tops=[...new Set(base.filter(m=>RV.sec==='all'||nbArea(m)===RV.sec).map(m=>m.topic))].sort();
+  const o=(v,l,c)=>`<option value="${esc(v)}"${v===c?' selected':''}>${esc(l)}</option>`;
+  return `<div class="nbtools" style="margin-bottom:2px"><select class="nbsel" data-rv="sec" aria-label="Section"><option value="all">All sections</option>${areas.map(a=>o(a,a,RV.sec)).join('')}</select>${msel('rv','topics',tops,RV.topics)}<select class="nbsel" data-rv="reason" aria-label="Last result"><option value="all">Any result</option>${o('wrong','Wrong',RV.reason)}${o('skipped','Left blank',RV.reason)}${o('correct','Correct last time',RV.reason)}</select>${rvFiltered()?'<button class="btn sm" data-act="rvreset">Clear filters</button>':''}</div>`;
+}
+const rvSelKey=()=>'rev:sel:'+[RV.sec,[...RV.topics].sort().join('+'),RV.reason,RV.show].join('|').toLowerCase().replace(/[^a-z0-9|]+/g,'-');
+const rvSelTitle=G=>{const p=[];if(RV.sec!=='all')p.push(RV.sec);if(RV.topics.length)p.push(RV.topics.length>3?RV.topics.length+' topics':RV.topics.join(' + '));if(RV.reason!=='all')p.push({wrong:'wrong',skipped:'left blank',correct:'correct last time'}[RV.reason]);return (p.join(' · ')||'All')+(G.length>1?' ('+G.length+' topics)':'')};
+function rvSelDoc(){return store.notes.find(n=>n.id===rvSelKey())}
+function rvSelPanel(G){
+  if(!rvFiltered()||!G.length)return '';
+  const n=G.reduce((s,x)=>s+x.items.length,0),d=rvSelDoc();
+  return `<section class="panel stack rvsel"><div class="row" style="gap:8px;align-items:center;flex-wrap:wrap"><h2 style="margin:0">Notes for this selection</h2><span class="chip">${esc(rvSelTitle(G))}</span><span class="chip">${n} question${n===1?'':'s'}</span></div>
+   <div class="rvnote">${d&&d.ai?`<div class="rvmd">${md(d.ai)}</div><div class="sub" style="font-size:12px">Saved ${fmtDate(d.aiAt||d.created)}</div>`:'<div class="sub">One combined note for everything shown under the filters above: formulas, shortcuts and patterns, organised by topic.</div>'}</div>
+   <div class="row" style="gap:8px;align-items:center"><button class="btn sm pri" data-act="rvsel">${d&&d.ai?'Regenerate selection note':'Get notes for this selection'}</button><span class="sub rvsst" style="font-size:12px"></span></div></section>`;
+}
+async function rvGenSel(){
+  const G=rvGroups();if(!G.length)return;
+  if(G.length===1){await rvGen(G[0].topic);return}
+  const box=document.querySelector('.rvsel'),st=box&&box.querySelector('.rvsst'),btn=box&&box.querySelector('[data-act=rvsel]');
+  if(st)st.textContent='Writing the note…';if(btn)btn.disabled=true;
+  try{
+    const items=[];const per=Math.max(2,Math.floor(18/G.length));
+    G.forEach(g=>g.items.slice(0,per).forEach(m=>items.push(m)));
+    const tags={},subs={};G.forEach(g=>{Object.entries(g.tags).forEach(([k,v])=>tags[k]=(tags[k]||0)+v)});
+    const S={topic:rvSelTitle(G)+': '+G.map(g=>g.topic+' ('+g.items.length+')').join(', '),items,cap:18,multi:true,tags,subs,secs:new Set(G.flatMap(g=>[...g.secs])),wrong:G.reduce((a,g)=>a+g.wrong,0),blank:G.reduce((a,g)=>a+g.blank,0)};
+    const txt=String(await aiAsk(rvPrompt({...S,items:S.items}))||'').trim();
+    if(!txt)throw new Error('The AI returned an empty answer.');
+    let d=rvSelDoc();if(!d)d={id:rvSelKey(),kind:'note',type:'revnote',topic:rvSelTitle(G),created:Date.now()};
+    Object.assign(d,{ai:txt,aiAt:Date.now(),n:items.length});store.save(d);
+    const nb=box.querySelector('.rvnote');if(nb){nb.innerHTML=`<div class="rvmd">${md(txt)}</div><div class="sub" style="font-size:12px">Saved ${fmtDate(Date.now())}</div>`;if(nb.animate)nb.animate([{opacity:0,filter:'blur(10px)'},{opacity:1,filter:'blur(0)'}],{duration:420,easing:'cubic-bezier(.2,0,0,1)'})}
+    if(btn)btn.textContent='Regenerate selection note';if(st)st.textContent='Saved';
+  }catch(e){if(st)st.textContent=String((e&&e.message)||e).slice(0,160)}
+  finally{if(btn)btn.disabled=false}
+}
+Object.assign(acts,{
+  rvreset(){RV.sec='all';RV.topics=[];RV.reason='all';renderRevision()},
+  async rvsel(){await rvGenSel()}
+});
+app.addEventListener('change',e=>{const t=e.target.closest&&e.target.closest('select[data-rv]');if(!t||V.view!=='revision')return;RV[t.dataset.rv]=t.value;if(t.dataset.rv==='sec')RV.topics=[];renderRevision()});
+{const _rt2=revisionText;revisionText=function(){let t=_rt2();if(rvFiltered()){const G=rvGroups(),d=rvSelDoc();t=t.replace(/\n/,'\nFilter: '+rvSelTitle(G)+'\n')+(d&&d.ai?'\n\n'+'='.repeat(100)+'\n## COMBINED NOTE FOR THIS SELECTION\n'+d.ai:'')}return t}}
+/* ---- real maths rendering with KaTeX (loaded on demand); plain-text fallback when offline ---- */
+const KX={st:0,ver:'0.16.9',cbs:[]};
+function kxLoad(){
+  if(KX.st===2||KX.st===1)return;KX.st=1;
+  try{const l=document.createElement('link');l.rel='stylesheet';l.href='https://cdnjs.cloudflare.com/ajax/libs/KaTeX/'+KX.ver+'/katex.min.css';document.head.appendChild(l)}catch(e){}
+  loadScript('https://cdnjs.cloudflare.com/ajax/libs/KaTeX/'+KX.ver+'/katex.min.js').then(()=>{KX.st=2;KX.cbs.splice(0).forEach(f=>{try{f()}catch(e){}})}).catch(()=>{KX.st=3});
+}
+function mathMd(t){
+  const parts=[];let src=String(t==null?'':t);
+  src=src.replace(/\$\$([\s\S]+?)\$\$|\\\[([\s\S]+?)\\\]|\\\(([\s\S]+?)\\\)|\$([^$\n]{1,300}?)\$/g,(m,d1,d2,i1,i2)=>{const tex=(d1||d2||i1||i2||'').trim(),disp=!!(d1||d2);parts.push({tex,disp});return '@@M'+(parts.length-1)+'@@'});
+  let h=_md0(src);
+  if(!parts.length)return texClean(h);
+  const ready=window.katex&&KX.st===2;if(!ready&&KX.st===0)kxLoad();
+  h=h.replace(/@@M(\d+)@@/g,(m,i)=>{const q=parts[+i];if(!q)return '';
+    if(ready){try{return window.katex.renderToString(q.tex,{throwOnError:false,displayMode:q.disp,output:'html'})}catch(e){}}
+    return '<span class="mfb">'+esc(texClean('$'+q.tex+'$'))+'</span>'});
+  if(!ready&&parts.length)KX.cbs.push(()=>{if(V.view==='revision')renderRevision()});
+  return h;
+}
+const _md0=md;md=function(t){return mathMd(t)};
+{const _rt=revisionText;revisionText=function(){return texClean(_rt())}}
 </script>
 </body></html>
