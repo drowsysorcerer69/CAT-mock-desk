@@ -2,7 +2,16 @@
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>CAT Mock Desk</title>
 <meta name="claude:viewport-fit-sides" content="cover">
-<meta name="app-build" content="2026-11-14.40">
+<meta name="app-build" content="2026-11-14.42">
+<script>(function(){try{var cmp=function(a,b){var f=function(x){return String(x).split(/[-.]/).map(Number)},p=f(a),q=f(b);for(var i=0;i<4;i++){if((p[i]||0)!==(q[i]||0))return(p[i]||0)>(q[i]||0)?1:-1}return 0};
+var me=document.querySelector('meta[name="app-build"]').content,o=localStorage.getItem('ovr.html');if(!o)return;
+var mm=o.match(/name="app-build" content="([^"]+)"/),ob=mm?mm[1]:'';
+if(!ob||cmp(ob,me)<0){localStorage.removeItem('ovr.html');return}
+if(cmp(ob,me)>0&&!window.__ovr){window.__ovr=1;window.stop();setTimeout(function(){var d=new DOMParser().parseFromString(o,'text/html'),H=document.head,B=document.body||document.documentElement.appendChild(document.createElement('body'));
+document.title=d.title||document.title;Array.prototype.slice.call(H.childNodes).forEach(function(n){if(n.nodeName!=='META'||n.getAttribute('charset')==null&&n.name!=='viewport')H.removeChild(n)});B.innerHTML='';
+var add=function(par,n){if(n.nodeName==='SCRIPT'){var c=document.createElement('script');for(var i=0;i<n.attributes.length;i++)c.setAttribute(n.attributes[i].name,n.attributes[i].value);c.textContent=n.textContent;if(n.src)c.async=false;par.appendChild(c)}else par.appendChild(document.importNode(n,true))};
+Array.prototype.slice.call(d.head.childNodes).forEach(function(n){if(n.nodeName==='META'&&(n.getAttribute('charset')!=null||n.name==='viewport'))return;add(H,n)});
+Array.prototype.slice.call(d.body.childNodes).forEach(function(n){add(B,n)})},0)}}catch(e){}})()</script>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto+Flex:opsz,wght@8..144,400;8..144,500;8..144,600&family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Serif:wght@400;600&display=swap">
 <style>
 /* Layout: home/analysis are scrolling pages on a paper-blue ground; the exam is a fixed-height console (header, section bar, question pane + palette, action bar) modelled on the CAT screen. */
@@ -1106,7 +1115,7 @@ function renderHome(){
   const tiles=[['practice','bolt','DPP','Daily practice',''],['notebook','warn','Mistakes','Review notebook',due?`<span class="dueb">${due}</span>`:''],['weak','insights','Weak areas','Find gaps',''],['combo','layers','Combined','Many mocks','']];
   app.innerHTML=`<div class="wrap hm">
   <header class="hm-head"><div class="hm-hi"><div class="hm-hello">Hello,</div><input class="nm hm-name" id="candname" value="${esc(candName())}" placeholder="Your name" aria-label="Your name" maxlength="40"></div>
-   <div class="hm-tools">${inprog?`<button class="hm-ic hm-alert" data-act="resume" aria-label="Resume test" title="Resume test">${ic('bolt')}</button>`:due?`<button class="hm-ic hm-alert" data-act="nbstart" data-set="due" aria-label="${due} mistakes due" title="${due} mistakes due - revise now">${ic('bolt')}<span class="hm-bdg">${due>99?'99+':due}</span></button>`:`<button class="hm-ic hm-alert" data-act="practice" aria-label="Start DPP" title="Start DPP">${ic('bolt')}</button>`}<button class="hm-ic" data-act="histopen" aria-label="Attempt history" title="Attempt history (${atts.length})">${ic('history')}</button><details class="more"><summary class="hm-ic" aria-label="Menu">${ic('more')}</summary><div class="menu"><button class="btn sm" data-act="theme">Theme &amp; colours</button><button class="btn sm" data-act="wmopen">Exam watermark (CAT ID)</button><button class="btn sm" data-act="syopen">Cloud sync${typeof SY!=='undefined'&&SY.refresh?' · on':''}</button>${window.Capacitor?'':`<button class="btn sm" data-act="fullscreen">${document.fullscreenElement?'Exit full screen':'Full screen'}</button>`}${window.desk?'<button class="btn sm" data-act="backup">Export backup</button><button class="btn sm" data-act="restore">Import backup</button>':''}${window.desk&&window.desk.updateApp?'<button class="btn sm" data-act="appupdate">Update app from file</button><button class="btn sm" data-act="appreset">Use built-in version</button>':''}<div class="sub" style="font-size:12px;padding:6px 12px">Build ${esc(BUILD)}</div><div class="sub" style="font-size:12px;padding:6px 12px">${window.desk?'History saved on this computer':window.Capacitor?'History saved on this phone':store.cloud?'History saved to your account':'History saved in this browser'}</div></div></details></div></header>
+   <div class="hm-tools">${inprog?`<button class="hm-ic hm-alert" data-act="resume" aria-label="Resume test" title="Resume test">${ic('bolt')}</button>`:due?`<button class="hm-ic hm-alert" data-act="nbstart" data-set="due" aria-label="${due} mistakes due" title="${due} mistakes due - revise now">${ic('bolt')}<span class="hm-bdg">${due>99?'99+':due}</span></button>`:`<button class="hm-ic hm-alert" data-act="practice" aria-label="Start DPP" title="Start DPP">${ic('bolt')}</button>`}<button class="hm-ic" data-act="histopen" aria-label="Attempt history" title="Attempt history (${atts.length})">${ic('history')}</button><details class="more"><summary class="hm-ic" aria-label="Menu">${ic('more')}</summary><div class="menu"><button class="btn sm" data-act="theme">Theme &amp; colours</button><button class="btn sm" data-act="wmopen">Exam watermark (CAT ID)</button><button class="btn sm" data-act="syopen">Cloud sync${typeof SY!=='undefined'&&SY.refresh?' · on':''}</button>${window.Capacitor?'':`<button class="btn sm" data-act="fullscreen">${document.fullscreenElement?'Exit full screen':'Full screen'}</button>`}${window.desk?'<button class="btn sm" data-act="backup">Export backup</button><button class="btn sm" data-act="restore">Import backup</button>':''}${window.Capacitor&&!window.desk?'<button class="btn sm" data-act="updopen">App update</button>':''}${window.desk&&window.desk.updateApp?'<button class="btn sm" data-act="appupdate">Update app from file</button><button class="btn sm" data-act="appreset">Use built-in version</button>':''}<div class="sub" style="font-size:12px;padding:6px 12px">Build ${esc(BUILD)}</div><div class="sub" style="font-size:12px;padding:6px 12px">${window.desk?'History saved on this computer':window.Capacitor?'History saved on this phone':store.cloud?'History saved to your account':'History saved in this browser'}</div></div></details></div></header>
   <div class="hm-top">
   <details class="panel hm-add stack"${V.msg?' open':''}><summary><span class="hm-ci">${ic('add')}</span><span class="hm-addt"><b>Add a practice paper</b><small>Import a PDF, JSON or pasted text</small></span></summary><div class="stack" style="gap:10px;margin-top:12px">
     <div class="addtop"><div class="in">
@@ -3082,6 +3091,19 @@ document.addEventListener('click',e=>{
   f(t,e);
   if(t.dataset.act==='delatt')setTimeout(()=>{const b=document.querySelector('#hist .hs-body');if(b){b.innerHTML=histHtml();const c=document.querySelector('#hist .chip');if(c)c.textContent=store.attempts.length}},120);
 });
+/* delete inside the history sheet: no table rebuild, no scroll jump, no width shift */
+document.addEventListener('click',e=>{
+  const t=e.target.closest&&e.target.closest('#hist [data-act="delatt"]');if(!t)return;
+  e.stopPropagation();e.preventDefault();
+  if(!t.dataset.armed){t.style.minWidth=t.offsetWidth+'px';armed(t,'Sure?');return}
+  const tr=t.closest('tr');if(!tr||tr.dataset.del)return;tr.dataset.del=1;
+  const a=store.attempts.find(x=>x.id===t.dataset.id);if(!a)return;
+  store.remove(a);
+  const fin=()=>{tr.remove();const c=document.querySelector('#hist .chip');if(c)c.textContent=store.attempts.length;
+    if(!store.attempts.length){const b=document.querySelector('#hist .hs-body');if(b)b.innerHTML=histHtml()}
+    const y=window.scrollY;render();window.scrollTo(0,y)};
+  if(tr.animate){tr.style.pointerEvents='none';tr.animate([{opacity:1},{opacity:0}],{duration:180,easing:'ease-out',fill:'forwards'}).onfinish=fin}else fin();
+},true);
 document.addEventListener('keydown',e=>{if(e.key==='Escape')histClose()});
 {const _re=renderExam;renderExam=function(){_re.apply(this,arguments);wmSync()}}
 Object.assign(acts,{wmopen(){openPanel('Exam watermark','Your CAT ID',wmPanel())}});
@@ -4189,6 +4211,65 @@ function psGo(){
   const _go=go;go=function(v,x){if(PS.on&&v!=='papers'&&v!=='cat'){PS.on=false;PS.ids.clear();psPaint()}return _go.apply(this,arguments)};
 })();
 </script>
+
+<script>
+'use strict';
+/* ===== Android: update the app from your GitHub repository without building a new APK ===== */
+const UPD={url:(()=>{try{return localStorage.getItem('upd.url')||''}catch(e){return ''}})(),found:null,msg:'',err:'',busy:false};
+const updCmp=(a,b)=>{const f=x=>String(x).split(/[-.]/).map(Number),p=f(a),q=f(b);for(let i=0;i<4;i++){if((p[i]||0)!==(q[i]||0))return(p[i]||0)>(q[i]||0)?1:-1}return 0};
+function updUrls(u){
+  u=(u||'').trim();if(!u)return [];
+  let m=u.match(/^https?:\/\/github\.com\/([^\/]+)\/([^\/#?]+?)(?:\.git)?\/blob\/([^\/]+)\/(.+?)(?:[?#].*)?$/i);
+  if(m)return ['https://raw.githubusercontent.com/'+m[1]+'/'+m[2]+'/'+m[3]+'/'+m[4]];
+  m=u.match(/^https?:\/\/github\.com\/([^\/]+)\/([^\/#?]+?)(?:\.git)?(?:\/(?:tree\/[^\/]+)?)?\/?(?:[?#].*)?$/i);
+  if(m)return ['main','master'].map(b=>'https://raw.githubusercontent.com/'+m[1]+'/'+m[2]+'/'+b+'/www/index.html');
+  return [u];
+}
+async function updFetch(){
+  let last='';
+  for(const base of updUrls(UPD.url)){
+    try{
+      const r=await syHttp(base+(base.includes('?')?'&':'?')+'t='+Date.now());
+      if(r.status>=400){last='Could not open the link ('+r.status+').';continue}
+      const t=await r.text();const m=String(t).match(/name="app-build" content="([^"]+)"/);
+      if(!m||!/CAT Mock Desk/.test(t)){last='That link does not look like the app file.';continue}
+      return {html:String(t),build:m[1]};
+    }catch(e){last=(e&&e.message)||'Could not reach the link.'}
+  }
+  throw new Error(last||'Paste your GitHub repository link first.');
+}
+function updHtml(){
+  const f=UPD.found;
+  return `<div class="stack" style="gap:12px;max-width:520px">
+   <div class="sub" style="margin:0">Paste your GitHub repository link once. After you replace <b>www/index.html</b> in that repository, press <b>Check for update</b> here and the app updates itself. No new APK needed.</div>
+   <label class="field"><span class="sub">Repository link</span><input class="cbin" id="updurl" value="${esc(UPD.url)}" placeholder="https://github.com/your-name/your-repo" autocapitalize="off" autocomplete="off"></label>
+   <div class="sub" style="font-size:12.5px;margin:0">This version: <b>${esc(BUILD)}</b></div>
+   ${UPD.err?`<div class="msg err">${esc(UPD.err)}</div>`:''}${UPD.msg?`<div class="msg ok">${esc(UPD.msg)}</div>`:''}
+   ${f?`<div class="msg info">New version <b>${esc(f.build)}</b> is ready.</div>`:''}
+   <div class="row"><button class="btn pri" data-act="updcheck" ${UPD.busy?'disabled':''}>${UPD.busy?'Checking…':'Check for update'}</button>${f?'<button class="btn pri" data-act="updinstall">Install and restart</button>':''}<button class="btn" data-act="updreset">Use built-in version</button></div>
+   <div class="sub" style="font-size:12px;margin:0">Your papers and history stay as they are. If a new APK is installed later, the newer of the two versions is used.</div></div>`;
+}
+function updPaint(){const b=document.querySelector('#zoomov .zoombody,#zoomov .zbody');const o=document.getElementById('zoomov');if(!o)return;openPanel('App update','From your GitHub repository',updHtml())}
+Object.assign(acts,{
+  updopen(){UPD.err='';UPD.msg='';UPD.found=null;openPanel('App update','From your GitHub repository',updHtml())},
+  async updcheck(){
+    const i=document.getElementById('updurl');if(i)UPD.url=i.value.trim();try{localStorage.setItem('upd.url',UPD.url)}catch(e){}
+    UPD.busy=true;UPD.err='';UPD.msg='';UPD.found=null;updPaint();
+    try{const r=await updFetch();const c=updCmp(r.build,BUILD);
+      if(c>0)UPD.found=r;else UPD.msg=c===0?'You already have the latest version ('+BUILD+').':'The repository has an older version ('+r.build+') than this app ('+BUILD+').'}
+    catch(e){UPD.err=(e&&e.message)||String(e)}
+    UPD.busy=false;updPaint()},
+  updinstall(){
+    const f=UPD.found;if(!f)return;
+    try{localStorage.setItem('ovr.html',f.html)}catch(e){UPD.err='Not enough storage on this phone to keep the update.';updPaint();return}
+    toast('Updated. Restarting…');setTimeout(()=>location.reload(),600)},
+  updreset(){try{localStorage.removeItem('ovr.html')}catch(e){}toast('Back to the built-in version. Restarting…');setTimeout(()=>location.reload(),600)}
+});
+document.addEventListener('click',e=>{const t=e.target.closest&&e.target.closest('#zoomov [data-act^="upd"]');if(t&&acts[t.dataset.act]&&!t.disabled)acts[t.dataset.act](t)});
+/* quiet check a few seconds after the app opens */
+if(window.Capacitor&&!window.desk&&UPD.url)setTimeout(async()=>{try{const r=await updFetch();if(updCmp(r.build,BUILD)>0)toast('App update '+r.build+' is available. Menu, then App update.')}catch(e){}},5000);
+</script>
+
 <style>
 #app .prow,#app .paper{-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}
 #app .psel{outline:2.5px solid var(--accent);outline-offset:-2px;position:relative}
