@@ -41,11 +41,18 @@ jobs:
           node /tmp/patch-gradle.js
       - name: Add download plugin (saves PDFs to Downloads and shows a notification)
         run: |
-          if [ -f scripts/add-downloader.js ] && [ -f native/DownloaderPlugin.java ]; then
-            node scripts/add-downloader.js
-          else
-            echo "native/ or scripts/add-downloader.js missing; building without the download plugin"
+          echo "Files in the repository root:"; ls -la
+          echo "native/:"; ls -la native || true
+          echo "scripts/:"; ls -la scripts || true
+          if [ ! -f scripts/add-downloader.js ] || [ ! -f native/DownloaderPlugin.java ]; then
+            echo "::error::native/DownloaderPlugin.java or scripts/add-downloader.js is missing from the repository. Upload them (keep the folder names) and run again."
+            exit 1
           fi
+          node scripts/add-downloader.js
+          echo "---- MainActivity.java ----"
+          cat android/app/src/main/java/com/catmockdesk/app/MainActivity.java
+          ls -la android/app/src/main/java/com/catmockdesk/app/
+          grep -n "POST_NOTIFICATIONS" android/app/src/main/AndroidManifest.xml
       - name: Copy app into Android project
         run: npx cap sync android
       - name: Build APK
