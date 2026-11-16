@@ -2,7 +2,7 @@
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>CAT Mock Desk</title>
 <meta name="claude:viewport-fit-sides" content="cover">
-<meta name="app-build" content="2026-11-14.55">
+<meta name="app-build" content="2026-11-14.57">
 <script>(function(){try{var L=function(m){try{var a=JSON.parse(localStorage.getItem('upd.log')||'[]');a.push(new Date().toTimeString().slice(0,8)+' '+m);localStorage.setItem('upd.log',JSON.stringify(a.slice(-16)))}catch(e){}};
 var cmp=function(a,b){var f=function(x){return String(x).split(/[-.]/).map(Number)},p=f(a),q=f(b);for(var i=0;i<4;i++){if((p[i]||0)!==(q[i]||0))return(p[i]||0)>(q[i]||0)?1:-1}return 0};
 var me=document.querySelector('meta[name="app-build"]').content,o=localStorage.getItem('ovr.html');
@@ -1117,7 +1117,7 @@ function renderHome(){
   const tiles=[['practice','bolt','DPP','Daily practice',''],['notebook','warn','Mistakes','Review notebook',due?`<span class="dueb">${due}</span>`:''],['weak','insights','Weak areas','Find gaps',''],['combo','layers','Combined','Many mocks','']];
   app.innerHTML=`<div class="wrap hm">
   <header class="hm-head"><div class="hm-hi"><div class="hm-hello">Hello,</div><input class="nm hm-name" id="candname" value="${esc(candName())}" placeholder="Your name" aria-label="Your name" maxlength="40"></div>
-   <div class="hm-tools">${inprog?`<button class="hm-ic hm-alert" data-act="resume" aria-label="Resume test" title="Resume test">${ic('bolt')}</button>`:due?`<button class="hm-ic hm-alert" data-act="nbstart" data-set="due" aria-label="${due} mistakes due" title="${due} mistakes due - revise now">${ic('bolt')}<span class="hm-bdg">${due>99?'99+':due}</span></button>`:`<button class="hm-ic hm-alert" data-act="practice" aria-label="Start DPP" title="Start DPP">${ic('bolt')}</button>`}<button class="hm-ic" data-act="histopen" aria-label="Attempt history" title="Attempt history (${atts.length})">${ic('history')}</button><details class="more"><summary class="hm-ic" aria-label="Menu">${ic('more')}</summary><div class="menu"><button class="btn sm" data-act="theme">Theme &amp; colours</button><button class="btn sm" data-act="wmopen">Exam watermark (CAT ID)</button><button class="btn sm" data-act="syopen">Cloud sync${typeof SY!=='undefined'&&SY.refresh?' · on':''}</button>${window.Capacitor?'':`<button class="btn sm" data-act="fullscreen">${document.fullscreenElement?'Exit full screen':'Full screen'}</button>`}${window.desk?'<button class="btn sm" data-act="backup">Export backup</button><button class="btn sm" data-act="restore">Import backup</button>':''}${window.Capacitor&&!window.desk?'<button class="btn sm" data-act="updopen">App update</button>':''}${window.desk&&window.desk.updateApp?'<button class="btn sm" data-act="appupdate">Update app from file</button><button class="btn sm" data-act="appreset">Use built-in version</button>':''}<div class="sub" style="font-size:12px;padding:6px 12px">Build ${esc(BUILD)}</div><div class="sub" style="font-size:12px;padding:6px 12px">${window.desk?'History saved on this computer':window.Capacitor?'History saved on this phone':store.cloud?'History saved to your account':'History saved in this browser'}</div></div></details></div></header>
+   <div class="hm-tools">${inprog?`<button class="hm-ic hm-alert" data-act="resume" aria-label="Resume test" title="Resume test">${ic('bolt')}</button>`:due?`<button class="hm-ic hm-alert" data-act="nbstart" data-set="due" aria-label="${due} mistakes due" title="${due} mistakes due - revise now">${ic('bolt')}<span class="hm-bdg">${due>99?'99+':due}</span></button>`:`<button class="hm-ic hm-alert" data-act="practice" aria-label="Start DPP" title="Start DPP">${ic('bolt')}</button>`}<button class="hm-ic" data-act="histopen" aria-label="Attempt history" title="Attempt history (${atts.length})">${ic('history')}</button><details class="more"><summary class="hm-ic" aria-label="Menu">${ic('more')}</summary><div class="menu"><button class="btn sm" data-act="theme">Theme &amp; colours</button><button class="btn sm" data-act="wmopen">Exam watermark (CAT ID)</button><button class="btn sm" data-act="syopen">Cloud sync${typeof SY!=='undefined'&&SY.refresh?' · on':''}</button>${window.Capacitor?'':`<button class="btn sm" data-act="fullscreen">${document.fullscreenElement?'Exit full screen':'Full screen'}</button>`}${window.desk?'<button class="btn sm" data-act="backup">Export backup</button><button class="btn sm" data-act="restore">Import backup</button>':''}${window.Capacitor&&!window.desk?'<button class="btn sm" data-act="updopen">App update</button>':''}${window.desk&&window.desk.updateApp?'<button class="btn sm" data-act="appupdate">Update app from file</button><button class="btn sm" data-act="appreset">Use built-in version</button>':''}<button class="btn sm" data-act="kbhelp">Keyboard shortcuts</button><div class="sub" style="font-size:12px;padding:6px 12px">Build ${esc(BUILD)}</div><div class="sub" style="font-size:12px;padding:6px 12px">${window.desk?'History saved on this computer':window.Capacitor?'History saved on this phone':store.cloud?'History saved to your account':'History saved in this browser'}</div></div></details></div></header>
   <div class="hm-top">
   <details class="panel hm-add stack"${V.msg?' open':''}><summary><span class="hm-ci">${ic('add')}</span><span class="hm-addt"><b>Add a practice paper</b><small>Import a PDF, JSON or pasted text</small></span></summary><div class="stack" style="gap:10px;margin-top:12px">
     <div class="addtop"><div class="in">
@@ -1460,7 +1460,7 @@ function renderAnalysis(){
   if(V.analysisId==='__cx')return renderCombo();
   const A=curAtt();if(!A){go('home');return}
   const P=attPaper(A),{tabs,body}=analysisParts(A,P);
-  app.innerHTML=`<div class="wrap"><div class="top"><div class="brand">Test analysis<small>${esc(A.mode==='cat'?'sectional timing':'free navigation')}</small></div><div class="row"><button class="btn" data-act="anpdf">PDF</button><button class="btn" data-act="retry" data-id="${A.id}" ${P&&A.qs.some(x=>x.status!=='correct')?'':'disabled'}>Retry mistakes (${A.qs.filter(x=>x.status!=='correct').length})</button><button class="btn" data-act="retake" data-id="${A.paperId}" ${P?'':'disabled'}>Retake paper</button>${V.fromCat?'<button class="btn" data-act="backcat">Back to list</button>':''}<button class="btn pri" data-act="home">Home</button></div></div>
+  app.innerHTML=`<div class="wrap"><div class="top"><div class="brand">Test analysis<small>${esc(A.mode==='cat'?'sectional timing':'free navigation')}</small></div><div class="row"><button class="btn pri" data-act="home">Home</button><button class="btn" data-act="retry" data-id="${A.id}" ${P&&A.qs.some(x=>x.status!=='correct')?'':'disabled'}>Retry mistakes (${A.qs.filter(x=>x.status!=='correct').length})</button><button class="btn" data-act="retake" data-id="${A.paperId}" ${P?'':'disabled'}>Retake paper</button>${V.fromCat?'<button class="btn" data-act="backcat">Back to list</button>':''}<button class="btn" data-act="anpdf">PDF</button></div></div>
    <div class="tabs">${tabs.map(([k,l])=>`<button class="${V.tab===k?'on':''}" data-act="tab" data-t="${k}">${l}</button>`).join('')}</div>${body}</div>`;
 }
 function givenText(q,x,pq){
@@ -4551,5 +4551,89 @@ body.ps-on #app .prow,body.ps-on #app .paper{cursor:pointer}
 @keyframes updfloat{0%,100%{transform:translateY(-2.5px)}50%{transform:translateY(2.5px)}}
 @keyframes updarrow{0%{transform:translate(31px,27px) scale(2.4) translateY(-1.2px);opacity:.25}50%{opacity:1}100%{transform:translate(31px,27px) scale(2.4) translateY(1.6px);opacity:.25}}
 @media (prefers-reduced-motion:reduce){.updbar .ucg,.updbar .uar{animation:none}}}
+</style>
+
+<script>
+'use strict';
+/* ===== Navigation shortcuts for Windows (keyboard + mouse): Alt+Left / Alt+Right, mouse back/forward buttons,
+   Alt+scroll wheel, Backspace, Alt+Home, F1 / ? for help. Never active inside a running test. ===== */
+(function(){
+  const BK=[],FW=[];let nav=false,lastT=0;
+  const snap=()=>{const s={};for(const k in V){const v=V[k];if(typeof v!=='function'&&k.indexOf('__')!==0)s[k]=v}return s};
+  const _g=go;
+  go=function(view,extra){
+    if(!nav&&V.view!=='exam'){
+      const cur=V.view,ch=view!==cur||(view==='analysis'&&extra&&extra.analysisId&&extra.analysisId!==V.analysisId);
+      if(ch){BK.push(snap());if(BK.length>40)BK.shift();FW.length=0}
+    }
+    return _g.apply(this,arguments);
+  };
+  function overlayOpen(){
+    if(document.getElementById('kbhelp')){closeHelp();return true}
+    if(document.getElementById('zoomov')){try{closeZoom()}catch(e){}return true}
+    return false;
+  }
+  function jump(list,other){
+    while(list.length){
+      const s=list.pop();if(!s||s.view==='exam')continue;
+      other.push(snap());nav=true;
+      try{_g(s.view,s)}finally{nav=false}
+      return true;
+    }
+    return false;
+  }
+  function back(){
+    if(Date.now()-lastT<250)return;lastT=Date.now();
+    if(V.view==='exam'){toast('Use the exam menu to leave the test');return}
+    if(overlayOpen())return;
+    if(!jump(BK,FW)){if(V.view!=='home')_g('home');else toast('Nothing to go back to')}
+  }
+  function fwd(){
+    if(Date.now()-lastT<250)return;lastT=Date.now();
+    if(V.view==='exam')return;
+    if(overlayOpen())return;
+    if(!jump(FW,BK))toast('Nothing to go forward to');
+  }
+  window.__navBack=back;window.__navFwd=fwd;
+  const typing=t=>t&&(/^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName||'')||t.isContentEditable);
+  document.addEventListener('keydown',e=>{
+    const k=e.key;
+    if(k==='F1'||(k==='?'&&!typing(e.target)&&!e.ctrlKey&&!e.altKey)){e.preventDefault();toggleHelp();return}
+    if(e.altKey&&k==='ArrowLeft'||k==='BrowserBack'){e.preventDefault();back();return}
+    if(e.altKey&&k==='ArrowRight'||k==='BrowserForward'){e.preventDefault();fwd();return}
+    if(e.altKey&&k==='Home'){e.preventDefault();if(V.view!=='exam'&&!overlayOpen()){BK.push(snap());FW.length=0;_g('home')}return}
+    if(k==='Backspace'&&!typing(e.target)&&!e.ctrlKey&&!e.altKey&&!e.metaKey){e.preventDefault();back()}
+  },true);
+  const eatSide=e=>{if(e.button===3||e.button===4)e.preventDefault()};
+  document.addEventListener('mousedown',eatSide,true);
+  document.addEventListener('auxclick',eatSide,true);
+  document.addEventListener('mouseup',e=>{if(e.button===3){e.preventDefault();back()}else if(e.button===4){e.preventDefault();fwd()}},true);
+  let wt=0;
+  document.addEventListener('wheel',e=>{
+    if(!e.altKey||e.ctrlKey||V.view==='exam')return;
+    e.preventDefault();
+    if(Date.now()-wt<450)return;wt=Date.now();
+    if(e.deltaY<0)back();else if(e.deltaY>0)fwd();
+  },{passive:false,capture:true});
+  const ROWS=[['Alt + Left','Back'],['Alt + Right','Forward'],['Mouse back / forward buttons','Back / Forward'],['Alt + scroll wheel','Up = Back, Down = Forward'],['Backspace','Back (when not typing)'],['Alt + Home','Go to Home'],['Esc','Close the open window'],['Left / Right arrows','Previous / next question in the question review'],['F11','Full screen (Windows app)'],['F1  or  ?','Show this list']];
+  function closeHelp(){const h=document.getElementById('kbhelp');if(h)h.remove()}
+  function toggleHelp(){
+    if(document.getElementById('kbhelp')){closeHelp();return}
+    const d=document.createElement('div');d.id='kbhelp';
+    d.innerHTML='<div class="kbc"><div class="kbt">Keyboard and mouse shortcuts</div>'+ROWS.map(r=>'<div class="kbr"><kbd>'+r[0]+'</kbd><span>'+r[1]+'</span></div>').join('')+'<div class="kbn">Navigation shortcuts are switched off during a running test.</div></div>';
+    d.addEventListener('click',()=>closeHelp());document.body.appendChild(d);
+  }
+  document.addEventListener('keydown',e=>{if(e.key==='Escape'&&document.getElementById('kbhelp')){e.stopPropagation();closeHelp()}},true);
+  acts.kbhelp=()=>toggleHelp();
+})();
+</script>
+<style>
+#kbhelp{position:fixed;inset:0;z-index:300;display:grid;place-items:center;background:rgba(10,14,24,.45);padding:16px}
+#kbhelp .kbc{background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:22px;padding:18px 20px;max-width:520px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.35)}
+#kbhelp .kbt{font:700 17px var(--f-ui);margin-bottom:10px}
+#kbhelp .kbr{display:flex;justify-content:space-between;gap:14px;padding:8px 0;border-top:1px solid var(--line);font:14px var(--f-ui)}
+#kbhelp kbd{font:600 12.5px ui-monospace,Consolas,monospace;background:var(--accent-soft);color:var(--accent);padding:3px 8px;border-radius:8px;white-space:nowrap}
+#kbhelp .kbr span{color:var(--muted);text-align:right}
+#kbhelp .kbn{margin-top:10px;font:12.5px var(--f-ui);color:var(--muted)}
 </style>
 </body></html>
