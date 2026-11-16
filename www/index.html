@@ -2,7 +2,7 @@
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>CAT Mock Desk</title>
 <meta name="claude:viewport-fit-sides" content="cover">
-<meta name="app-build" content="2026-11-14.54">
+<meta name="app-build" content="2026-11-14.55">
 <script>(function(){try{var L=function(m){try{var a=JSON.parse(localStorage.getItem('upd.log')||'[]');a.push(new Date().toTimeString().slice(0,8)+' '+m);localStorage.setItem('upd.log',JSON.stringify(a.slice(-16)))}catch(e){}};
 var cmp=function(a,b){var f=function(x){return String(x).split(/[-.]/).map(Number)},p=f(a),q=f(b);for(var i=0;i<4;i++){if((p[i]||0)!==(q[i]||0))return(p[i]||0)>(q[i]||0)?1:-1}return 0};
 var me=document.querySelector('meta[name="app-build"]').content,o=localStorage.getItem('ovr.html');
@@ -3270,11 +3270,16 @@ function paperToJson(p){
     if(q.type==='mcq'){o.options=q.options;o.answer=String.fromCharCode(65+q.ai)}else o.answer=q.answer.length===1?q.answer[0]:q.answer;
     o.marks=q.marks;o.negative=q.neg;if(q.solution)o.solution=q.solution;return o})}))};
 }
-setTimeout(()=>{try{if(window.Capacitor&&Capacitor.registerPlugin&&!window.desk&&Capacitor.getPlatform&&Capacitor.getPlatform()==='android')Capacitor.registerPlugin('Downloader').ask().catch(()=>{})}catch(e){}},9000);
+function dlPlugin(){const C=window.Capacitor;if(!C)return null;
+  if(typeof C.registerPlugin==='function'){try{return C.registerPlugin('Downloader')}catch(e){}}
+  if(C.Plugins&&C.Plugins.Downloader)return C.Plugins.Downloader;
+  if(typeof C.nativePromise==='function')return {save:o=>C.nativePromise('Downloader','save',o),ask:o=>C.nativePromise('Downloader','ask',o||{})};
+  return null}
+setTimeout(()=>{try{const D=dlPlugin();if(D&&!window.desk&&Capacitor.getPlatform&&Capacitor.getPlatform()==='android')Promise.resolve(D.ask()).catch(()=>{})}catch(e){}},9000);
 /* Android app: save into Downloads/CAT Mock Desk and post a notification (native plugin, see android-app/native) */
 async function nativeSave(name,bytes,mime){
-  if(!(window.Capacitor&&Capacitor.registerPlugin)||window.desk)return false;
-  try{const DL=Capacitor.registerPlugin('Downloader');
+  if(!window.Capacitor||window.desk)return false;
+  try{const DL=dlPlugin();if(!DL)throw new Error('Downloader plugin not available (not implemented)');
     let bin='';const CH=0x8000;for(let i=0;i<bytes.length;i+=CH)bin+=String.fromCharCode.apply(null,bytes.subarray(i,i+CH));
     await DL.save({name:String(name).replace(/[\\/]/g,'-'),mime:mime||'application/octet-stream',data:btoa(bin)});
     toast('Saved in Downloads / CAT Mock Desk. Check your notifications.');return true}
@@ -4326,8 +4331,8 @@ Object.assign(acts,{
     updLog('Saved. Restarting');updBar('Saved. Restarting the app…',100);await updWait(900);location.reload()},
   async updtestdl(){
     const C=window.Capacitor;let rep='Build '+BUILD+'\nCapacitor: '+(C?'yes':'NO')+(C&&C.getPlatform?' ('+C.getPlatform()+')':'')+'\n';
-    try{const has=C&&C.isPluginAvailable?C.isPluginAvailable('Downloader'):'unknown';rep+='Downloader plugin available: '+has+'\n';
-      const DL=C.registerPlugin('Downloader');const t=new TextEncoder().encode('%PDF-1.4 test');
+    try{const has=C&&C.isPluginAvailable?C.isPluginAvailable('Downloader'):'unknown';rep+='Downloader plugin available: '+has+' | registerPlugin: '+(typeof C.registerPlugin)+' | Plugins.Downloader: '+!!(C.Plugins&&C.Plugins.Downloader)+'\n';
+      const DL=dlPlugin();if(!DL)throw new Error('no way to reach the plugin (not implemented)');const t=new TextEncoder().encode('%PDF-1.4 test');
       const r=await DL.save({name:'CAT test '+Date.now()+'.txt',mime:'text/plain',data:btoa('CAT Mock Desk download test')});rep+='SAVED OK: '+JSON.stringify(r)+'\nCheck Downloads > CAT Mock Desk and your notifications.'}
     catch(e){rep+='ERROR: '+((e&&e.message)||JSON.stringify(e)||e)}
     try{updLog(rep.replace(/\n/g,' | '))}catch(x){}
