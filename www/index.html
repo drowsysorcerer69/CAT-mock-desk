@@ -2,7 +2,7 @@
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>CAT Mock Desk</title>
 <meta name="claude:viewport-fit-sides" content="cover">
-<meta name="app-build" content="2026-11-14.57">
+<meta name="app-build" content="2026-11-14.58">
 <script>(function(){try{var L=function(m){try{var a=JSON.parse(localStorage.getItem('upd.log')||'[]');a.push(new Date().toTimeString().slice(0,8)+' '+m);localStorage.setItem('upd.log',JSON.stringify(a.slice(-16)))}catch(e){}};
 var cmp=function(a,b){var f=function(x){return String(x).split(/[-.]/).map(Number)},p=f(a),q=f(b);for(var i=0;i<4;i++){if((p[i]||0)!==(q[i]||0))return(p[i]||0)>(q[i]||0)?1:-1}return 0};
 var me=document.querySelector('meta[name="app-build"]').content,o=localStorage.getItem('ovr.html');
@@ -1460,7 +1460,7 @@ function renderAnalysis(){
   if(V.analysisId==='__cx')return renderCombo();
   const A=curAtt();if(!A){go('home');return}
   const P=attPaper(A),{tabs,body}=analysisParts(A,P);
-  app.innerHTML=`<div class="wrap"><div class="top"><div class="brand">Test analysis<small>${esc(A.mode==='cat'?'sectional timing':'free navigation')}</small></div><div class="row"><button class="btn pri" data-act="home">Home</button><button class="btn" data-act="retry" data-id="${A.id}" ${P&&A.qs.some(x=>x.status!=='correct')?'':'disabled'}>Retry mistakes (${A.qs.filter(x=>x.status!=='correct').length})</button><button class="btn" data-act="retake" data-id="${A.paperId}" ${P?'':'disabled'}>Retake paper</button>${V.fromCat?'<button class="btn" data-act="backcat">Back to list</button>':''}<button class="btn" data-act="anpdf">PDF</button></div></div>
+  app.innerHTML=`<div class="wrap"><div class="top"><div class="brand">Test analysis<small>${esc(A.mode==='cat'?'sectional timing':'free navigation')}</small></div><div class="row anrow"><button class="btn pri" data-act="home">Home</button><button class="btn" data-act="anpdf">PDF</button>${V.fromCat?'<button class="btn" data-act="backcat">Back to list</button>':''}<button class="btn" data-act="retry" data-id="${A.id}" ${P&&A.qs.some(x=>x.status!=='correct')?'':'disabled'}>Retry mistakes (${A.qs.filter(x=>x.status!=='correct').length})</button><button class="btn" data-act="retake" data-id="${A.paperId}" ${P?'':'disabled'}>Retake paper</button></div></div>
    <div class="tabs">${tabs.map(([k,l])=>`<button class="${V.tab===k?'on':''}" data-act="tab" data-t="${k}">${l}</button>`).join('')}</div>${body}</div>`;
 }
 function givenText(q,x,pq){
@@ -2616,7 +2616,7 @@ function renderCombo(){
   const valid=new Set(store.attempts.map(a=>a.id));[...st.sel].forEach(id=>{if(!valid.has(id))st.sel.delete(id)});
   V.analysisId='__cx';
   if(document.getElementById('cxres')&&document.querySelector('.cxgrid')){cxPaintRes();return}
-  app.innerHTML=`<div class="wrap"><div class="top"><div class="brand">Combined analysis<small>many mocks, one picture</small></div><div class="row"><button class="btn sm" data-act="anpdf">Colour PDF</button><button class="btn sm" data-act="weak">Weak areas</button><button class="btn sm" data-act="home">Back</button></div></div>
+  app.innerHTML=`<div class="wrap"><div class="top"><div class="brand">Combined analysis<small>many mocks, one picture</small></div><div class="row anrow"><button class="btn sm" data-act="anpdf">Colour PDF</button><button class="btn sm" data-act="weak">Weak areas</button><button class="btn sm" data-act="home">Back</button></div></div>
   <div class="cxgrid"><aside class="panel stack cxside"><div><h2>Pick the attempts</h2><div class="sub" style="font-size:13px">Tick any mix of full, sectional, topic-wise and drill attempts. They are merged into one analysis with VA / RC, DILR and Quant as the subjects.</div></div>
    <div class="chips">${[['all','All'],...Object.keys(CATS).map(k=>[k,CATS[k].name])].map(([k,l])=>`<button class="chip ${st.cat===k?'on':''}" data-act="cxcat" data-f="${k}">${esc(l)}</button>`).join('')}</div>
    <div class="row"><button class="btn sm" data-act="cxall">Select all shown</button><button class="btn sm" data-act="cxlatest">Latest of each paper</button><button class="btn sm" data-act="cxclear">Clear</button></div>
@@ -4635,5 +4635,13 @@ body.ps-on #app .prow,body.ps-on #app .paper{cursor:pointer}
 #kbhelp kbd{font:600 12.5px ui-monospace,Consolas,monospace;background:var(--accent-soft);color:var(--accent);padding:3px 8px;border-radius:8px;white-space:nowrap}
 #kbhelp .kbr span{color:var(--muted);text-align:right}
 #kbhelp .kbn{margin-top:10px;font:12.5px var(--f-ui);color:var(--muted)}
+</style>
+<style>
+@media (max-width:640px){
+  body:not(.exam-on) .wrap>.top>.row.anrow{width:100%;max-width:100%;display:flex;flex-wrap:wrap;gap:8px;justify-content:stretch}
+  body:not(.exam-on) .wrap>.top>.row.anrow .btn{flex:1 1 auto;min-height:40px;padding:8px 14px;font-size:14px;text-align:center;white-space:nowrap}
+  body:not(.exam-on) .wrap>.top:has(.anrow){padding:10px 10px 10px 14px;gap:8px 10px}
+  body:not(.exam-on) .wrap>.top:has(.anrow)>.brand{flex:1 1 100%}
+}
 </style>
 </body></html>
