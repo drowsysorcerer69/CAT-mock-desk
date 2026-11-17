@@ -16,7 +16,7 @@ document.getElementById('bfr').onclick=function(){location.reload()};
 document.getElementById('bfx').onclick=function(){try{localStorage.removeItem('ovr.html');localStorage.removeItem('ovr.try')}catch(x){}location.reload()};
 },4500)})();
 </script>
-<meta name="app-build" content="2026-11-14.63">
+<meta name="app-build" content="2026-11-14.64">
 <script>(function(){try{var L=function(m){try{var a=JSON.parse(localStorage.getItem('upd.log')||'[]');a.push(new Date().toTimeString().slice(0,8)+' '+m);localStorage.setItem('upd.log',JSON.stringify(a.slice(-16)))}catch(e){}};
 var cmp=function(a,b){var f=function(x){return String(x).split(/[-.]/).map(Number)},p=f(a),q=f(b);for(var i=0;i<4;i++){if((p[i]||0)!==(q[i]||0))return(p[i]||0)>(q[i]||0)?1:-1}return 0};
 var me=document.querySelector('meta[name="app-build"]').content,o=localStorage.getItem('ovr.html');
@@ -4735,5 +4735,20 @@ function starSet(key,on){
 .starb:active{transform:scale(.88)}
 .hm-star{position:relative}.hm-star.on{color:#f0a800}
 .hm-star .hm-bdg{background:#f0a800;color:#2a1c00}
+</style>
+<style>
+/* question window: topic line with Close beside it (phone) / topic centred (wide screens); star in the top-right corner of every question row */
+.zoombar:has(>.sub){display:grid;grid-template-columns:minmax(110px,1fr) minmax(0,2.4fr) minmax(86px,1fr);align-items:center;gap:6px 12px}
+.zoombar:has(>.sub)>b{grid-column:1;min-width:0}
+.zoombar:has(>.sub)>.sub{grid-column:2;text-align:center;min-width:0;overflow-wrap:anywhere}
+.zoombar:has(>.sub)>.btn{grid-column:3;justify-self:end}
+@media (max-width:640px){
+  .zoombar:has(>.sub){grid-template-columns:minmax(0,1fr) auto;align-items:start}
+  .zoombar:has(>.sub)>b{grid-column:1/-1;grid-row:1}
+  .zoombar:has(>.sub)>.sub{grid-column:1;grid-row:2;text-align:left}
+  .zoombar:has(>.sub)>.btn{grid-column:2;grid-row:2;align-self:start}
+}
+.rev>summary:has(>.starb){position:relative;padding-right:52px!important}
+.rev>summary>.starb{position:absolute;top:8px;right:10px;margin:0;order:0}
 </style>
 </body></html>
