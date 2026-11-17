@@ -16,7 +16,7 @@ document.getElementById('bfr').onclick=function(){location.reload()};
 document.getElementById('bfx').onclick=function(){try{localStorage.removeItem('ovr.html');localStorage.removeItem('ovr.try')}catch(x){}location.reload()};
 },4500)})();
 </script>
-<meta name="app-build" content="2026-11-14.67">
+<meta name="app-build" content="2026-11-14.68">
 <script>(function(){try{var L=function(m){try{var a=JSON.parse(localStorage.getItem('upd.log')||'[]');a.push(new Date().toTimeString().slice(0,8)+' '+m);localStorage.setItem('upd.log',JSON.stringify(a.slice(-16)))}catch(e){}};
 var cmp=function(a,b){var f=function(x){return String(x).split(/[-.]/).map(Number)},p=f(a),q=f(b);for(var i=0;i<4;i++){if((p[i]||0)!==(q[i]||0))return(p[i]||0)>(q[i]||0)?1:-1}return 0};
 var me=document.querySelector('meta[name="app-build"]').content,o=localStorage.getItem('ovr.html');
@@ -4734,6 +4734,43 @@ function starSet(key,on){
   if(on)d.map[key]={at:Date.now()};else delete d.map[key];
   store.save(d);
 }
+const STARS={all:[],missing:0,f:{topic:'all',sub:'all'}};
+const starSub=(n,t)=>n===t?t+' question'+(t===1?'':'s'):n+' of '+t+' questions';
+function starFiltered(){const f=STARS.f;return STARS.all.filter(m=>(f.topic==='all'||m.x.topic===f.topic)&&(f.sub==='all'||m.x.sub===f.sub))}
+function starList(){
+  const list=starFiltered(),groups=new Map();
+  list.forEach(m=>{if(!groups.has(m.B.id))groups.set(m.B.id,{B:m.B,PB:m.PB,items:[]});groups.get(m.B.id).items.push(m)});
+  let h='';
+  if(!STARS.all.length)h='<div class="sub" style="padding:10px 4px">No starred questions yet. Tap the star on any question in an analysis to save it here.</div>';
+  else if(!list.length)h='<div class="sub" style="padding:10px 4px">No starred questions match this filter.</div>';
+  else h=[...groups.values()].map((g,i)=>paperGroup(g.B.title,fmtDate(g.B.date).split(',').slice(0,2).join(','),g.items,i===0)).join('');
+  if(STARS.missing>0)h+='<div class="sub" style="padding:8px 4px">'+STARS.missing+' starred question'+(STARS.missing>1?'s are':' is')+' no longer available (the paper or attempt was deleted).</div>';
+  return h;
+}
+function starBody(){
+  const f=STARS.f,tops=[...new Set(STARS.all.map(m=>m.x.topic))].sort();
+  const subs=[...new Set(STARS.all.filter(m=>f.topic==='all'||m.x.topic===f.topic).map(m=>m.x.sub).filter(Boolean))].sort();
+  const cnt=t=>STARS.all.filter(m=>m.x.topic===t).length,scnt=u=>STARS.all.filter(m=>(f.topic==='all'||m.x.topic===f.topic)&&m.x.sub===u).length;
+  const bar=STARS.all.length?`<div class="nbtools starflt" style="margin-bottom:8px">
+    <select class="nbsel" data-sf="topic" aria-label="Topic"><option value="all">All topics (${STARS.all.length})</option>${tops.map(t=>`<option value="${esc(t)}"${f.topic===t?' selected':''}>${esc(t)} (${cnt(t)})</option>`).join('')}</select>
+    ${subs.length?`<select class="nbsel" data-sf="sub" aria-label="Subtopic"><option value="all">All subtopics</option>${subs.map(u=>`<option value="${esc(u)}"${f.sub===u?' selected':''}>${esc(u)} (${scnt(u)})</option>`).join('')}</select>`:''}
+    ${f.topic!=='all'||f.sub!=='all'?'<button class="btn sm" type="button" data-sf-clear="1">Clear filters</button>':''}</div>`:'';
+  return '<div class="tq">'+bar+'<div class="starlist">'+starList()+'</div></div>';
+}
+function starRefresh(){
+  const z=document.getElementById('zoomov');if(!z||!z.querySelector('.starflt, .starlist'))return;
+  const sc=z.querySelector('.zoomscroll');if(!sc)return;
+  sc.innerHTML=starBody();sc.scrollTop=0;
+  const sub=z.querySelector('.zoombar .sub');if(sub)sub.textContent=starSub(starFiltered().length,STARS.all.length);
+}
+document.addEventListener('change',e=>{
+  const t=e.target.closest&&e.target.closest('select[data-sf]');if(!t||!document.getElementById('zoomov'))return;
+  const k=t.dataset.sf;STARS.f[k]=t.value;if(k==='topic')STARS.f.sub='all';starRefresh();
+});
+document.addEventListener('click',e=>{
+  const b=e.target.closest&&e.target.closest('[data-sf-clear]');if(!b)return;
+  STARS.f={topic:'all',sub:'all'};starRefresh();
+});
 (function(){
   const _ri=revItem;
   revItem=function(A,P,x,o){
@@ -4753,18 +4790,13 @@ function starSet(key,on){
   },true);
   Object.assign(acts,{
     starred(){
-      const map=starMap(),seen=new Set(),groups=new Map();
+      const map=starMap(),seen=new Set(),all=[];
       [...store.attempts].filter(B=>!B.virtual).sort((a,b)=>b.date-a.date).forEach(B=>{
         const PB=attPaper(B);
-        B.qs.forEach(x=>{const k=starKey(B,x);if(!map[k]||seen.has(k))return;seen.add(k);
-          if(!groups.has(B.id))groups.set(B.id,{B,PB,items:[]});groups.get(B.id).items.push({B,PB,x})});
+        B.qs.forEach(x=>{const k=starKey(B,x);if(!map[k]||seen.has(k))return;seen.add(k);all.push({B,PB,x})});
       });
-      const n=seen.size,missing=Object.keys(map).length-n;
-      let h='<div class="tq">';
-      if(!n)h+='<div class="sub" style="padding:10px 4px">No starred questions yet. Tap the star on any question in an analysis to save it here.</div>';
-      else h+=[...groups.values()].map((g,i)=>paperGroup(g.B.title,fmtDate(g.B.date).split(',').slice(0,2).join(','),g.items,i===0)).join('');
-      if(missing>0)h+='<div class="sub" style="padding:8px 4px">'+missing+' starred question'+(missing>1?'s are':' is')+' no longer available (the paper or attempt was deleted).</div>';
-      openPanel('Starred questions',n+' question'+(n===1?'':'s'),h+'</div>');
+      STARS.all=all;STARS.missing=Object.keys(map).length-seen.size;STARS.f={topic:'all',sub:'all'};
+      openPanel('Starred questions',starSub(all.length,all.length),starBody());
     }
   });
 })();
