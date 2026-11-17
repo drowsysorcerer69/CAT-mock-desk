@@ -16,7 +16,7 @@ document.getElementById('bfr').onclick=function(){location.reload()};
 document.getElementById('bfx').onclick=function(){try{localStorage.removeItem('ovr.html');localStorage.removeItem('ovr.try')}catch(x){}location.reload()};
 },4500)})();
 </script>
-<meta name="app-build" content="2026-11-14.68">
+<meta name="app-build" content="2026-11-14.69">
 <script>(function(){try{var L=function(m){try{var a=JSON.parse(localStorage.getItem('upd.log')||'[]');a.push(new Date().toTimeString().slice(0,8)+' '+m);localStorage.setItem('upd.log',JSON.stringify(a.slice(-16)))}catch(e){}};
 var cmp=function(a,b){var f=function(x){return String(x).split(/[-.]/).map(Number)},p=f(a),q=f(b);for(var i=0;i<4;i++){if((p[i]||0)!==(q[i]||0))return(p[i]||0)>(q[i]||0)?1:-1}return 0};
 var me=document.querySelector('meta[name="app-build"]').content,o=localStorage.getItem('ovr.html');
@@ -4774,11 +4774,13 @@ document.addEventListener('click',e=>{
 (function(){
   const _ri=revItem;
   revItem=function(A,P,x,o){
-    const h=_ri.apply(this,arguments);
+    let h=_ri.apply(this,arguments);
     let k;try{k=starKey(A,x)}catch(e){return h}
     const on=!!starMap()[k];
     const b=`<button type="button" class="starb${on?' on':''}" data-sk="${esc(k)}" aria-pressed="${on}" aria-label="Star this question" title="${on?'Starred. Click to remove':'Star this question'}"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="${IC.star}"/></svg></button>`;
-    return h.replace('<summary>','<summary>'+b);
+    h=h.replace('<summary>','<summary>'+b);
+    if(!(o&&o.cur)){const i=h.lastIndexOf('</div></details>');if(i>0)h=h.slice(0,i)+'<div class="revcol"><button type="button" class="btn sm" data-collapse="1" aria-label="Collapse this question">&#9650; Collapse</button></div>'+h.slice(i)}
+    return h;
   };
   document.addEventListener('click',e=>{
     const b=e.target.closest&&e.target.closest('.starb');if(!b)return;
@@ -4787,6 +4789,13 @@ document.addEventListener('click',e=>{
     starSet(k,on);
     document.querySelectorAll('.starb').forEach(el=>{if(el.dataset.sk===k){el.classList.toggle('on',on);el.setAttribute('aria-pressed',on);el.title=on?'Starred. Click to remove':'Star this question'}});
     toast(on?'Starred':'Removed from starred');
+  },true);
+  document.addEventListener('click',e=>{
+    const c=e.target.closest&&e.target.closest('[data-collapse]');if(!c)return;
+    const d=c.closest('details.rev');if(!d)return;e.preventDefault();e.stopPropagation();
+    const sm=d.querySelector(':scope>summary');
+    if(sm)sm.click();else d.open=false;
+    setTimeout(()=>{try{d.scrollIntoView({block:'nearest',behavior:'smooth'})}catch(x){}},60);
   },true);
   Object.assign(acts,{
     starred(){
@@ -4807,6 +4816,8 @@ document.addEventListener('click',e=>{
 .starb:hover{background:rgba(127,127,127,.18)}
 .starb.on{color:#f0a800}.starb.on svg{fill:#f5b301;stroke:#d99700}
 .starb:active{transform:scale(.88)}
+.revcol{display:flex;justify-content:center;padding-top:6px;border-top:1px dashed var(--line);margin-top:4px}
+.revcol .btn{min-width:150px}
 .hm-star{position:relative}.hm-star.on{color:#f0a800}
 .hm-star .hm-bdg{background:#f0a800;color:#2a1c00}
 </style>
