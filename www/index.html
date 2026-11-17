@@ -16,7 +16,7 @@ document.getElementById('bfr').onclick=function(){location.reload()};
 document.getElementById('bfx').onclick=function(){try{localStorage.removeItem('ovr.html');localStorage.removeItem('ovr.try')}catch(x){}location.reload()};
 },4500)})();
 </script>
-<meta name="app-build" content="2026-11-14.64">
+<meta name="app-build" content="2026-11-14.65">
 <script>(function(){try{var L=function(m){try{var a=JSON.parse(localStorage.getItem('upd.log')||'[]');a.push(new Date().toTimeString().slice(0,8)+' '+m);localStorage.setItem('upd.log',JSON.stringify(a.slice(-16)))}catch(e){}};
 var cmp=function(a,b){var f=function(x){return String(x).split(/[-.]/).map(Number)},p=f(a),q=f(b);for(var i=0;i<4;i++){if((p[i]||0)!==(q[i]||0))return(p[i]||0)>(q[i]||0)?1:-1}return 0};
 var me=document.querySelector('meta[name="app-build"]').content,o=localStorage.getItem('ovr.html');
@@ -1735,12 +1735,17 @@ store.init().then(()=>{if(V.view==='home')renderHome()});
 'use strict';
 /* ---------- AI coach ---------- */
 const DESK=!!window.desk;
+const NATIVE=!DESK&&!!window.Capacitor;   /* Android app: own provider + key kept on this phone */
+const AIOWN=DESK||NATIVE;
+const AICFG='ai.cfg';
+const aiCfg=()=>{try{return JSON.parse(localStorage.getItem(AICFG)||'{}')||{}}catch(e){return{}}};
 const AIS={provider:null,model:'',baseUrl:'',hasKey:false,loaded:false};
 const AI_LABEL={gemini:'Google Gemini',anthropic:'Anthropic Claude',openai:'OpenAI-compatible endpoint',inpage:'Claude (built into this page)'};
 const AI_MODEL={gemini:'gemini-3.1-pro-preview',anthropic:'claude-sonnet-5-5',openai:''};
 async function aiLoad(){
   try{if(DESK)Object.assign(AIS,await window.desk.getSettings())}catch(e){}
-  if(!AIS.provider)AIS.provider=DESK?'gemini':'inpage';
+  if(NATIVE){const c=aiCfg();Object.assign(AIS,{provider:c.provider||'gemini',model:c.model||'',baseUrl:c.baseUrl||'',hasKey:!!c.key})}
+  if(!AIS.provider)AIS.provider=AIOWN?'gemini':'inpage';
   AIS.loaded=true;
 }
 function md(t){
@@ -1792,8 +1797,35 @@ function buildAiPrompt(A,P){
   L.push('Be specific to this data. Do not invent facts that are not above.');
   return L.join('\n');
 }
+/* direct provider call from the Android app (CapacitorHttp makes these requests natively, so there are no browser CORS limits) */
+async function aiDirect(prompt){
+  const c=aiCfg(),prov=c.provider||'gemini',key=c.key;
+  if(!key)throw new Error('No API key saved. Open the AI coach tab (inside any analysis), paste your key and press Save settings.');
+  const J=async r=>{const t=await r.text();let d={};try{d=JSON.parse(t)}catch(e){}return {ok:r.ok,status:r.status,d,t}};
+  const err=o=>{const e=o.d&&(o.d.error&&(o.d.error.message||o.d.error));return o.status+': '+(typeof e==='string'?e:(o.t||'').slice(0,300))};
+  const timed=p=>Promise.race([p,new Promise((_,rej)=>setTimeout(()=>rej(new Error('The request timed out after 4 minutes.')),240000))]);
+  if(prov==='gemini'){
+    let model=c.model||'gemini-3.1-pro-preview';if(/^gemini-2\.5-pro/.test(model))model='gemini-3.1-pro-preview';
+    const o=await timed(fetch('https://generativelanguage.googleapis.com/v1beta/models/'+encodeURIComponent(model)+':generateContent',{method:'POST',headers:{'content-type':'application/json','x-goog-api-key':key},body:JSON.stringify({contents:[{role:'user',parts:[{text:prompt}]}],generationConfig:{temperature:0.4}})}).then(J));
+    if(!o.ok)throw new Error(err(o));
+    const cd=o.d.candidates&&o.d.candidates[0],text=((cd&&cd.content&&cd.content.parts)||[]).map(x=>x.text||'').join('');
+    if(!text)throw new Error('Gemini returned no text'+(cd&&cd.finishReason?' (finish reason: '+cd.finishReason+')':'')+'.');return text;
+  }
+  if(prov==='anthropic'){
+    const o=await timed(fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'content-type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:c.model||'claude-sonnet-5-5',max_tokens:6000,messages:[{role:'user',content:prompt}]})}).then(J));
+    if(!o.ok)throw new Error(err(o));return (o.d.content||[]).filter(b=>b.type==='text').map(b=>b.text).join('');
+  }
+  if(prov==='openai'){
+    if(!c.model)throw new Error('Enter a model name for the custom endpoint.');
+    const base=(c.baseUrl||'https://api.openai.com/v1').replace(/\/+$/,'');
+    const o=await timed(fetch(base+'/chat/completions',{method:'POST',headers:{'content-type':'application/json',authorization:'Bearer '+key},body:JSON.stringify({model:c.model,messages:[{role:'user',content:prompt}]})}).then(J));
+    if(!o.ok)throw new Error(err(o));const m=o.d.choices&&o.d.choices[0]&&o.d.choices[0].message;return (m&&m.content)||'';
+  }
+  throw new Error('Unknown provider: '+prov);
+}
 async function aiAsk(prompt){
   if(DESK)return window.desk.ai(prompt);
+  if(NATIVE)return aiDirect(prompt);
   const s=window.claude&&claude.use?await claude.use('sample'):null;
   if(!s)throw new Error('The built-in Claude analysis is not available in this view. Use Copy prompt and paste it into any AI you like.');
   const r=await s(prompt,{modelTier:'complex',cache:false});
@@ -1802,13 +1834,13 @@ async function aiAsk(prompt){
 function aiTab(A){
   if(!AIS.loaded){aiLoad().then(()=>{if((V.view==='analysis'||V.view==='combo')&&V.tab==='ai')renderAnalysis()});return '<div class="panel sub">Loading…</div>'}
   const P=attPaper(A),prompt=buildAiPrompt(A,P);
-  const form=DESK?`<div class="row" style="align-items:flex-end">
+  const form=AIOWN?`<div class="row" style="align-items:flex-end">
     <div class="field"><label for="aiprov">Provider</label><select id="aiprov">${['gemini','anthropic','openai'].map(k=>`<option value="${k}" ${AIS.provider===k?'selected':''}>${AI_LABEL[k]}</option>`).join('')}</select></div>
     <div class="field"><label for="aimodel">Model</label><input id="aimodel" value="${esc(/^gemini-2\.5-pro/.test(AIS.model||'')?'':(AIS.model||''))}" placeholder="${esc(AI_MODEL[AIS.provider]||'model name')}"></div>
     <div class="field"><label for="aiurl">Base URL (custom endpoints only)</label><input id="aiurl" value="${esc(AIS.baseUrl||'')}" placeholder="https://host/v1"></div>
     <div class="field"><label for="aikey">API key</label><input id="aikey" type="password" autocomplete="off" placeholder="${AIS.hasKey?'Saved. Leave blank to keep':'Paste API key'}"></div>
     <button class="btn" data-act="aisave">Save settings</button></div>
-    <div class="sub" style="font-size:12px">Your key is stored encrypted on this computer by Windows and is only sent to the provider you pick.</div>`
+    <div class="sub" style="font-size:12px">${DESK?'Your key is stored encrypted on this computer by Windows and is only sent to the provider you pick.':'Your key is kept only on this phone (it is not synced or backed up) and is sent only to the provider you pick. A free Google Gemini key from aistudio.google.com works.'}</div>`
    :`<div class="msg info">This page analyses with Claude directly. To use Gemini or another provider, use the Windows app.</div>`;
   return `<div class="panel stack"><div><h2>AI coach</h2><div class="sub">Sends your result data (scores, topics, timings, and the text of your costliest questions) to an AI and returns a written analysis and study plan.</div></div>
    ${form}
@@ -1820,6 +1852,11 @@ function aiTab(A){
 }
 acts.aisave=async()=>{
   const v=id=>(document.getElementById(id)||{}).value||'';
+  if(NATIVE){
+    const o=aiCfg(),n={provider:v('aiprov')||'gemini',model:v('aimodel').trim(),baseUrl:v('aiurl').trim(),key:v('aikey').trim()||o.key||''};
+    try{localStorage.setItem(AICFG,JSON.stringify(n))}catch(e){V.aiErr='Could not save on this phone: '+e.message;renderAnalysis();return}
+    Object.assign(AIS,{provider:n.provider,model:n.model,baseUrl:n.baseUrl,hasKey:!!n.key});toast('Settings saved');V.aiErr='';renderAnalysis();return;
+  }
   try{const r=await window.desk.setSettings({provider:v('aiprov'),model:v('aimodel').trim(),baseUrl:v('aiurl').trim(),key:v('aikey').trim()});Object.assign(AIS,r);toast('Settings saved');V.aiErr='';renderAnalysis()}catch(e){V.aiErr=e.message||String(e);renderAnalysis()}
 };
 acts.aicopy=()=>{const A=curAtt();if(A)copyText(buildAiPrompt(A,attPaper(A)))};
@@ -1828,7 +1865,7 @@ acts.airun=async()=>{
   V.aiBusy=true;V.aiErr='';renderAnalysis();
   try{const text=await aiAsk(buildAiPrompt(A,attPaper(A)));
     if(!text||!String(text).trim())throw new Error('The AI returned an empty answer.');
-    A.ai={text:String(text),at:Date.now(),by:AI_LABEL[AIS.provider]+(DESK&&AIS.model?' · '+AIS.model:(DESK&&AI_MODEL[AIS.provider]?' · '+AI_MODEL[AIS.provider]:''))};saveAtt(A)}
+    A.ai={text:String(text),at:Date.now(),by:AI_LABEL[AIS.provider]+(AIOWN&&AIS.model?' · '+AIS.model:(AIOWN&&AI_MODEL[AIS.provider]?' · '+AI_MODEL[AIS.provider]:''))};saveAtt(A)}
   catch(e){V.aiErr=(e&&e.message)||String(e)}
   V.aiBusy=false;if(V.view==='analysis'||V.view==='combo')renderAnalysis();
 };
@@ -3564,7 +3601,7 @@ acts.qai=async t=>{
   try{
     const text=await aiAsk(qaiPrompt(A,x,m,custom));
     if(!text||!String(text).trim())throw new Error('The AI returned an empty answer.');
-    A.qai=A.qai||{};(A.qai[x.id]=A.qai[x.id]||[]).push({m,q:custom,text:String(text),at:Date.now(),by:DESK?(AI_LABEL[AIS.provider]||'AI')+(AIS.model?' · '+AIS.model:''):'Claude'});
+    A.qai=A.qai||{};(A.qai[x.id]=A.qai[x.id]||[]).push({m,q:custom,text:String(text),at:Date.now(),by:AIOWN?(AI_LABEL[AIS.provider]||'AI')+(AIS.model?' · '+AIS.model:''):'Claude'});
     saveAtt(A);if(m==='ask')inp.value='';
     out.innerHTML=qaiOut(A.qai[x.id]);
   }catch(e){
@@ -4057,7 +4094,7 @@ function renderRevision(){
   app.innerHTML=`<div class="wrap"><div class="top"><div class="brand">Revision sheet<small>${tot} question${tot===1?'':'s'} across ${G.length} topic${G.length===1?'':'s'} · ${open} still open</small></div><div class="row"><button class="btn sm" data-act="notebook">Notebook</button><button class="btn sm" data-act="home">Back</button></div></div>
    <div class="panel stack">${rvFilterBar()}<div class="row" style="gap:8px;align-items:center;flex-wrap:wrap"><span class="sub" style="font-size:12px">Show</span><button class="chip ${RV.show==='open'?'on':''}" data-act="rvshow" data-v="open">Still open</button><button class="chip ${RV.show==='all'?'on':''}" data-act="rvshow" data-v="all">Including mastered</button></div>
     <div class="row" style="gap:8px;flex-wrap:wrap"><button class="btn sm pri" data-act="rvall" ${G.length?'':'disabled'}>${rvFiltered()?'Generate a note for each topic shown':'Generate AI notes for all topics'}</button><button class="btn sm" data-act="rvpdf" ${G.length?'':'disabled'}>Download PDF</button><button class="btn sm" data-act="rvtxt" ${G.length?'':'disabled'}>Text (.md)</button><button class="btn sm" data-act="rvcopy" ${G.length?'':'disabled'}>Copy</button></div>
-    <div class="sub" style="font-size:12px">AI notes are written once per topic from your missed questions, saved here, and included in the exports. ${DESK?'Uses the AI provider and key set in the Analysis AI tab.':'Uses the built-in Claude analysis when available; otherwise copy the text export into any AI.'}</div></div>
+    <div class="sub" style="font-size:12px">AI notes are written once per topic from your missed questions, saved here, and included in the exports. ${AIOWN?'Uses the AI provider and key set in the Analysis AI tab.':'Uses the built-in Claude analysis when available; otherwise copy the text export into any AI.'}</div></div>
    ${rvSelPanel(G)}
    ${G.length?`<div class="rvgrid">${G.map(panel).join('')}</div>`:'<div class="panel"><p class="sub">Nothing to revise yet. Questions you get wrong or leave blank in a test will collect here, grouped by topic.</p></div>'}</div>`;
 }
@@ -4083,7 +4120,7 @@ async function rvGen(t,box){
   const p=document.querySelector(`.rvp[data-topic="${CSS.escape(t)}"]`),st=p&&p.querySelector('.rvst'),btn=p&&p.querySelector('[data-act=rvai]');
   if(st)st.textContent='Writing the note…';if(btn)btn.disabled=true;RV.busy[t]=1;
   try{
-    if(DESK&&typeof aiLoad==='function'&&!AIS.loaded)await aiLoad();
+    if(AIOWN&&typeof aiLoad==='function'&&!AIS.loaded)await aiLoad();
     const txt=String(await aiAsk(rvPrompt(g))||'').trim();
     if(!txt)throw new Error('The AI returned an empty answer.');
     rvSave(t,{ai:txt,aiAt:Date.now(),n:Math.min(12,g.items.length)});
