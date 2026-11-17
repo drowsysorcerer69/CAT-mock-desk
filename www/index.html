@@ -16,7 +16,7 @@ document.getElementById('bfr').onclick=function(){location.reload()};
 document.getElementById('bfx').onclick=function(){try{localStorage.removeItem('ovr.html');localStorage.removeItem('ovr.try')}catch(x){}location.reload()};
 },4500)})();
 </script>
-<meta name="app-build" content="2026-11-14.65">
+<meta name="app-build" content="2026-11-14.67">
 <script>(function(){try{var L=function(m){try{var a=JSON.parse(localStorage.getItem('upd.log')||'[]');a.push(new Date().toTimeString().slice(0,8)+' '+m);localStorage.setItem('upd.log',JSON.stringify(a.slice(-16)))}catch(e){}};
 var cmp=function(a,b){var f=function(x){return String(x).split(/[-.]/).map(Number)},p=f(a),q=f(b);for(var i=0;i<4;i++){if((p[i]||0)!==(q[i]||0))return(p[i]||0)>(q[i]||0)?1:-1}return 0};
 var me=document.querySelector('meta[name="app-build"]').content,o=localStorage.getItem('ovr.html');
@@ -3802,7 +3802,7 @@ setTimeout(()=>{if(SY.refresh)syncNow(true)},2500);
   A.addListener('backButton',()=>{
     if(document.getElementById('zoomov')){closeZoom();return}
     if(V.view==='exam'){toast('Use the exam menu to submit or leave the test');return}
-    if(V.view!=='home'){go('home');return}
+    if(V.view!=='home'){if(window.__navBack)window.__navBack();else go('home');return}
     if(Date.now()-last<2000)A.exitApp();else{last=Date.now();toast('Press back again to exit')}
   });
 })();
@@ -4653,6 +4653,11 @@ body.ps-on #app .prow,body.ps-on #app .paper{cursor:pointer}
     if(!jump(FW,BK))toast('Nothing to go forward to');
   }
   window.__navBack=back;window.__navFwd=fwd;
+  /* inner tabs / sections count as one step each, so one back press goes back exactly one step */
+  ['tab','ctab'].forEach(n=>{const o=acts[n];if(typeof o!=='function')return;
+    acts[n]=function(t){const nv=t&&t.dataset&&(t.dataset.t||t.dataset.v),key=n==='tab'?'tab':'ctab';
+      if(nv&&V[key]!==nv&&V.view!=='exam'){BK.push(snap());if(BK.length>40)BK.shift();FW.length=0}
+      const r=o.apply(this,arguments);sync();return r}});
   document.addEventListener('click',e=>{const t=e.target.closest&&e.target.closest('#tbback,#tbfwd');if(!t||t.disabled)return;lastT=0;if(t.id==='tbback')back();else fwd()});
   setTimeout(sync,300);
   const typing=t=>t&&(/^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName||'')||t.isContentEditable);
@@ -4787,5 +4792,19 @@ function starSet(key,on){
 }
 .rev>summary:has(>.starb){position:relative;padding-right:52px!important}
 .rev>summary>.starb{position:absolute;top:8px;right:10px;margin:0;order:0}
+</style>
+<style>
+/* phone: wider popup windows with less padding inside */
+@media (max-width:640px){
+  .zoomov{padding:6px!important}
+  body:not(.exam-on) .zoombox{padding:12px 6px 12px;border-radius:22px;width:100%}
+  body:not(.exam-on) .zoombox .zoombar{padding-inline:8px;margin-bottom:6px}
+  body:not(.exam-on) .zoombox .zoomscroll{padding:3px!important;border-radius:16px}
+  body:not(.exam-on) .zoombox .rev>summary{padding:10px 10px!important;padding-right:44px!important;gap:6px 10px}
+  body:not(.exam-on) .zoombox .rev>summary>.starb{right:6px;top:6px}
+  body:not(.exam-on) .zoombox .revbody{padding:6px 10px 12px}
+  body:not(.exam-on) .zoombox .qnavbar{padding-inline:6px;margin-top:8px}
+  body:not(.exam-on) .zoombox .pgh{padding-inline:10px}
+}
 </style>
 </body></html>
