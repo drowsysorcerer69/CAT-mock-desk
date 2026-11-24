@@ -16,7 +16,7 @@ document.getElementById('bfr').onclick=function(){location.reload()};
 document.getElementById('bfx').onclick=function(){try{localStorage.removeItem('ovr.html');localStorage.removeItem('ovr.lz');localStorage.removeItem('ovr.try')}catch(x){}location.reload()};
 },4500)})();
 </script>
-<meta name="app-build" content="2026-11-24.75">
+<meta name="app-build" content="2026-11-24.76">
 <script>(function(){try{var L=function(m){try{var a=JSON.parse(localStorage.getItem('upd.log')||'[]');a.push(new Date().toTimeString().slice(0,8)+' '+m);localStorage.setItem('upd.log',JSON.stringify(a.slice(-16)))}catch(e){}};
 var cmp=function(a,b){var f=function(x){return String(x).split(/[-.]/).map(Number)},p=f(a),q=f(b);for(var i=0;i<4;i++){if((p[i]||0)!==(q[i]||0))return(p[i]||0)>(q[i]||0)?1:-1}return 0};
 var LZ=window.__lz=window.__lz||{enc:function(s){var b=new TextEncoder().encode(s),o=[],m=new Map(),n=257,w=b[0];for(var i=1;i<b.length;i++){var c=b[i],k=w*256+c,v=m.get(k);if(v!==undefined)w=v;else{o.push(w+32);if(n<32768)m.set(k,n++);else{o.push(288);m.clear();n=257}w=c}}o.push(w+32);var r='';for(i=0;i<o.length;i+=8192)r+=String.fromCharCode.apply(null,o.slice(i,i+8192));return r},dec:function(s){var P=[],S=[],n=257,pv=-1,out=new Uint8Array(1<<20),L=0,t=[];function put(x){if(L>=out.length){var q=new Uint8Array(out.length*2);q.set(out);out=q}out[L++]=x}function ex(c){t.length=0;while(c>=257){t.push(S[c]);c=P[c]}t.push(c);return t}for(var i=0;i<s.length;i++){var c=s.charCodeAt(i)-32;if(c===256){n=257;pv=-1;continue}if(pv===-1){put(c);pv=c;continue}var e,f;if(c<n){e=ex(c);f=e[e.length-1]}else{e=ex(pv);f=e[e.length-1];e.unshift(f)}for(var j=e.length-1;j>=0;j--)put(e[j]);if(n<32768){P[n]=pv;S[n]=f;n++}pv=c}return new TextDecoder().decode(out.subarray(0,L))}};
@@ -4925,6 +4925,54 @@ tbody td{border-bottom:1px solid ${line}}
   Object.assign(acts,{trkopen(){open()}});
   const nb=window.__navBack;
   if(typeof nb==='function')window.__navBack=function(){if(close())return;return nb.apply(this,arguments)};
+})();
+</script>
+<style>
+@keyframes zbIn{0%{opacity:0;transform:scale(.35) translateY(18px)}60%{opacity:1}100%{opacity:1;transform:none}}
+@keyframes zvIn{from{opacity:0}to{opacity:1}}
+@keyframes qslR{from{opacity:0;transform:translateX(34px)}to{opacity:1;transform:none}}
+@keyframes qslL{from{opacity:0;transform:translateX(-34px)}to{opacity:1;transform:none}}
+@keyframes qrise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.zoomov{animation:zvIn .22s ease-out both}
+.zoombox{animation:zbIn .38s cubic-bezier(.16,1,.3,1) both}
+.zoomov:not([data-qi]) .zoomscroll details.rev,.zoomov:not([data-qi]) .zoomscroll details.pg{animation:qrise .36s cubic-bezier(.2,.8,.2,1) both}
+.zoomov:not([data-qi]) .zoomscroll details:nth-of-type(2){animation-delay:.05s}
+.zoomov:not([data-qi]) .zoomscroll details:nth-of-type(3){animation-delay:.1s}
+.zoomov:not([data-qi]) .zoomscroll details:nth-of-type(4){animation-delay:.15s}
+.zoomov:not([data-qi]) .zoomscroll details:nth-of-type(5){animation-delay:.2s}
+.zoomov:not([data-qi]) .zoomscroll details:nth-of-type(6){animation-delay:.25s}
+.zoomov:not([data-qi]) .zoomscroll details:nth-of-type(n+7){animation-delay:.3s}
+.zoomov .tq.slR{animation:qslR .3s cubic-bezier(.2,.8,.2,1) both}
+.zoomov .tq.slL{animation:qslL .3s cubic-bezier(.2,.8,.2,1) both}
+.qb{transition:transform .16s cubic-bezier(.3,1.6,.5,1),box-shadow .16s}
+.qb:hover{transform:translateY(-2px) scale(1.14);box-shadow:0 4px 10px rgba(0,0,0,.22)}
+.qb:active{transform:scale(.86)}
+@media (prefers-reduced-motion:reduce){.zoomov,.zoombox,.zoomov .zoomscroll details,.zoomov .tq{animation:none!important}}
+</style>
+<script>
+(function(){
+  let pt=null;
+  document.addEventListener('click',e=>{const t=e.target.closest&&e.target.closest('[data-act="qopen"],[data-act="grp"],[data-act="grptopic"]');pt=t?{x:e.clientX,y:e.clientY,t:Date.now()}:null},true);
+  const op=window.openPanel;
+  if(typeof op==='function'){
+    window.openPanel=openPanel=function(){
+      const r=op.apply(this,arguments);
+      try{
+        const z=document.getElementById('zoomov'),b=z&&z.querySelector('.zoombox');
+        if(b&&pt&&Date.now()-pt.t<600&&(pt.x||pt.y)){const px=pt.x,py=pt.y;Promise.resolve().then(()=>{try{const w=b.offsetWidth,h=b.offsetHeight;b.style.transformOrigin=Math.max(-40,Math.min(w+40,px-b.offsetLeft))+'px '+Math.max(-40,Math.min(h+40,py-b.offsetTop))+'px'}catch(e){}})}
+      }catch(e){}
+      pt=null;return r;
+    };
+  }
+  const qp=window.qNavPaint;
+  if(typeof qp==='function'){
+    window.qNavPaint=qNavPaint=function(i){
+      const z=document.getElementById('zoomov'),old=z&&z.dataset.qi!==undefined?+z.dataset.qi:null;
+      const r=qp.apply(this,arguments);
+      try{const t=z&&z.querySelector('.zoomscroll .tq');if(t&&old!==null&&old!==i){t.classList.remove('slL','slR');void t.offsetWidth;t.classList.add(i>old?'slR':'slL')}}catch(e){}
+      return r;
+    };
+  }
 })();
 </script>
 </body></html>
