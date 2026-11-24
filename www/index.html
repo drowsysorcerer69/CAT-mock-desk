@@ -13,18 +13,19 @@ var m=document.querySelectorAll('meta[name="app-build"]');
 d.innerHTML='<h2 style="margin:0 0 8px">The app could not start</h2><p>Please send a screenshot of this page.</p><p><b>Build:</b> '+(m.length?m[m.length-1].content:'?')+' &middot; <b>scripts:</b> '+document.scripts.length+' &middot; <b>app box:</b> '+(a?'found':'missing')+'</p><p><b>Errors:</b><br>'+(E.length?E.join('<br>'):'none captured. The page file may be incomplete (re-upload www/index.html by dragging the file in, not by pasting).')+'</p><p><button id="bfr" style="padding:10px 16px;font-size:15px">Reload</button> <button id="bfx" style="padding:10px 16px;font-size:15px">Forget saved update and reload</button></p>';
 document.body.appendChild(d);
 document.getElementById('bfr').onclick=function(){location.reload()};
-document.getElementById('bfx').onclick=function(){try{localStorage.removeItem('ovr.html');localStorage.removeItem('ovr.try')}catch(x){}location.reload()};
+document.getElementById('bfx').onclick=function(){try{localStorage.removeItem('ovr.html');localStorage.removeItem('ovr.lz');localStorage.removeItem('ovr.try')}catch(x){}location.reload()};
 },4500)})();
 </script>
-<meta name="app-build" content="2026-11-24.74">
+<meta name="app-build" content="2026-11-24.75">
 <script>(function(){try{var L=function(m){try{var a=JSON.parse(localStorage.getItem('upd.log')||'[]');a.push(new Date().toTimeString().slice(0,8)+' '+m);localStorage.setItem('upd.log',JSON.stringify(a.slice(-16)))}catch(e){}};
 var cmp=function(a,b){var f=function(x){return String(x).split(/[-.]/).map(Number)},p=f(a),q=f(b);for(var i=0;i<4;i++){if((p[i]||0)!==(q[i]||0))return(p[i]||0)>(q[i]||0)?1:-1}return 0};
-var me=document.querySelector('meta[name="app-build"]').content,o=localStorage.getItem('ovr.html');
+var LZ=window.__lz=window.__lz||{enc:function(s){var b=new TextEncoder().encode(s),o=[],m=new Map(),n=257,w=b[0];for(var i=1;i<b.length;i++){var c=b[i],k=w*256+c,v=m.get(k);if(v!==undefined)w=v;else{o.push(w+32);if(n<32768)m.set(k,n++);else{o.push(288);m.clear();n=257}w=c}}o.push(w+32);var r='';for(i=0;i<o.length;i+=8192)r+=String.fromCharCode.apply(null,o.slice(i,i+8192));return r},dec:function(s){var P=[],S=[],n=257,pv=-1,out=new Uint8Array(1<<20),L=0,t=[];function put(x){if(L>=out.length){var q=new Uint8Array(out.length*2);q.set(out);out=q}out[L++]=x}function ex(c){t.length=0;while(c>=257){t.push(S[c]);c=P[c]}t.push(c);return t}for(var i=0;i<s.length;i++){var c=s.charCodeAt(i)-32;if(c===256){n=257;pv=-1;continue}if(pv===-1){put(c);pv=c;continue}var e,f;if(c<n){e=ex(c);f=e[e.length-1]}else{e=ex(pv);f=e[e.length-1];e.unshift(f)}for(var j=e.length-1;j>=0;j--)put(e[j]);if(n<32768){P[n]=pv;S[n]=f;n++}pv=c}return new TextDecoder().decode(out.subarray(0,L))}};
+var me=document.querySelector('meta[name="app-build"]').content,o=null,oz=localStorage.getItem('ovr.lz');if(oz){try{o=LZ.dec(oz)}catch(e){o=null;localStorage.removeItem('ovr.lz')}}if(!o)o=localStorage.getItem('ovr.html');
 if(window.__ovr)return;
-if(localStorage.getItem('ovr.try')){localStorage.removeItem('ovr.try');localStorage.removeItem('ovr.html');L('Previous start did not finish. Built-in version '+me+' restored.');return}
+if(localStorage.getItem('ovr.try')){localStorage.removeItem('ovr.try');localStorage.removeItem('ovr.html');localStorage.removeItem('ovr.lz');L('Previous start did not finish. Built-in version '+me+' restored.');return}
 if(!o)return;
 var mm=o.match(/name="app-build" content="([^"]+)"/),ob=mm?mm[1]:'';
-if(!ob||cmp(ob,me)<0){localStorage.removeItem('ovr.html');return}
+if(!ob||cmp(ob,me)<0){localStorage.removeItem('ovr.html');localStorage.removeItem('ovr.lz');return}
 if(cmp(ob,me)>0){L('Starting updated version '+ob);localStorage.setItem('ovr.try',ob);window.__ovr=1;var mt=document.querySelector('meta[name="app-build"]');if(mt&&mt.parentNode)mt.parentNode.removeChild(mt);document.write(o+'<plaintext style="display:none">')}}catch(e){}})()</script>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto+Flex:opsz,wght@8..144,400;8..144,500;8..144,600&family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Serif:wght@400;600&display=swap">
 <style>
@@ -4379,7 +4380,7 @@ Object.assign(acts,{
   async updinstall(){
     const f=UPD.found;if(!f||UPD.busy)return;UPD.busy=true;UPD.err='';updPaint();updStart('Saving the update on this phone…');updLog('Saving '+f.build+' ('+Math.round(f.html.length/1024)+' KB)');
     await updWait(350);
-    try{localStorage.setItem('ovr.html',f.html)}catch(e){updStop();UPD.busy=false;UPD.step='';UPD.err='Not enough storage on this phone to keep the update.';updLog('Save failed');updPaint();return}
+    try{const z=window.__lz.enc(f.html);if(window.__lz.dec(z)!==f.html)throw new Error('verify');try{localStorage.removeItem('ovr.html')}catch(x){}localStorage.setItem('ovr.lz',z);updLog('Stored '+Math.round(z.length/1024)+'K chars')}catch(e){updStop();UPD.busy=false;UPD.step='';UPD.err='The app\'s own storage space is full (this is a browser limit, not your phone\'s free space). Build a new APK from GitHub with this index.html to get the update.';updLog('Save failed: '+((e&&e.message)||e));updPaint();return}
     updLog('Saved. Restarting');updBar('Saved. Restarting the app…',100);await updWait(900);location.reload()},
   async updtestdl(){
     const C=window.Capacitor;let rep='Build '+BUILD+'\nCapacitor: '+(C?'yes':'NO')+(C&&C.getPlatform?' ('+C.getPlatform()+')':'')+'\n';
@@ -4390,7 +4391,7 @@ Object.assign(acts,{
     try{updLog(rep.replace(/\n/g,' | '))}catch(x){}
     alert(rep)
   },
-  updreset(){if(UPD.busy)return;try{localStorage.removeItem('ovr.html');localStorage.removeItem('ovr.try')}catch(e){}updLog('Back to built-in version');updBar('Going back to the built-in version…',null);setTimeout(()=>location.reload(),700)}
+  updreset(){if(UPD.busy)return;try{localStorage.removeItem('ovr.html');localStorage.removeItem('ovr.lz');localStorage.removeItem('ovr.try')}catch(e){}updLog('Back to built-in version');updBar('Going back to the built-in version…',null);setTimeout(()=>location.reload(),700)}
 });
 document.addEventListener('click',e=>{const t=e.target.closest&&e.target.closest('#zoomov [data-act^="upd"]');if(t&&acts[t.dataset.act]&&!t.disabled)acts[t.dataset.act](t)});
 /* the app started fine: clear the safety flag, so the update stays */
