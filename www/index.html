@@ -16,7 +16,7 @@ document.getElementById('bfr').onclick=function(){location.reload()};
 document.getElementById('bfx').onclick=function(){try{localStorage.removeItem('ovr.html');localStorage.removeItem('ovr.lz');localStorage.removeItem('ovr.try')}catch(x){}location.reload()};
 },4500)})();
 </script>
-<meta name="app-build" content="2026-11-24.76">
+<meta name="app-build" content="2026-11-25.77">
 <script>(function(){try{var L=function(m){try{var a=JSON.parse(localStorage.getItem('upd.log')||'[]');a.push(new Date().toTimeString().slice(0,8)+' '+m);localStorage.setItem('upd.log',JSON.stringify(a.slice(-16)))}catch(e){}};
 var cmp=function(a,b){var f=function(x){return String(x).split(/[-.]/).map(Number)},p=f(a),q=f(b);for(var i=0;i<4;i++){if((p[i]||0)!==(q[i]||0))return(p[i]||0)>(q[i]||0)?1:-1}return 0};
 var LZ=window.__lz=window.__lz||{enc:function(s){var b=new TextEncoder().encode(s),o=[],m=new Map(),n=257,w=b[0];for(var i=1;i<b.length;i++){var c=b[i],k=w*256+c,v=m.get(k);if(v!==undefined)w=v;else{o.push(w+32);if(n<32768)m.set(k,n++);else{o.push(288);m.clear();n=257}w=c}}o.push(w+32);var r='';for(i=0;i<o.length;i+=8192)r+=String.fromCharCode.apply(null,o.slice(i,i+8192));return r},dec:function(s){var P=[],S=[],n=257,pv=-1,out=new Uint8Array(1<<20),L=0,t=[];function put(x){if(L>=out.length){var q=new Uint8Array(out.length*2);q.set(out);out=q}out[L++]=x}function ex(c){t.length=0;while(c>=257){t.push(S[c]);c=P[c]}t.push(c);return t}for(var i=0;i<s.length;i++){var c=s.charCodeAt(i)-32;if(c===256){n=257;pv=-1;continue}if(pv===-1){put(c);pv=c;continue}var e,f;if(c<n){e=ex(c);f=e[e.length-1]}else{e=ex(pv);f=e[e.length-1];e.unshift(f)}for(var j=e.length-1;j>=0;j--)put(e[j]);if(n<32768){P[n]=pv;S[n]=f;n++}pv=c}return new TextDecoder().decode(out.subarray(0,L))}};
@@ -1133,7 +1133,7 @@ function renderHome(){
   const tiles=[['practice','bolt','DPP','Daily practice',''],['notebook','warn','Mistakes','Review notebook',due?`<span class="dueb">${due}</span>`:''],['weak','insights','Weak areas','Find gaps',''],['combo','layers','Combined','Many mocks','']];
   app.innerHTML=`<div class="wrap hm">
   <header class="hm-head"><div class="hm-hi"><div class="hm-hello">Hello,</div><input class="nm hm-name" id="candname" value="${esc(candName())}" placeholder="Your name" aria-label="Your name" maxlength="40"></div>
-   <div class="hm-tools">${inprog?`<button class="hm-ic hm-alert" data-act="resume" aria-label="Resume test" title="Resume test">${ic('bolt')}</button>`:due?`<button class="hm-ic hm-alert" data-act="nbstart" data-set="due" aria-label="${due} mistakes due" title="${due} mistakes due - revise now">${ic('bolt')}<span class="hm-bdg">${due>99?'99+':due}</span></button>`:`<button class="hm-ic hm-alert" data-act="practice" aria-label="Start DPP" title="Start DPP">${ic('bolt')}</button>`}<button class="hm-ic" data-act="histopen" aria-label="Attempt history" title="Attempt history (${atts.length})">${ic('history')}</button><button class="hm-ic hm-star${SC()?' on':''}" data-act="starred" aria-label="Starred questions" title="Starred questions (${SC()})">${ic('star')}${SC()?`<span class="hm-bdg">${SC()>99?'99+':SC()}</span>`:''}</button><button class="hm-ic" data-act="trkopen" aria-label="MBA tracker" title="MBA college tracker">${ic('trk')}</button><details class="more"><summary class="hm-ic" aria-label="Menu">${ic('more')}</summary><div class="menu"><button class="btn sm" data-act="theme">Theme &amp; colours</button><button class="btn sm" data-act="wmopen">Exam watermark (CAT ID)</button><button class="btn sm" data-act="syopen">Cloud sync${typeof SY!=='undefined'&&SY.refresh?' · on':''}</button>${window.Capacitor?'':`<button class="btn sm" data-act="fullscreen">${document.fullscreenElement?'Exit full screen':'Full screen'}</button>`}${window.desk?'<button class="btn sm" data-act="backup">Export backup</button><button class="btn sm" data-act="restore">Import backup</button>':''}${window.Capacitor&&!window.desk?'<button class="btn sm" data-act="updopen">App update</button>':''}${window.desk&&window.desk.updateApp?'<button class="btn sm" data-act="appupdate">Update app from file</button><button class="btn sm" data-act="appreset">Use built-in version</button>':''}<button class="btn sm" data-act="kbhelp">Keyboard shortcuts</button><div class="sub" style="font-size:12px;padding:6px 12px">Build ${esc(BUILD)}</div><div class="sub" style="font-size:12px;padding:6px 12px">${window.desk?'History saved on this computer':window.Capacitor?'History saved on this phone':store.cloud?'History saved to your account':'History saved in this browser'}</div></div></details></div></header>
+   <div class="hm-tools">${inprog?`<button class="hm-ic hm-alert" data-act="resume" aria-label="Resume test" title="Resume test">${ic('bolt')}</button>`:due?`<button class="hm-ic hm-alert" data-act="nbstart" data-set="due" aria-label="${due} mistakes due" title="${due} mistakes due - revise now">${ic('bolt')}<span class="hm-bdg">${due>99?'99+':due}</span></button>`:`<button class="hm-ic hm-alert" data-act="practice" aria-label="Start DPP" title="Start DPP">${ic('bolt')}</button>`}<button class="hm-ic" data-act="histopen" aria-label="Attempt history" title="Attempt history (${atts.length})">${ic('history')}</button><button class="hm-ic hm-star${SC()?' on':''}" data-act="starred" aria-label="Starred questions" title="Starred questions (${SC()})">${ic('star')}${SC()?`<span class="hm-bdg">${SC()>99?'99+':SC()}</span>`:''}</button><button class="hm-ic" data-act="trkopen" aria-label="MBA tracker" title="MBA college tracker">${ic('trk')}</button><details class="more"><summary class="hm-ic" aria-label="Menu">${ic('more')}</summary><div class="menu"><button class="btn sm" data-act="theme">Theme &amp; colours</button>${HAP.can()?`<button class="btn sm" data-act="haptoggle">Haptic feedback · ${HAP.on?'on':'off'}</button>`:''}<button class="btn sm" data-act="wmopen">Exam watermark (CAT ID)</button><button class="btn sm" data-act="syopen">Cloud sync${typeof SY!=='undefined'&&SY.refresh?' · on':''}</button>${window.Capacitor?'':`<button class="btn sm" data-act="fullscreen">${document.fullscreenElement?'Exit full screen':'Full screen'}</button>`}${window.desk?'<button class="btn sm" data-act="backup">Export backup</button><button class="btn sm" data-act="restore">Import backup</button>':''}${window.Capacitor&&!window.desk?'<button class="btn sm" data-act="updopen">App update</button>':''}${window.desk&&window.desk.updateApp?'<button class="btn sm" data-act="appupdate">Update app from file</button><button class="btn sm" data-act="appreset">Use built-in version</button>':''}<button class="btn sm" data-act="kbhelp">Keyboard shortcuts</button><div class="sub" style="font-size:12px;padding:6px 12px">Build ${esc(BUILD)}</div><div class="sub" style="font-size:12px;padding:6px 12px">${window.desk?'History saved on this computer':window.Capacitor?'History saved on this phone':store.cloud?'History saved to your account':'History saved in this browser'}</div></div></details></div></header>
   <div class="hm-top">
   <details class="panel hm-add stack"${V.msg?' open':''}><summary><span class="hm-ci">${ic('add')}</span><span class="hm-addt"><b>Add a practice paper</b><small>Import a PDF, JSON or pasted text</small></span></summary><div class="stack" style="gap:10px;margin-top:12px">
     <div class="addtop"><div class="in">
@@ -1728,6 +1728,18 @@ document.addEventListener('keydown',e=>{
   if(m){e.preventDefault();calcKey(m)}
 });
 
+const DESK=!!window.desk;
+const NATIVE=!DESK&&!!window.Capacitor;   /* Android app: own provider + key kept on this phone */
+const AIOWN=DESK||NATIVE;
+/* Haptic feedback: Android = native View haptics through the Downloader plugin; other touch browsers = navigator.vibrate */
+const HAP=(()=>{let last=0,on=true;try{on=localStorage.getItem('hap.on')!=='0'}catch(e){}
+  const can=()=>NATIVE||(!DESK&&typeof navigator.vibrate==='function');
+  const buzz=t=>{try{navigator.vibrate&&navigator.vibrate({tick:8,sel:12,ok:[10,40,16],warn:[25,45,25],heavy:35}[t]||8)}catch(e){}};
+  function fire(t){if(!on||!can())return;const n=performance.now();if(n-last<45)return;last=n;
+    try{if(NATIVE){const C=window.Capacitor,P=C.Plugins&&C.Plugins.Downloader;let r=null;
+        if(P&&P.haptic)r=P.haptic({t});else if(typeof C.nativePromise==='function')r=C.nativePromise('Downloader','haptic',{t});
+        if(r&&r.catch)r.catch(()=>buzz(t));else if(!r)buzz(t)}else buzz(t)}catch(e){}}
+  return{fire,can,get on(){return on},set(v){on=!!v;try{localStorage.setItem('hap.on',v?'1':'0')}catch(e){}}}})();
 renderHome();
 store.init().then(()=>{if(V.view==='home')renderHome()});
 </script>
@@ -1735,9 +1747,7 @@ store.init().then(()=>{if(V.view==='home')renderHome()});
 <script>
 'use strict';
 /* ---------- AI coach ---------- */
-const DESK=!!window.desk;
-const NATIVE=!DESK&&!!window.Capacitor;   /* Android app: own provider + key kept on this phone */
-const AIOWN=DESK||NATIVE;
+
 const AICFG='ai.cfg';
 const aiCfg=()=>{try{return JSON.parse(localStorage.getItem(AICFG)||'{}')||{}}catch(e){return{}}};
 const AIS={provider:null,model:'',baseUrl:'',hasKey:false,loaded:false};
@@ -4973,6 +4983,23 @@ tbody td{border-bottom:1px solid ${line}}
       return r;
     };
   }
+})();
+</script>
+<script>
+(function(){
+  Object.assign(acts,{haptoggle(){HAP.set(!HAP.on);if(HAP.on)HAP.fire('ok');render()}});
+  const SEL='button,summary,a[href],[data-act],[data-zoom],.qb,.opt,label,select,[role=button],input[type=checkbox],input[type=radio],.hm-ic,.seg button,.swatch';
+  document.addEventListener('click',e=>{
+    if(!HAP.on)return;
+    const t=e.target.closest&&e.target.closest(SEL);
+    if(!t||t.disabled||t.getAttribute('aria-disabled')==='true')return;
+    const a=(t.dataset&&t.dataset.act)||'',tx=(t.textContent||'').trim();
+    let k='tick';
+    if(/del|remove|reset|clear|forget|discard/i.test(a)||(t.matches('button')&&/^(delete|remove|reset|clear|forget|discard)/i.test(tx)))k='warn';
+    else if(t.matches('.starb,.hm-star,input[type=checkbox],input[type=radio],.opt,.swatch,.seg button,[data-collapse]'))k='sel';
+    else if(/submit|finish|save|done|start|confirm|apply|install|resume|retake/i.test(a)||t.classList.contains('pri'))k='ok';
+    HAP.fire(k);
+  },true);
 })();
 </script>
 </body></html>
