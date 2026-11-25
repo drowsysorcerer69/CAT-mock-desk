@@ -14,6 +14,8 @@ import android.os.Build;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Base64;
+import android.view.HapticFeedbackConstants;
+import android.view.View;
 
 import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
@@ -35,6 +37,35 @@ import java.io.OutputStream;
 public class DownloaderPlugin extends Plugin {
 
     private static final String CHANNEL = "downloads";
+
+    /** Haptic tick through the system's own haptic engine (respects the phone's touch-feedback setting). */
+    @PluginMethod
+    public void haptic(final PluginCall call) {
+        final String t = call.getString("t", "tick");
+        try {
+            if (getActivity() != null) {
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            View v = getBridge().getWebView();
+                            int sdk = Build.VERSION.SDK_INT;
+                            int c;
+                            if ("warn".equals(t)) c = sdk >= 30 ? HapticFeedbackConstants.REJECT : HapticFeedbackConstants.LONG_PRESS;
+                            else if ("ok".equals(t)) c = sdk >= 30 ? HapticFeedbackConstants.CONFIRM : HapticFeedbackConstants.CONTEXT_CLICK;
+                            else if ("heavy".equals(t)) c = HapticFeedbackConstants.LONG_PRESS;
+                            else if ("sel".equals(t)) c = sdk >= 23 ? HapticFeedbackConstants.CONTEXT_CLICK : HapticFeedbackConstants.KEYBOARD_TAP;
+                            else c = HapticFeedbackConstants.CLOCK_TICK;
+                            if (v != null) v.performHapticFeedback(c);
+                        } catch (Throwable ignored) {
+                        }
+                    }
+                });
+            }
+        } catch (Throwable ignored) {
+        }
+        call.resolve();
+    }
 
     /** Called from JS a few seconds after start (never at startup, so it cannot block launching). */
     @PluginMethod
