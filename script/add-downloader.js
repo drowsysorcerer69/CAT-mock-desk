@@ -26,4 +26,8 @@ if (!m.includes('POST_NOTIFICATIONS')) {
   m = m.replace(/<application/, '<uses-permission android:name="android.permission.POST_NOTIFICATIONS" />\n    <application');
   fs.writeFileSync(mf, m);
 }
+if (!m.includes('android.permission.VIBRATE')) {
+  m = m.replace(/<application/, '<uses-permission android:name="android.permission.VIBRATE" />\n    <application');
+  fs.writeFileSync(mf, m);
+}
 console.log('downloader plugin added');
