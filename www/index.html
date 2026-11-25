@@ -16,7 +16,7 @@ document.getElementById('bfr').onclick=function(){location.reload()};
 document.getElementById('bfx').onclick=function(){try{localStorage.removeItem('ovr.html');localStorage.removeItem('ovr.lz');localStorage.removeItem('ovr.try')}catch(x){}location.reload()};
 },4500)})();
 </script>
-<meta name="app-build" content="2026-11-25.77">
+<meta name="app-build" content="2026-11-25.78">
 <script>(function(){try{var L=function(m){try{var a=JSON.parse(localStorage.getItem('upd.log')||'[]');a.push(new Date().toTimeString().slice(0,8)+' '+m);localStorage.setItem('upd.log',JSON.stringify(a.slice(-16)))}catch(e){}};
 var cmp=function(a,b){var f=function(x){return String(x).split(/[-.]/).map(Number)},p=f(a),q=f(b);for(var i=0;i<4;i++){if((p[i]||0)!==(q[i]||0))return(p[i]||0)>(q[i]||0)?1:-1}return 0};
 var LZ=window.__lz=window.__lz||{enc:function(s){var b=new TextEncoder().encode(s),o=[],m=new Map(),n=257,w=b[0];for(var i=1;i<b.length;i++){var c=b[i],k=w*256+c,v=m.get(k);if(v!==undefined)w=v;else{o.push(w+32);if(n<32768)m.set(k,n++);else{o.push(288);m.clear();n=257}w=c}}o.push(w+32);var r='';for(i=0;i<o.length;i+=8192)r+=String.fromCharCode.apply(null,o.slice(i,i+8192));return r},dec:function(s){var P=[],S=[],n=257,pv=-1,out=new Uint8Array(1<<20),L=0,t=[];function put(x){if(L>=out.length){var q=new Uint8Array(out.length*2);q.set(out);out=q}out[L++]=x}function ex(c){t.length=0;while(c>=257){t.push(S[c]);c=P[c]}t.push(c);return t}for(var i=0;i<s.length;i++){var c=s.charCodeAt(i)-32;if(c===256){n=257;pv=-1;continue}if(pv===-1){put(c);pv=c;continue}var e,f;if(c<n){e=ex(c);f=e[e.length-1]}else{e=ex(pv);f=e[e.length-1];e.unshift(f)}for(var j=e.length-1;j>=0;j--)put(e[j]);if(n<32768){P[n]=pv;S[n]=f;n++}pv=c}return new TextDecoder().decode(out.subarray(0,L))}};
@@ -854,7 +854,19 @@ const fmtDate=t=>{try{return new Date(t).toLocaleString(undefined,{day:'numeric'
 const uid=p=>p+Date.now().toString(36)+Math.random().toString(36).slice(2,6);
 const r1=n=>Math.round(n*10)/10;
 const pct=(a,b)=>b?Math.round(a/b*100):0;
-const LS={get(k){try{return JSON.parse(localStorage.getItem(k))}catch(e){return null}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v));return true}catch(e){return false}},del(k){try{localStorage.removeItem(k)}catch(e){}}};
+/* Big data (papers, attempts, notes, running test) lives in IndexedDB (no 5 MB cap); localStorage keeps only small settings. */
+const BIGK=new Set(['cmd.papers','cmd.attempts','cmd.notes','cmd.session']);
+const KV=(()=>{let db=null,t=null;const o={ok:false,cache:{},dirty:new Set(),err:'',
+  open(){return new Promise(res=>{try{const r=indexedDB.open('cmd-kv',1);r.onupgradeneeded=()=>{r.result.createObjectStore('kv')};r.onsuccess=()=>{db=r.result;o.ok=true;res(true)};r.onerror=()=>{o.err='open failed';res(false)};r.onblocked=()=>res(false)}catch(e){o.err=String(e);res(false)}})},
+  get(k){return new Promise(res=>{try{const q=db.transaction('kv','readonly').objectStore('kv').get(k);q.onsuccess=()=>res(q.result==null?null:q.result);q.onerror=()=>res(null)}catch(e){res(null)}})},
+  put(k,v){return new Promise(res=>{try{const tx=db.transaction('kv','readwrite');tx.objectStore('kv').put(v,k);tx.oncomplete=()=>res(true);tx.onerror=tx.onabort=()=>{o.err=(tx.error&&tx.error.name)||'write failed';res(false)}}catch(e){o.err=String(e);res(false)}})},
+  sched(k){o.dirty.add(k);clearTimeout(t);t=setTimeout(o.flush,150)},
+  flush(){clearTimeout(t);if(!o.ok)return Promise.resolve();const ks=[...o.dirty];o.dirty.clear();
+    return Promise.all(ks.map(k=>o.put(k,o.cache[k]===undefined?'null':JSON.stringify(o.cache[k])).then(ok=>{if(!ok){o.dirty.add(k);try{toast('Could not save to storage ('+o.err+')')}catch(e){}}})))}};
+  return o})();
+const LS={get(k){if(BIGK.has(k)&&Object.prototype.hasOwnProperty.call(KV.cache,k))return KV.cache[k];try{return JSON.parse(localStorage.getItem(k))}catch(e){return null}},set(k,v){if(BIGK.has(k)&&KV.ok){KV.cache[k]=v;KV.sched(k);return true}try{localStorage.setItem(k,JSON.stringify(v));return true}catch(e){return false}},del(k){if(BIGK.has(k)&&KV.ok){KV.cache[k]=null;KV.sched(k)}try{localStorage.removeItem(k)}catch(e){}}};
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden')KV.flush()});
+addEventListener('pagehide',()=>KV.flush());
 let toastT;
 function toast(m){let t=document.querySelector('.toast');if(!t){t=document.createElement('div');t.className='toast';document.body.appendChild(t)}t.textContent=m;clearTimeout(toastT);toastT=setTimeout(()=>t.remove(),2600)}
 async function copyText(t){try{await navigator.clipboard.writeText(t);toast('Copied')}catch(e){const ta=document.createElement('textarea');ta.value=t;document.body.appendChild(ta);ta.select();try{document.execCommand('copy');toast('Copied')}catch(_){toast('Select and copy manually')}ta.remove()}}
@@ -862,7 +874,28 @@ async function copyText(t){try{await navigator.clipboard.writeText(t);toast('Cop
 /* ---------- storage: browser copy always, account copy when the viewer provides it ---------- */
 const store={papers:LS.get('cmd.papers')||[],attempts:(LS.get('cmd.attempts')||[]).filter(a=>a&&Array.isArray(a.qs)),notes:LS.get('cmd.notes')||[],cloud:false,col:null,q:Promise.resolve(),
   mirror(){LS.set('cmd.papers',this.papers);LS.set('cmd.attempts',this.attempts);LS.set('cmd.notes',this.notes)},
+  async idbBoot(){
+    let ok=false;try{ok=await KV.open()}catch(e){}
+    if(!ok){try{if(localStorage.getItem('cmd.idb')==='1')toast('Could not open the app database; your data is still safe on this phone')}catch(e){}return}
+    try{
+      for(const k of BIGK){
+        let lraw=null;try{lraw=localStorage.getItem(k)}catch(e){}
+        const raw=await KV.get(k);
+        if(lraw!=null&&lraw!=='null'){            /* older copy in localStorage: move it, verify, then free the space */
+          if(await KV.put(k,lraw)&&(await KV.get(k))===lraw){KV.cache[k]=JSON.parse(lraw);try{localStorage.removeItem(k)}catch(e){}}
+          else{KV.ok=false;return}                  /* could not verify: keep using localStorage */
+        }else if(raw!=null){KV.cache[k]=JSON.parse(raw)}
+      }
+      try{localStorage.setItem('cmd.idb','1')}catch(e){}
+      const put=(arr,v)=>{arr.length=0;(v||[]).forEach(x=>arr.push(x))};
+      if(KV.cache['cmd.papers'])put(this.papers,KV.cache['cmd.papers']);
+      if(KV.cache['cmd.attempts'])put(this.attempts,KV.cache['cmd.attempts'].filter(a=>a&&Array.isArray(a.qs)));
+      if(KV.cache['cmd.notes'])put(this.notes,KV.cache['cmd.notes']);
+      KV.cache['cmd.papers']=this.papers;KV.cache['cmd.attempts']=this.attempts;KV.cache['cmd.notes']=this.notes;
+    }catch(e){console.warn('idb boot',e)}
+  },
   async init(){
+    await this.idbBoot();
     try{
       if(!window.claude||!claude.use)return;
       const [db,user]=await Promise.all([claude.use('db'),claude.use('user')]);
@@ -1740,8 +1773,10 @@ const HAP=(()=>{let last=0,on=true;try{on=localStorage.getItem('hap.on')!=='0'}c
         if(P&&P.haptic)r=P.haptic({t});else if(typeof C.nativePromise==='function')r=C.nativePromise('Downloader','haptic',{t});
         if(r&&r.catch)r.catch(()=>buzz(t));else if(!r)buzz(t)}else buzz(t)}catch(e){}}
   return{fire,can,get on(){return on},set(v){on=!!v;try{localStorage.setItem('hap.on',v?'1':'0')}catch(e){}}}})();
-renderHome();
-store.init().then(()=>{if(V.view==='home')renderHome()});
+const IDBMODE=(()=>{try{return localStorage.getItem('cmd.idb')==='1'}catch(e){return false}})();
+if(!IDBMODE)renderHome();
+store.init().catch(()=>{}).then(()=>{if(V.view==='home')renderHome()});
+if(IDBMODE)setTimeout(()=>{if(!document.querySelector('#app *'))renderHome()},3500);
 </script>
 
 <script>
@@ -4306,6 +4341,10 @@ function psGo(){
 /* ===== Android: update the app from your GitHub repository without building a new APK ===== */
 const UPD={url:(()=>{try{return localStorage.getItem('upd.url')||''}catch(e){return ''}})(),found:null,msg:'',err:'',busy:false,step:'',pct:null,t0:0,tick:null};
 const updCmp=(a,b)=>{const f=x=>String(x).split(/[-.]/).map(Number),p=f(a),q=f(b);for(let i=0;i<4;i++){if((p[i]||0)!==(q[i]||0))return(p[i]||0)>(q[i]||0)?1:-1}return 0};
+function lsUsage(){let n=0;const rows=[];try{for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i),v=localStorage.getItem(k)||'';n+=k.length+v.length;rows.push([k,v.length])}}catch(e){}rows.sort((x,y)=>y[1]-x[1]);return{n,rows}}
+function storageLine(){try{const u=lsUsage();let d=0;for(const k of BIGK){try{d+=JSON.stringify(KV.cache[k]||[]).length}catch(e){}}
+  return 'Storage: settings '+Math.round(u.n/1024)+' KB of about 5000 KB · papers & history '+(Math.round(d/1024/10.24)/100)+' MB '+(KV.ok?'(app database)':'(browser storage)')}catch(e){return ''}}
+setTimeout(()=>{try{const u=lsUsage();if(u.n>3600000)toast('Browser storage is almost full ('+Math.round(u.n/1024)+' KB). Open ⋯ → App update to see details.')}catch(e){}},6000);
 function updLog(m){try{const a=JSON.parse(localStorage.getItem('upd.log')||'[]');a.push(new Date().toTimeString().slice(0,8)+' '+m);localStorage.setItem('upd.log',JSON.stringify(a.slice(-16)))}catch(e){}}
 function updUrls(u){
   u=(u||'').trim();if(!u)return [];
@@ -4368,6 +4407,7 @@ function updHtml(){
    <div class="sub" style="margin:0">Paste your GitHub repository link once. After you replace <b>www/index.html</b> in that repository, press <b>Check for update</b> here and the app updates itself. No new APK needed.</div>
    <label class="field"><span class="sub">Repository link</span><input class="cbin" id="updurl" value="${esc(UPD.url)}" placeholder="https://github.com/your-name/your-repo" autocapitalize="off" autocomplete="off"></label>
    <div class="sub" style="font-size:12.5px;margin:0">This version: <b>${esc(BUILD)}</b></div>
+   <div class="sub" style="font-size:12px;margin:0">${esc(storageLine())}</div>
    <div id="updbar" class="updbar" ${UPD.step?'':'hidden'}><svg class="ucl" viewBox="0 0 120 120" role="img" aria-label="Update progress"><circle class="urt" cx="60" cy="60" r="52"/><circle class="ur" cx="60" cy="60" r="52" style="stroke-dasharray:${UPD_C};stroke-dashoffset:${UPD_C*(1-(UPD.shown||0)/100)}"/><g class="ucg"><path class="ucp" d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z" transform="translate(31 27) scale(2.4)"/><g class="uar" transform="translate(31 27) scale(2.4)"><path d="M12 11.5v5.5M9.6 14.8 12 17.2l2.4-2.4"/></g></g></svg><div class="un">${Math.round(UPD.shown||0)}%</div><div class="ut">${esc(UPD.step)}</div></div>
    ${UPD.err?`<div class="msg err">${esc(UPD.err)}</div>`:''}${UPD.msg?`<div class="msg ok">${esc(UPD.msg)}</div>`:''}
    ${f?`<div class="msg info">New version <b>${esc(f.build)}</b> is ready.</div>`:''}
@@ -4390,7 +4430,9 @@ Object.assign(acts,{
   async updinstall(){
     const f=UPD.found;if(!f||UPD.busy)return;UPD.busy=true;UPD.err='';updPaint();updStart('Saving the update on this phone…');updLog('Saving '+f.build+' ('+Math.round(f.html.length/1024)+' KB)');
     await updWait(350);
-    try{const z=window.__lz.enc(f.html);if(window.__lz.dec(z)!==f.html)throw new Error('verify');try{localStorage.removeItem('ovr.html')}catch(x){}localStorage.setItem('ovr.lz',z);updLog('Stored '+Math.round(z.length/1024)+'K chars')}catch(e){updStop();UPD.busy=false;UPD.step='';UPD.err='The app\'s own storage space is full (this is a browser limit, not your phone\'s free space). Build a new APK from GitHub with this index.html to get the update.';updLog('Save failed: '+((e&&e.message)||e));updPaint();return}
+    try{const z=window.__lz.enc(f.html);if(window.__lz.dec(z)!==f.html)throw new Error('verify');try{localStorage.removeItem('ovr.html')}catch(x){}
+      try{localStorage.setItem('ovr.lz',z)}catch(e1){try{localStorage.removeItem('upd.log')}catch(x){}localStorage.setItem('ovr.lz',z)}
+      updLog('Stored '+Math.round(z.length/1024)+'K chars')}catch(e){updStop();UPD.busy=false;UPD.step='';UPD.err='The app\'s small settings storage is full ('+storageLine()+'). Install the newest APK once; after that your papers move to the app database and updates fit.';updLog('Save failed: '+((e&&e.message)||e));updPaint();return}
     updLog('Saved. Restarting');updBar('Saved. Restarting the app…',100);await updWait(900);location.reload()},
   async updtestdl(){
     const C=window.Capacitor;let rep='Build '+BUILD+'\nCapacitor: '+(C?'yes':'NO')+(C&&C.getPlatform?' ('+C.getPlatform()+')':'')+'\n';
